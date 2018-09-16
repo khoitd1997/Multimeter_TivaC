@@ -27,7 +27,7 @@
 	<variableList>
 		<variable>
 			<name>ORIGINAL_PROJECT_ROOT</name>
-			<value>file:/home/kd/Multimeter_TivaC/ccs</value>
+			<value>file:/home/kd/Multimeter_TivaC</value>
 		</variable>
 		<variable>
 			<name>SW_ROOT</name>

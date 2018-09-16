@@ -7,39 +7,51 @@ CMD_SRCS += \
 ../tm4c123gh6pm.cmd 
 
 C_SRCS += \
-../freertos_demo.c \
-../led_task.c \
+../adc_multimeter.c \
+../core_measure_task.c \
+../main.c \
+../multimeter_core_task.c \
 ../startup_ccs.c \
-../switch_task.c 
+../uart_util.c 
 
 C_DEPS += \
-./freertos_demo.d \
-./led_task.d \
+./adc_multimeter.d \
+./core_measure_task.d \
+./main.d \
+./multimeter_core_task.d \
 ./startup_ccs.d \
-./switch_task.d 
+./uart_util.d 
 
 OBJS += \
-./freertos_demo.obj \
-./led_task.obj \
+./adc_multimeter.obj \
+./core_measure_task.obj \
+./main.obj \
+./multimeter_core_task.obj \
 ./startup_ccs.obj \
-./switch_task.obj 
+./uart_util.obj 
 
 OBJS__QUOTED += \
-"freertos_demo.obj" \
-"led_task.obj" \
+"adc_multimeter.obj" \
+"core_measure_task.obj" \
+"main.obj" \
+"multimeter_core_task.obj" \
 "startup_ccs.obj" \
-"switch_task.obj" 
+"uart_util.obj" 
 
 C_DEPS__QUOTED += \
-"freertos_demo.d" \
-"led_task.d" \
+"adc_multimeter.d" \
+"core_measure_task.d" \
+"main.d" \
+"multimeter_core_task.d" \
 "startup_ccs.d" \
-"switch_task.d" 
+"uart_util.d" 
 
 C_SRCS__QUOTED += \
-"../freertos_demo.c" \
-"../led_task.c" \
+"../adc_multimeter.c" \
+"../core_measure_task.c" \
+"../main.c" \
+"../multimeter_core_task.c" \
 "../startup_ccs.c" \
-"../switch_task.c" 
+"../uart_util.c" 
 
 

@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "*.cu": "c",
+        "*.tdd": "makefile",
+        "*.cfg": "tcl",
+        "*.svd": "xml",
+        "switch_task.h": "c",
+        "uart.h": "c",
+        "led_task.h": "c",
+        "rom.h": "c",
+        "sysctl.h": "c",
+        "pin_map.h": "c",
+        "adc.h": "c",
+        "adc_multimeter.h": "c",
+        "gpio.h": "c",
+        "hw_types.h": "c",
+        "queue.h": "c",
+        "freertos.h": "c",
+        "uart_util.h": "c"
+    }
+}

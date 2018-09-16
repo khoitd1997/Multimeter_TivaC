@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -llibc.a -l"/home/kd/Multimeter_TivaC/Tivaware_Dep/driverlib/ccs/Debug/driverlib.lib" -l"/home/kd/Multimeter_TivaC/Tivaware_Dep/sensorlib/ccs/Debug/sensorlib.lib"
+LIBS := -l"/home/kd/Documents/TivaWare_1/sensorlib/ccs/Debug/sensorlib.lib" -llibc.a -l"/home/kd/Multimeter_TivaC/Tivaware_Dep/driverlib/ccs/Debug/driverlib.lib"
 

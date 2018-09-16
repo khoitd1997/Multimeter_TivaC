@@ -8,10 +8,12 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./freertos_demo.obj" \
-"./led_task.obj" \
+"./adc_multimeter.obj" \
+"./core_measure_task.obj" \
+"./main.obj" \
+"./multimeter_core_task.obj" \
 "./startup_ccs.obj" \
-"./switch_task.obj" \
+"./uart_util.obj" \
 "./Tivaware_Dep/driverlib/epi_workaround_ccs.obj" \
 "./Tivaware_Dep/drivers/buttons.obj" \
 "./Tivaware_Dep/drivers/rgb.obj" \
@@ -19,6 +21,7 @@ ORDERED_OBJS += \
 "./Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.obj" \
 "./Tivaware_Dep/third_party/FreeRTOS/Source/list.obj" \
 "./Tivaware_Dep/third_party/FreeRTOS/Source/queue.obj" \
+"./Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.obj" \
 "./Tivaware_Dep/third_party/FreeRTOS/Source/tasks.obj" \
 "./Tivaware_Dep/third_party/FreeRTOS/Source/timers.obj" \
 "./Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" \
@@ -32,9 +35,9 @@ ORDERED_OBJS += \
 "../Tivaware_Dep/driverlib/ccs/Debug/driverlib.lib" \
 "../Tivaware_Dep/sensorlib/ccs/Debug/sensorlib.lib" \
 $(GEN_CMDS__FLAG) \
+-l"/home/kd/Documents/TivaWare_1/sensorlib/ccs/Debug/sensorlib.lib" \
 -llibc.a \
 -l"/home/kd/Multimeter_TivaC/Tivaware_Dep/driverlib/ccs/Debug/driverlib.lib" \
--l"/home/kd/Multimeter_TivaC/Tivaware_Dep/sensorlib/ccs/Debug/sensorlib.lib" \
 
 -include ../makefile.init
 
@@ -180,7 +183,7 @@ all: freertos_demo.out
 freertos_demo.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.3.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --advice:power="all" -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --ual -z -m"freertos_demo_ccs.map" --stack_size=512 --heap_size=0 -i"/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.3.LTS/lib" -i"/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.3.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="freertos_demo_linkInfo.xml" --rom_model -o "freertos_demo.out" $(ORDERED_OBJS)
+	"/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.3.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -O2 --advice:power="all" -g --c99 --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --define=TARGET_IS_TM4C123_RB1 --diag_warning=225 --diag_wrap=off --display_error_number --gen_func_subsections=on --ual -z -m"freertos_demo_ccs.map" --stack_size=512 --heap_size=0 -i"/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.3.LTS/lib" -i"/opt/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.3.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="freertos_demo_linkInfo.xml" --rom_model -o "freertos_demo.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -196,8 +199,8 @@ freertos_demo.bin: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "freertos_demo.obj" "led_task.obj" "startup_ccs.obj" "switch_task.obj" "Tivaware_Dep/driverlib/epi_workaround_ccs.obj" "Tivaware_Dep/drivers/buttons.obj" "Tivaware_Dep/drivers/rgb.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/list.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.obj" "Tivaware_Dep/utils/softuart.obj" "Tivaware_Dep/utils/uartstdio.obj" "Tivaware_Dep/utils/ustdlib.obj" 
-	-$(RM) "freertos_demo.d" "led_task.d" "startup_ccs.d" "switch_task.d" "Tivaware_Dep/drivers/buttons.d" "Tivaware_Dep/drivers/rgb.d" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.d" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.d" "Tivaware_Dep/third_party/FreeRTOS/Source/list.d" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.d" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.d" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.d" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.d" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.d" "Tivaware_Dep/utils/softuart.d" "Tivaware_Dep/utils/uartstdio.d" "Tivaware_Dep/utils/ustdlib.d" 
+	-$(RM) "adc_multimeter.obj" "core_measure_task.obj" "main.obj" "multimeter_core_task.obj" "startup_ccs.obj" "uart_util.obj" "Tivaware_Dep/driverlib/epi_workaround_ccs.obj" "Tivaware_Dep/drivers/buttons.obj" "Tivaware_Dep/drivers/rgb.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/list.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.obj" "Tivaware_Dep/utils/softuart.obj" "Tivaware_Dep/utils/uartstdio.obj" "Tivaware_Dep/utils/ustdlib.obj" 
+	-$(RM) "adc_multimeter.d" "core_measure_task.d" "main.d" "multimeter_core_task.d" "startup_ccs.d" "uart_util.d" "Tivaware_Dep/drivers/buttons.d" "Tivaware_Dep/drivers/rgb.d" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.d" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.d" "Tivaware_Dep/third_party/FreeRTOS/Source/list.d" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.d" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.d" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.d" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.d" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.d" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.d" "Tivaware_Dep/utils/softuart.d" "Tivaware_Dep/utils/uartstdio.d" "Tivaware_Dep/utils/ustdlib.d" 
 	-$(RM) "Tivaware_Dep/driverlib/epi_workaround_ccs.d" 
 	-$(RM) "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.d" 
 	-@echo 'Finished clean'
