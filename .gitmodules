@@ -1,0 +1,3 @@
+[submodule "Tivaware_Dep"]
+	path = Tivaware_Dep
+	url = https://github.com/khoitd1997/Tivaware_Dep.git
