@@ -7,7 +7,8 @@
 class GeneralTimer {
  private:
   GeneralTimer(void);
-  uint64_t tickToMs(uint64_t tickCount);
+  uint64_t tickToMicroSec(uint64_t tickCount);
+  uint64_t getTimeStamp(uint32_t timerBase, uint32_t timerName);
 
  public:
   static GeneralTimer& getTimer(void);

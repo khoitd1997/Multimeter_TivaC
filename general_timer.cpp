@@ -15,23 +15,22 @@
 #include "utils/uartstdio.h"
 
 // hardware
+#include "Tivaware_Dep/inc/hw_timer.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-static const uint64_t MAX_TIMER_VAL = 18446744073709551614;
-static const uint32_t PRESCALER     = 250;
-static const uint64_t TIMER_LOAD    = 1099511627770;
+// timer value config
+static const uint32_t TIMER_LOAD = 18446744073709551610;
+static const uint32_t TIMER_MODE = TIMER_CFG_PERIODIC_UP;
 
+// timer register configuration
 static const uint32_t TIMER_BASE  = WTIMER0_BASE;
 static const uint32_t TIMER_CLOCK = SYSCTL_PERIPH_WTIMER0;
 static const uint32_t TIMER_NAME  = TIMER_A;
 
-// max 3.518 million seconds
-
 GeneralTimer& GeneralTimer::getTimer() {
   static auto singleTonTimer = GeneralTimer();
-
   return singleTonTimer;
 }
 
@@ -41,35 +40,34 @@ GeneralTimer::GeneralTimer() {
     // wait until timer peripheral clock is ready
   }
 
-  // intitiate 32 bit wide timer
-  TimerConfigure(TIMER_BASE, TIMER_CFG_A_PERIODIC_UP);
-  TimerPrescaleSet(TIMER_BASE, TIMER_NAME, PRESCALER);
-  TimerLoadSet(TIMER_BASE, TIMER_NAME, TIMER_LOAD);
-
+  // use a concacentated 64 bit timer clock
+  TimerConfigure(TIMER_BASE, TIMER_MODE);
+  TimerLoadSet64(TIMER_BASE, TIMER_LOAD);
   TimerEnable(TIMER_BASE, TIMER_NAME);
 }
 
 void GeneralTimer::startTimer(uint64_t& timeStamp) {
-  timeStamp = TimerValueGet(TIMER_BASE, TIMER_NAME);
+  timeStamp = getTimeStamp(TIMER_BASE, TIMER_NAME);
 }
 
-uint64_t GeneralTimer::tickToMs(uint64_t tickCount) {
-  return ((float)tickCount / (float)(SysCtlClockGet())) * 1000;
+uint64_t GeneralTimer::getTimeStamp(uint32_t timerBase, uint32_t timerName) {
+  return TimerValueGet64(timerBase);
 }
 
-// return time elapsed in ms
+uint64_t GeneralTimer::tickToMicroSec(uint64_t tickCount) {
+  return ((float)tickCount / (float)(SysCtlClockGet())) * 1000000;
+}
+
+// return time elapsed in microsecond
 // TODO: handle clock change
 uint64_t GeneralTimer::stopTimer(const uint64_t& intialTimeStamp) {
-  uint64_t currTimeStamp = TimerValueGet(TIMER_BASE, TIMER_NAME);
+  uint64_t currTimeStamp = getTimeStamp(TIMER_BASE, TIMER_NAME);
 
   if (currTimeStamp > intialTimeStamp) {
     // no overflow case
-    // UARTprintf("No overflow case, prescale: %d, load: %u\n",
-    //            TimerPrescaleGet(TIMER_BASE, TIMER_NAME),
-    //            TimerLoadGet(TIMER_BASE, TIMER_NAME));
-    return tickToMs(currTimeStamp - intialTimeStamp);
+    return tickToMicroSec(currTimeStamp - intialTimeStamp);
   } else {
     // this case meant overflow, assuming overflow once
-    return tickToMs(((MAX_TIMER_VAL - intialTimeStamp) + currTimeStamp));
+    return tickToMicroSec(((TIMER_LOAD - intialTimeStamp) + currTimeStamp));
   }
 }
