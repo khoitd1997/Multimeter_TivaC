@@ -21,8 +21,8 @@
 #include "FreeRTOSConfig.h"
 #include "semphr.h"
 
-#define UART_QUEUE_LEN 1
-#define UART_STACK_SIZE 215
+static const uint8_t  UART_QUEUE_LEN  = 1;
+static const uint32_t UART_STACK_SIZE = 215;
 
 char              uartBuffer[MAX_CHAR_PER_PRINT + 1] = "";
 SemaphoreHandle_t uartSemaphr                        = NULL;

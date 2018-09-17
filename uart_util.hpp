@@ -4,7 +4,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#define MAX_CHAR_PER_PRINT 25
+static const uint8_t MAX_CHAR_PER_PRINT = 25;
 
 extern char              uartBuffer[];
 extern SemaphoreHandle_t uartSemaphr;

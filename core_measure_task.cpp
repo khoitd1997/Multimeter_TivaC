@@ -9,9 +9,9 @@
 #include "uart_util.hpp"
 #include "utils/uartstdio.h"
 
-#define CORE_TASK_STACK 250
-#define CORE_TASK_PRIORITY 5
-#define CORE_TASK_TIMEOUT pdMS_TO_TICKS(50)
+static const uint32_t CORE_TASK_STACK    = 250;
+static const uint8_t  CORE_TASK_PRIORITY = 5;
+static const uint32_t CORE_TASK_TIMEOUT  = pdMS_TO_TICKS(50);
 
 TaskHandle_t coreTaskHandle = NULL;
 

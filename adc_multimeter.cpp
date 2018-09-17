@@ -24,11 +24,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-// parameter defining specs of the adc
-#define ADC_RESOLUTION 4096
-#define ADC_MAX_VOLTAGE 3.3
-#define OVERSAMPLING_FACTOR 2
-#define MAX_SEQUENCE_SAMPLE 8
+// parameter defining specs and hard coded configs of the adc
+static const uint32_t ADC_RESOLUTION      = 4096;
+static const float    ADC_MAX_VOLTAGE     = 3.3;
+static const uint8_t  OVERSAMPLING_FACTOR = 2;
+static const uint8_t  MAX_SEQUENCE_SAMPLE = 8;
 
 AdcSensor::AdcSensor(const uint8_t& adcModuleNum,
                      const uint8_t& adcSequencer,
