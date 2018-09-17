@@ -30,11 +30,11 @@
 #define OVERSAMPLING_FACTOR 2
 #define MAX_SEQUENCE_SAMPLE 8
 
-AdcSensor::AdcSensor(const uint8_t adcModuleNum,
-                     const uint8_t adcSequencer,
-                     const char    adcPinPort,
-                     const uint8_t adcPinNum,
-                     const uint8_t adcPriority) {
+AdcSensor::AdcSensor(const uint8_t& adcModuleNum,
+                     const uint8_t& adcSequencer,
+                     const char&    adcPinPort,
+                     const uint8_t& adcPinNum,
+                     const uint8_t& adcPriority) {
   assert(adcPriority < 4);
   _adcAddr                = adcAddrFromName(adcModuleNum);
   _clockPeriPortAddr      = gpioPeriAddrFromName(adcPinPort);
@@ -72,7 +72,7 @@ void AdcSensor::init(void) {
   ADCSequenceEnable(_adcAddr, _adcSequencer);
 }
 
-float AdcSensor::convertAdcToVolt(uint32_t* adcResult) {
+float AdcSensor::convertRawToVolt(uint32_t* adcResult) {
   float result = 0;
   for (uint8_t adcIndex = 0; adcIndex < _adcTotalSequence; ++adcIndex) {
     result += (float)adcResult[adcIndex] / (float)_adcTotalSequence;
@@ -96,5 +96,5 @@ float AdcSensor::readVolt(void) {
   // Read raw value from the ADC.
   ADCSequenceDataGet(_adcAddr, _adcSequencer, adcResult);
 
-  return convertAdcToVolt(adcResult);
+  return convertRawToVolt(adcResult);
 }

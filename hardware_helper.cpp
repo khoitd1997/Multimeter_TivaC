@@ -16,7 +16,7 @@
 
 #include "bit_manipulation.h"
 
-uint32_t adcPeriphAddrByName(uint8_t adcModuleNum) {
+uint32_t adcPeriphAddrByName(const uint8_t& adcModuleNum) {
   assert(adcModuleNum < 2);
   uint32_t result = 0;
   switch (adcModuleNum) {
@@ -31,7 +31,7 @@ uint32_t adcPeriphAddrByName(uint8_t adcModuleNum) {
   return result;
 }
 
-uint32_t adcAddrFromName(uint8_t adcModuleNum) {
+uint32_t adcAddrFromName(const uint8_t& adcModuleNum) {
   assert(adcModuleNum < 2);
   uint32_t result = 0;
   switch (adcModuleNum) {
@@ -46,7 +46,7 @@ uint32_t adcAddrFromName(uint8_t adcModuleNum) {
   return result;
 }
 
-uint32_t gpioPeriAddrFromName(char portName) {
+uint32_t gpioPeriAddrFromName(const char& portName) {
   assert(portName == 'A' || portName == 'B' || portName == 'C' || portName == 'D' ||
          portName == 'E' || portName == 'F');
   uint32_t result = 0;
@@ -78,7 +78,7 @@ uint32_t gpioPeriAddrFromName(char portName) {
   return result;
 }
 
-uint32_t gpioPortAddrFromName(char portName) {
+uint32_t gpioPortAddrFromName(const char& portName) {
   assert(portName == 'A' || portName == 'B' || portName == 'C' || portName == 'D' ||
          portName == 'E' || portName == 'F');
   uint32_t result = 0;
@@ -110,12 +110,12 @@ uint32_t gpioPortAddrFromName(char portName) {
   return result;
 }
 
-uint32_t gpioMaskFromName(uint8_t pinNumber) {
+uint32_t gpioMaskFromName(const uint8_t& pinNumber) {
   assert(pinNumber < 8);
   return BIT(pinNumber);
 }
 
-uint8_t adcChannelMaskFromName(uint8_t pinNumber, char portName) {
+uint8_t adcChannelMaskFromName(const uint8_t& pinNumber, char portName) {
   assert(pinNumber < 6);
   assert(portName == 'A' || portName == 'B' || portName == 'C' || portName == 'D' ||
          portName == 'E' || portName == 'F');
@@ -153,7 +153,7 @@ uint8_t adcChannelMaskFromName(uint8_t pinNumber, char portName) {
   return result;
 }
 
-uint8_t totalSequenceFromSequencer(uint8_t sequencerNum) {
+uint8_t totalSequenceFromSequencer(const uint8_t& sequencerNum) {
   assert(sequencerNum < 4);
   uint8_t result = 0;
   switch (sequencerNum) {

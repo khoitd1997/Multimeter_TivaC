@@ -14,14 +14,14 @@ class AdcSensor {
   uint8_t  _adcChannelMask;
   uint8_t  _adcPriority;
   uint32_t _adcPeriphAddr;
-  float    convertAdcToVolt(uint32_t* adcResult);
+  float    convertRawToVolt(uint32_t* adcResult);
 
  public:
-  AdcSensor(const uint8_t adcModuleNum,
-            const uint8_t adcSequencer,
-            const char    adcPinPort,
-            const uint8_t adcPinNum,
-            const uint8_t adcPriority);
+  AdcSensor(const uint8_t& adcModuleNum,
+            const uint8_t& adcSequencer,
+            const char&    adcPinPort,
+            const uint8_t& adcPinNum,
+            const uint8_t& adcPriority);
 
   float readVolt(void);
   void  init(void);
