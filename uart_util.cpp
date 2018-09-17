@@ -1,4 +1,4 @@
-#include "uart_util.h"
+#include "uart_util.hpp"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -16,9 +16,10 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
+// FreeRTOS
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
-#include "queue.h"
+#include "semphr.h"
 
 #define UART_QUEUE_LEN 1
 #define UART_STACK_SIZE 215
@@ -42,7 +43,7 @@ void uartPrint(char* string) {
   xSemaphoreGive(uartSemaphr);
 }
 
-TaskHandle_t uARTConfigure(void) {
+TaskHandle_t uartConfigure(uint32_t baudRate) {
   // Enable the GPIO Peripheral used by the UART.
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
@@ -61,7 +62,7 @@ TaskHandle_t uARTConfigure(void) {
   uartSemaphr = xSemaphoreCreateBinary();
 
   // Initialize the UART for console I/O.
-  UARTStdioConfig(0, 115200, 16000000);
+  UARTStdioConfig(0, baudRate, 16000000);
 
   TaskHandle_t uartHandle;
 

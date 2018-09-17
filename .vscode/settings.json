@@ -16,6 +16,7 @@
         "hw_types.h": "c",
         "queue.h": "c",
         "freertos.h": "c",
-        "uart_util.h": "c"
+        "uart_util.hpp": "c",
+        "core_measure_task.hpp": "c"
     }
 }

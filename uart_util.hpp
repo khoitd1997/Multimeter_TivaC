@@ -2,7 +2,6 @@
 #define _UART_UTIL_H
 
 #include "FreeRTOS.h"
-#include "queue.h"
 #include "semphr.h"
 
 #define MAX_CHAR_PER_PRINT 25
@@ -14,6 +13,6 @@ void uartTask(void* uartParam);
 
 void uartPrint(char* string);
 
-TaskHandle_t uARTConfigure(void);
+TaskHandle_t uartConfigure(uint32_t baudRate);
 
 #endif
