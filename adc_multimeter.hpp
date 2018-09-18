@@ -3,7 +3,8 @@
 
 #include <cstdint>
 
-static const float ADC_MARGIN_ERROR = 0.02;  // experimental value
+static const uint8_t MAX_SEQUENCE_SAMPLE = 8;
+static const float   ADC_MARGIN_ERROR    = 0.08;  // experimental value
 class AdcSensor {
  private:
   uint32_t _adcAddr;
@@ -15,7 +16,8 @@ class AdcSensor {
   uint8_t  _adcChannelMask;
   uint8_t  _adcPriority;
   uint32_t _adcPeriphAddr;
-  float    convertRawToVolt(uint32_t* adcResult);
+  uint32_t _adcResult[MAX_SEQUENCE_SAMPLE];
+  float    convertRawToVolt(void);
 
  public:
   AdcSensor(const uint8_t& adcModuleNum,

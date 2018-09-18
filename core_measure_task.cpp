@@ -22,15 +22,16 @@ void coreMeasureTask(void* coreParam) {
   float acFreqKhz                          = 0;
 
   // auto dcVoltSensor                       = AdcSensor(0, 0, 'E', 3, 0);
-  auto acVoltSensor = AcSensor(0, 1, 'E', 3, 0);
-
+  auto     acVoltSensor = AcSensor(0, 1, 'E', 3, 0, 0.0);
+  uint32_t counter      = 0;
   // dcVoltSensor.init();
   acVoltSensor.init();
 
   for (;;) {
-    UARTprintf("Stack Watermark: %d\n", uxTaskGetStackHighWaterMark(NULL));
+    // UARTprintf("Stack Watermark: %d\n", uxTaskGetStackHighWaterMark(NULL));
     acVoltSensor.measureAC(acVolt, acFreqKhz);
-    sprintf(coreBuffer, "V: %3.2f, f: %.2f\n", acVolt, acFreqKhz);
+    sprintf(coreBuffer, "V: %3.2f, f: %.5f\n", acVolt, acFreqKhz);
+    ++counter;
     uartPrint(coreBuffer);
   }
 }

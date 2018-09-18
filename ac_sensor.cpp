@@ -23,8 +23,10 @@ AcSensor::AcSensor(const uint8_t& adcModuleNum,
                    const uint8_t& adcSequencer,
                    const char&    adcPinPort,
                    const uint8_t& adcPinNum,
-                   const uint8_t& adcPriority)
+                   const uint8_t& adcPriority,
+                   const float&   voltOffset)
     : AdcSensor(adcModuleNum, adcSequencer, adcPinPort, adcPinNum, adcPriority) {
+  _voltOffset = voltOffset;
   GeneralTimer::getTimer();  // intialize the timer if it hasn't been already
 }
 
@@ -38,16 +40,17 @@ void AcSensor::detectZeroCrossing(const float&    volt,
     if (FIRST_CROSS == stateFlag) {
       stateFlag       = SECOND_CROSS;
       secondCrossTime = firstCrossTime + genTimer.stopTimer(firstCrossTime);
-      UARTprintf("Detected second crossing\n");
+      // UARTprintf("Detected second crossing\n");
       // UARTprintf("Stack Watermark: %d\n", uxTaskGetStackHighWaterMark(NULL));
     } else {
       stateFlag = ZERO_STATE;
+      // UARTprintf("Detected Zero State\n");
       genTimer.startTimer(firstCrossTime);
     }
   } else {
     if (ZERO_STATE == stateFlag) {
       stateFlag = FIRST_CROSS;
-      UARTprintf("Detected first crossing\n");
+      // UARTprintf("Detected first crossing\n");
       // UARTprintf("Stack Watermark: %d\n", uxTaskGetStackHighWaterMark(NULL));
     }
   }
@@ -68,11 +71,10 @@ void AcSensor::measureAC(float& rmsVolt, float& freqKhz) {
 
   // TODO: rethink about global var for duplicate task safety
   isMeasuring = true;
-  UARTprintf("Starting AC measurement\n");
   while (isMeasuring) {
     tempVolt = readVolt();
-    sprintf(tempBuf, "%f", tempVolt);
-    UARTprintf("Voltage: %s, state: %d\n", tempBuf, stateFlag);
+    // sprintf(tempBuf, "%f", tempVolt);
+    // UARTprintf("Voltage: %s, state: %d\n", tempBuf, stateFlag);
 
     // check for zero crossing and write timestamp
     detectZeroCrossing(tempVolt, firstCrossTime, secondCrossTime, stateFlag);
@@ -83,6 +85,8 @@ void AcSensor::measureAC(float& rmsVolt, float& freqKhz) {
       isMeasuring = false;
     }
   }
-  rmsVolt = curMaxVolt / 2.8;  // conver peak-to-peak to rms
-  freqKhz = 1 / (((float)secondCrossTime - (float)firstCrossTime) * 2);
+  // REMEMBER TO RENABLE RMS
+  // / 2.8
+  rmsVolt = _voltOffset + (curMaxVolt);  // conver peak-to-peak to rms
+  freqKhz = 1000 * ((float)1 / ((secondCrossTime - firstCrossTime) * 2));
 }
