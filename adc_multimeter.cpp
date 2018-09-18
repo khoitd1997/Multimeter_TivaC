@@ -27,7 +27,7 @@
 // parameter defining specs and hard coded configs of the adc
 static const uint32_t ADC_RESOLUTION      = 4096;
 static const float    ADC_MAX_VOLTAGE     = 3.3;
-static const uint8_t  OVERSAMPLING_FACTOR = 2;
+static const uint8_t  OVERSAMPLING_FACTOR = 64;
 static const uint8_t  MAX_SEQUENCE_SAMPLE = 8;
 
 AdcSensor::AdcSensor(const uint8_t& adcModuleNum,
@@ -81,9 +81,11 @@ float AdcSensor::convertRawToVolt(uint32_t* adcResult) {
 }
 
 float AdcSensor::readVolt(void) {
-  uint32_t adcResult[MAX_SEQUENCE_SAMPLE];
+  uint32_t adcResult[MAX_SEQUENCE_SAMPLE] = {0};
 
-  // ask the ADC to read
+  while (ADCBusy(_adcAddr)) {
+    // wait until the current sampling is done
+  }
   ADCProcessorTrigger(_adcAddr, _adcSequencer);
 
   while (!ADCIntStatus(_adcAddr, _adcSequencer, false)) {

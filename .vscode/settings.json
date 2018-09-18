@@ -4,6 +4,7 @@
         "*.tdd": "makefile",
         "*.cfg": "tcl",
         "*.svd": "xml",
+        "*.hpp": "cpp",
         "switch_task.h": "c",
         "uart.h": "c",
         "led_task.h": "c",
@@ -17,6 +18,10 @@
         "queue.h": "c",
         "freertos.h": "c",
         "uart_util.hpp": "c",
-        "core_measure_task.hpp": "c"
+        "core_measure_task.hpp": "c",
+        "*.tcc": "cpp",
+        "streambuf": "cpp",
+        "array": "cpp",
+        "string_view": "cpp"
     }
 }

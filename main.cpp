@@ -1,6 +1,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <cstdio>
 
 // FreeRTOS
 #include "FreeRTOS.h"
@@ -24,6 +25,7 @@
 // application
 #include "core_measure_task.hpp"
 #include "freeRTOS_hook.h"
+#include "general_timer.hpp"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200
@@ -40,6 +42,17 @@ int main(void) {
   TaskHandle_t coreTaskHandle = coreMeasureInit();
 
   UARTprintf("\n\nMultimeter TivaC\n");
+
+  // timer test
+  // GeneralTimer genTimer = GeneralTimer::getTimer();
+  // uint64_t     tempTime;
+  // genTimer.startTimer(tempTime);
+  // for (;;) {
+  //   if (genTimer.stopTimer(tempTime) > 5000000) {
+  //     UARTprintf("Timer hit\n");
+  //     genTimer.startTimer(tempTime);
+  //   }
+  // }
 
   vTaskStartScheduler();
 

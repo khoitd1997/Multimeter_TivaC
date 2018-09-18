@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+static const float ADC_MARGIN_ERROR = 0.02;  // experimental value
 class AdcSensor {
  private:
   uint32_t _adcAddr;
@@ -23,8 +24,9 @@ class AdcSensor {
             const uint8_t& adcPinNum,
             const uint8_t& adcPriority);
 
-  float readVolt(void);
-  void  init(void);
+  virtual float readVolt(void);
+  virtual void  init(void);
+  virtual ~AdcSensor(void) {}
 };
 
 #endif

@@ -21,7 +21,7 @@
 #include "inc/hw_types.h"
 
 // timer value config
-static const uint32_t TIMER_LOAD = 18446744073709551610;
+static const uint64_t TIMER_LOAD = 18446744073709551610;
 static const uint32_t TIMER_MODE = TIMER_CFG_PERIODIC_UP;
 
 // timer register configuration

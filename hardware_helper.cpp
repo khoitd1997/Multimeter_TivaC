@@ -104,7 +104,7 @@ uint32_t gpioPortAddrFromName(const char& portName) {
       break;
 
     case 'F':
-      result = GPIO_PORTE_BASE;
+      result = GPIO_PORTF_BASE;
       break;
   }
   return result;
