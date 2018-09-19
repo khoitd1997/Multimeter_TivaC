@@ -25,7 +25,7 @@
 // application
 #include "core_measure_task.hpp"
 #include "freeRTOS_hook.h"
-#include "general_timer.hpp"
+#include "general_timer/general_timer.hpp"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200

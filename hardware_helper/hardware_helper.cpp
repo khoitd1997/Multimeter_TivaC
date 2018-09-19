@@ -9,14 +9,15 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
+#include "driverlib/udma.h"
 
 // hardware
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-#include "bit_manipulation.h"
+#include "tiva_utils/bit_manipulation.h"
 
-uint32_t adcPeriphAddrByName(const uint8_t& adcModuleNum) {
+uint32_t adcPeriphAddrByName(const uint32_t& adcModuleNum) {
   assert(adcModuleNum < 2);
   uint32_t result = 0;
   switch (adcModuleNum) {
@@ -31,7 +32,7 @@ uint32_t adcPeriphAddrByName(const uint8_t& adcModuleNum) {
   return result;
 }
 
-uint32_t adcAddrFromName(const uint8_t& adcModuleNum) {
+uint32_t adcAddrFromName(const uint32_t& adcModuleNum) {
   assert(adcModuleNum < 2);
   uint32_t result = 0;
   switch (adcModuleNum) {
@@ -110,16 +111,16 @@ uint32_t gpioPortAddrFromName(const char& portName) {
   return result;
 }
 
-uint32_t gpioMaskFromName(const uint8_t& pinNumber) {
+uint32_t gpioMaskFromName(const uint32_t& pinNumber) {
   assert(pinNumber < 8);
   return BIT(pinNumber);
 }
 
-uint8_t adcChannelMaskFromName(const uint8_t& pinNumber, char portName) {
+uint32_t adcChannelMaskFromName(const uint32_t& pinNumber, char portName) {
   assert(pinNumber < 6);
   assert(portName == 'A' || portName == 'B' || portName == 'C' || portName == 'D' ||
          portName == 'E' || portName == 'F');
-  uint8_t result = 0;
+  uint32_t result = 0;
   if (pinNumber == 3 && portName == 'E') {
     result = ADC_CTL_CH0;
   } else if (pinNumber == 2 && portName == 'E') {
@@ -153,9 +154,9 @@ uint8_t adcChannelMaskFromName(const uint8_t& pinNumber, char portName) {
   return result;
 }
 
-uint8_t totalSequenceFromSequencer(const uint8_t& sequencerNum) {
+uint32_t totalSequenceFromSequencer(const uint32_t& sequencerNum) {
   assert(sequencerNum < 4);
-  uint8_t result = 0;
+  uint32_t result = 0;
   switch (sequencerNum) {
     case 0:
       result = 8;
@@ -174,4 +175,84 @@ uint8_t totalSequenceFromSequencer(const uint8_t& sequencerNum) {
       break;
   }
   return result;
+}
+
+uint32_t getSrcIncFromNum(const uint32_t& size) {
+  assert(size == 8 || size == 16 || size == 32);
+  uint32_t result = 0;
+  switch (size) {
+    case 8:
+      result = UDMA_SIZE_8;
+      break;
+    case 16:
+      result = UDMA_SIZE_16;
+      break;
+    case 32:
+      result = UDMA_SIZE_32;
+      break;
+  }
+  return result;
+}
+
+uint32_t getDataSizeFromNum(const uint32_t& size) {
+  assert(size == 0 || size == 8 || size == 16 || size == 32);
+  uint32_t result = 0;
+  switch (size) {
+    case 0:
+      result = UDMA_SRC_INC_NONE;
+      break;
+    case 8:
+      result = UDMA_SRC_INC_8;
+      break;
+    case 16:
+      result = UDMA_SRC_INC_16;
+      break;
+    case 32:
+      result = UDMA_SRC_INC_32;
+      break;
+  }
+  return result;
+}
+uint32_t getDestIncFromNum(const uint32_t& size) {
+  assert(size == 0 || size == 8 || size == 16 || size == 32);
+  uint32_t result = 0;
+  switch (size) {
+    case 0:
+      result = UDMA_DST_INC_NONE;
+      break;
+    case 8:
+      result = UDMA_DST_INC_8;
+      break;
+    case 16:
+      result = UDMA_DST_INC_16;
+      break;
+    case 32:
+      result = UDMA_DST_INC_32;
+      break;
+  }
+  return result;
+}
+
+static const uint32_t TOTAL_VALID_ARB_SIZE = 15;
+uint32_t              getArbSizeFromNum(const uint32_t& arbSize) {
+  const uint32_t validSize[] = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024};
+  const uint32_t validFlag[] = {UDMA_ARB_1,
+                                UDMA_ARB_2,
+                                UDMA_ARB_4,
+                                UDMA_ARB_8,
+                                UDMA_ARB_16,
+                                UDMA_ARB_32,
+                                UDMA_ARB_64,
+                                UDMA_ARB_128,
+                                UDMA_ARB_256,
+                                UDMA_ARB_512,
+                                UDMA_ARB_1024};
+
+  for (uint32_t validIndex = 0; validIndex < TOTAL_VALID_ARB_SIZE; ++validIndex) {
+    if (validSize[validIndex] == arbSize) { return validFlag[validIndex]; }
+  }
+
+  for (;;) {
+    // no reason to proceed
+  }
 }
