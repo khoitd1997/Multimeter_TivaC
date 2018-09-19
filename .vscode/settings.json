@@ -24,6 +24,9 @@
         "array": "cpp",
         "string_view": "cpp",
         "initializer_list": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "cstdint": "cpp"
     }
 }

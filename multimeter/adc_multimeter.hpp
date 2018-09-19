@@ -7,15 +7,14 @@
 
 class AdcMultimeter : public AdcSensor {
  private:
-  void adcConfigureDMA();
-
  public:
   AdcMultimeter(const uint32_t& adcModuleNum,
                 const uint32_t& adcSequencer,
                 const char&     adcPinPort,
                 const uint32_t  adcPinNum,
                 const uint32_t  adcPriority);
-  float readVolt(void);
+  float readVolt(uint32_t* adcBuffer);
+  void  init(uint32_t adcTriggerFlag, const uint32_t& phaseDelayFlag);
 };
 
 #endif

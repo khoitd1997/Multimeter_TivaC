@@ -3,8 +3,8 @@
 
 #include <cstdint>
 
-static const uint32_t MAX_SEQUENCE_SAMPLE = 8;
 static const float    ADC_MARGIN_ERROR    = 0.08;  // experimental value
+static const uint32_t MAX_SEQUENCE_SAMPLE = 8;
 class AdcSensor {
  protected:
   uint32_t _adcAddr;
@@ -16,9 +16,14 @@ class AdcSensor {
   uint32_t _adcChannelMask;
   uint32_t _adcPriority;
   uint32_t _adcPeriphClockAddr;
-  uint32_t _adcResult[MAX_SEQUENCE_SAMPLE];
+
   uint32_t _adcTriggerFlag;
-  float    convertRawToVolt(void);
+  float    convertRawToVolt(uint32_t* adcBuffer);
+
+  void adcEnableDMA();
+
+ private:
+  uint32_t _adcBuffer[MAX_SEQUENCE_SAMPLE];
 
  public:
   AdcSensor(const uint32_t& adcModuleNum,
@@ -27,11 +32,17 @@ class AdcSensor {
             const uint32_t& adcPinNum,
             const uint32_t& adcPriority);
 
-  virtual float readVolt(void);
-  virtual void  init(uint32_t adcTriggerFlag);
-  virtual void  enable(void);
-  virtual void  disable(void);
+  float        readVolt(void);
+  void         init(uint32_t adcTriggerFlag, bool nonLastDataInt, bool lastDataInt);
+  virtual void enable(void);
+  virtual void disable(void);
   virtual ~AdcSensor(void) {}
+
+  uint32_t  getAdcAddr(void) const;
+  uint32_t  getAdcSequencer(void) const;
+  uint32_t  getAdcTotalSequence(void) const;
+  uint32_t  getAdcFifoAddr(void) const;
+  uint32_t* getAdcBuffer(void);
 };
 
 #endif

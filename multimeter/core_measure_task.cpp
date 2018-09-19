@@ -12,7 +12,7 @@
 #include "uart_util.hpp"
 #include "utils/uartstdio.h"
 
-static const uint32_t CORE_TASK_STACK    = 500;  // can be smaller when not debug
+static const uint32_t CORE_TASK_STACK = 800;  // BE CAREFUL WITH MAX, can be smaller when not debug
 static const uint32_t CORE_TASK_PRIORITY = 5;
 static const uint32_t CORE_TASK_TIMEOUT  = pdMS_TO_TICKS(50);
 
@@ -35,7 +35,7 @@ void coreMeasureTask(void* coreParam) {
     acVoltSensor.measureAC(acVolt, acFreqKhz);
     sprintf(coreBuffer, "V: %3.2f, f: %.5f\n", acVolt, acFreqKhz);
     ++counter;
-    uartPrint(coreBuffer);
+    // uartPrint(coreBuffer);
   }
 }
 

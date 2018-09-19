@@ -5,31 +5,34 @@
 
 class DmaManager {
  private:
+  bool                  isFirstConfig;
   static const uint32_t _tivaDmaControlTableSize = 1024;
   uint8_t               _dmaControlTable[_tivaDmaControlTableSize];
-  bool checkDmaModifiable(const uint32_t& channelNum, const bool& usePrimaryTable) const;
+  bool checkDmaModifiable(const uint32_t& channelNum, const uint32_t& tableFlag) const;
   DmaManager(void);
-  void checkValidChannel(const uint32_t& channelNum);
+  void checkValidChannel(const uint32_t& channelNum) const;
 
  public:
-  DmaManager& getDmaManager(void);
-  void        init(void);
-  void        configureChannelControl(const uint32_t& channelNum,
-                                      const bool&     usePrimaryTable,
-                                      const uint32_t& dataSize,
-                                      const uint32_t& srcAddrInc,
-                                      const uint32_t& destAddrInc,
-                                      const uint32_t& arbSize,
-                                      const bool&     useBurst);
+  static DmaManager& getDmaManager(void);
+  void               init(void);
+  void               configureChannelControl(const uint32_t& channelNum,
+                                             const uint32_t& usePrimaryTable,
+                                             const uint32_t& dataSizeFlag,
+                                             const uint32_t& srcAddrIncFlag,
+                                             const uint32_t& destAddrIncFlag,
+                                             const uint32_t& arbSizeFlag,
+                                             const uint32_t& useBurstFlag);
 
   void configureChannelTransfer(const uint32_t& channelNum,
                                 const uint32_t& modeFlag,
                                 void*           srcAddr,
                                 void*           destAddr,
                                 const uint32_t& totalTxItems,
-                                const bool&     usePrimaryTable);
+                                const uint32_t& tableFlag);
   void enable(void);
   void makeRequest(const uint32_t& channelNum);
+
+  void configureInt(const uint32_t& intChannelFlag, void (*intHandler)(void));
 };
 
 #endif

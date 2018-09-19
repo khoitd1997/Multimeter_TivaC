@@ -12,6 +12,7 @@
 #include "driverlib/udma.h"
 
 // hardware
+#include "inc/hw_adc.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
@@ -45,6 +46,26 @@ uint32_t adcAddrFromName(const uint32_t& adcModuleNum) {
       break;
   }
   return result;
+}
+
+uint32_t adcFifoOffsetFromName(const uint32_t adcSequenceNum) {
+  assert(adcSequenceNum < 4);
+  uint32_t fifoOffset = 0;
+  switch (adcSequenceNum) {
+    case 0:
+      fifoOffset = ADC_O_SSFIFO0;
+      break;
+    case 1:
+      fifoOffset = ADC_O_SSFIFO1;
+      break;
+    case 2:
+      fifoOffset = ADC_O_SSFIFO2;
+      break;
+    case 3:
+      fifoOffset = ADC_O_SSFIFO3;
+      break;
+  }
+  return fifoOffset;
 }
 
 uint32_t gpioPeriAddrFromName(const char& portName) {
@@ -154,7 +175,7 @@ uint32_t adcChannelMaskFromName(const uint32_t& pinNumber, char portName) {
   return result;
 }
 
-uint32_t totalSequenceFromSequencer(const uint32_t& sequencerNum) {
+uint32_t adcTotalSequenceFromSequencer(const uint32_t& sequencerNum) {
   assert(sequencerNum < 4);
   uint32_t result = 0;
   switch (sequencerNum) {
@@ -177,7 +198,7 @@ uint32_t totalSequenceFromSequencer(const uint32_t& sequencerNum) {
   return result;
 }
 
-uint32_t getSrcIncFromNum(const uint32_t& size) {
+uint32_t dmaSrcIncFromNum(const uint32_t& size) {
   assert(size == 8 || size == 16 || size == 32);
   uint32_t result = 0;
   switch (size) {
@@ -194,7 +215,7 @@ uint32_t getSrcIncFromNum(const uint32_t& size) {
   return result;
 }
 
-uint32_t getDataSizeFromNum(const uint32_t& size) {
+uint32_t dmaDataSizeFromNum(const uint32_t& size) {
   assert(size == 0 || size == 8 || size == 16 || size == 32);
   uint32_t result = 0;
   switch (size) {
@@ -213,7 +234,7 @@ uint32_t getDataSizeFromNum(const uint32_t& size) {
   }
   return result;
 }
-uint32_t getDestIncFromNum(const uint32_t& size) {
+uint32_t dmaDestIncFromNum(const uint32_t& size) {
   assert(size == 0 || size == 8 || size == 16 || size == 32);
   uint32_t result = 0;
   switch (size) {
@@ -234,7 +255,7 @@ uint32_t getDestIncFromNum(const uint32_t& size) {
 }
 
 static const uint32_t TOTAL_VALID_ARB_SIZE = 15;
-uint32_t              getArbSizeFromNum(const uint32_t& arbSize) {
+uint32_t              dmaArbSizeFromNum(const uint32_t& arbSize) {
   const uint32_t validSize[] = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024};
   const uint32_t validFlag[] = {UDMA_ARB_1,
                                 UDMA_ARB_2,

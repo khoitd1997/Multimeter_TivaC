@@ -34,20 +34,20 @@ AdcSensor::AdcSensor(const uint32_t& adcModuleNum,
                      const char&     adcPinPort,
                      const uint32_t& adcPinNum,
                      const uint32_t& adcPriority)
-    : _adcResult({0}) {
+    : _adcBuffer({0}) {
   assert(adcPriority < 4);
   _adcAddr                = adcAddrFromName(adcModuleNum);
   _adcPinClockAddr        = gpioPeriAddrFromName(adcPinPort);
   _portAddr               = gpioPortAddrFromName(adcPinPort);
   _pinBitMask             = gpioMaskFromName(adcPinNum);
   this->_adcSequencer     = adcSequencer;
-  this->_adcTotalSequence = totalSequenceFromSequencer(adcSequencer);
+  this->_adcTotalSequence = adcTotalSequenceFromSequencer(adcSequencer);
   _adcChannelMask         = adcChannelMaskFromName(adcPinNum, adcPinPort);
   _adcPriority            = adcPriority;
   _adcPeriphClockAddr     = adcPeriphAddrByName(adcModuleNum);
 }
 
-void AdcSensor::init(uint32_t adcTriggerFlag) {
+void AdcSensor::init(uint32_t adcTriggerFlag, bool nonLastDataInt, bool lastDataInt) {
   _adcTriggerFlag = adcTriggerFlag;
   SysCtlPeripheralEnable(_adcPeriphClockAddr);
   while (!SysCtlPeripheralReady(_adcPeriphClockAddr)) {
@@ -61,13 +61,18 @@ void AdcSensor::init(uint32_t adcTriggerFlag) {
   ADCSequenceConfigure(_adcAddr, _adcSequencer, adcTriggerFlag, _adcPriority);
   // ADCHardwareOversampleConfigure(_adcAddr, OVERSAMPLING_FACTOR);
 
+  uint32_t nonLastDataIntFlag = (nonLastDataInt ? ADC_CTL_IE : 0);
+
   // configure individual sample in a sequence
   uint32_t sampleNum = 0;
   for (sampleNum = 0; sampleNum < _adcTotalSequence - 1; ++sampleNum) {
-    ADCSequenceStepConfigure(_adcAddr, _adcSequencer, sampleNum, _adcChannelMask | ADC_CTL_IE);
+    ADCSequenceStepConfigure(
+        _adcAddr, _adcSequencer, sampleNum, _adcChannelMask | nonLastDataIntFlag);
   }
+
+  uint32_t lastDataIntFlag = (lastDataInt ? ADC_CTL_IE : 0);
   ADCSequenceStepConfigure(
-      _adcAddr, _adcSequencer, sampleNum, ADC_CTL_END | _adcChannelMask | ADC_CTL_IE);
+      _adcAddr, _adcSequencer, sampleNum, ADC_CTL_END | _adcChannelMask | lastDataIntFlag);
 }
 
 void AdcSensor::enable(void) {
@@ -82,10 +87,10 @@ void AdcSensor::disable(void) {
   ADCSequenceDisable(_adcAddr, _adcSequencer);
 }
 
-float AdcSensor::convertRawToVolt(void) {
+float AdcSensor::convertRawToVolt(uint32_t* adcBuffer) {
   uint32_t result = 0;
   for (uint32_t adcIndex = 0; adcIndex < _adcTotalSequence; ++adcIndex) {
-    result += _adcResult[adcIndex];
+    result += adcBuffer[adcIndex];
   }
   return (ADC_COEFF * result) / (_adcTotalSequence);
 }
@@ -106,7 +111,17 @@ float AdcSensor::readVolt(void) {
   ADCIntClear(_adcAddr, _adcSequencer);
 
   // Read raw value from the ADC.
-  ADCSequenceDataGet(_adcAddr, _adcSequencer, _adcResult);
+  ADCSequenceDataGet(_adcAddr, _adcSequencer, _adcBuffer);
 
-  return convertRawToVolt();
+  return convertRawToVolt(_adcBuffer);
+}
+
+void AdcSensor::adcEnableDMA() { ADCSequenceDMAEnable(_adcAddr, _adcSequencer); }
+
+uint32_t  AdcSensor::getAdcAddr(void) const { return _adcAddr; }
+uint32_t  AdcSensor::getAdcSequencer(void) const { return _adcSequencer; }
+uint32_t  AdcSensor::getAdcTotalSequence(void) const { return _adcTotalSequence; }
+uint32_t* AdcSensor::getAdcBuffer(void) { return _adcBuffer; }
+uint32_t  AdcSensor::getAdcFifoAddr(void) const {
+  return _adcAddr + adcFifoOffsetFromName(_adcSequencer);
 }
