@@ -91,7 +91,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-.metadata
 bin/
 tmp/
 *.tmp
