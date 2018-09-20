@@ -34,17 +34,18 @@ AdcSensor::AdcSensor(const uint32_t& adcModuleNum,
                      const char&     adcPinPort,
                      const uint32_t& adcPinNum,
                      const uint32_t& adcPriority)
-    : _adcBuffer({0}) {
+    : _adcModNum(adcModuleNum),
+      _adcAddr(adcAddrFromName(adcModuleNum)),
+      _adcPinClockAddr(gpioPeriAddrFromName(adcPinPort)),
+      _portAddr(gpioPortAddrFromName(adcPinPort)),
+      _pinBitMask(gpioMaskFromName(adcPinNum)),
+      _adcSequencer(adcSequencer),
+      _adcTotalSequence(adcTotalSequenceFromSequencer(adcSequencer)),
+      _adcChannelMask(adcChannelMaskFromName(adcPinNum, adcPinPort)),
+      _adcPriority(adcPriority),
+      _adcPeriphClockAddr(adcPeriphAddrByName(adcModuleNum)),
+      _adcBuffer({0}) {
   assert(adcPriority < 4);
-  _adcAddr                = adcAddrFromName(adcModuleNum);
-  _adcPinClockAddr        = gpioPeriAddrFromName(adcPinPort);
-  _portAddr               = gpioPortAddrFromName(adcPinPort);
-  _pinBitMask             = gpioMaskFromName(adcPinNum);
-  this->_adcSequencer     = adcSequencer;
-  this->_adcTotalSequence = adcTotalSequenceFromSequencer(adcSequencer);
-  _adcChannelMask         = adcChannelMaskFromName(adcPinNum, adcPinPort);
-  _adcPriority            = adcPriority;
-  _adcPeriphClockAddr     = adcPeriphAddrByName(adcModuleNum);
 }
 
 void AdcSensor::init(uint32_t adcTriggerFlag, bool nonLastDataInt, bool lastDataInt) {
@@ -116,12 +117,17 @@ float AdcSensor::readVolt(void) {
   return convertRawToVolt(_adcBuffer);
 }
 
-void AdcSensor::adcEnableDMA() { ADCSequenceDMAEnable(_adcAddr, _adcSequencer); }
+void AdcSensor::adcEnableDMA() {
+  ADCIntClearEx(_adcAddr, adcDmaIntFlagFromSequencer(_adcSequencer));
+  ADCIntEnableEx(_adcAddr, adcDmaIntFlagFromSequencer(_adcSequencer));
+  ADCSequenceDMAEnable(_adcAddr, _adcSequencer);
+}
 
-uint32_t  AdcSensor::getAdcAddr(void) const { return _adcAddr; }
-uint32_t  AdcSensor::getAdcSequencer(void) const { return _adcSequencer; }
-uint32_t  AdcSensor::getAdcTotalSequence(void) const { return _adcTotalSequence; }
-uint32_t* AdcSensor::getAdcBuffer(void) { return _adcBuffer; }
-uint32_t  AdcSensor::getAdcFifoAddr(void) const {
+uint32_t AdcSensor::getAdcAddr(void) const { return _adcAddr; }
+uint32_t AdcSensor::getAdcSequencer(void) const { return _adcSequencer; }
+uint32_t AdcSensor::getAdcTotalSequence(void) const { return _adcTotalSequence; }
+uint32_t AdcSensor::getAdcFifoAddr(void) const {
   return _adcAddr + adcFifoOffsetFromName(_adcSequencer);
 }
+
+uint32_t AdcSensor::getAdcModNum(void) const { return _adcModNum; }

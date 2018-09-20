@@ -48,6 +48,29 @@ uint32_t adcAddrFromName(const uint32_t& adcModuleNum) {
   return result;
 }
 
+uint32_t adcDmaIntFlagFromSequencer(const uint32_t& sequencerNum) {
+  assert(sequencerNum < 4);
+  uint32_t result = 0;
+  switch (sequencerNum) {
+    case 0:
+      result = ADC_INT_DMA_SS0;
+      break;
+
+    case 1:
+      result = ADC_INT_DMA_SS1;
+      break;
+
+    case 2:
+      result = ADC_INT_DMA_SS2;
+      break;
+
+    case 3:
+      result = ADC_INT_DMA_SS3;
+      break;
+  }
+  return result;
+}
+
 uint32_t adcFifoOffsetFromName(const uint32_t adcSequenceNum) {
   assert(adcSequenceNum < 4);
   uint32_t fifoOffset = 0;
@@ -66,6 +89,55 @@ uint32_t adcFifoOffsetFromName(const uint32_t adcSequenceNum) {
       break;
   }
   return fifoOffset;
+}
+
+uint32_t adcDmaChannelFlagFromSequencerAndMod(const uint32_t& adcModNum,
+                                              const uint32_t& adcSequence) {
+  assert(adcModNum < 2);
+  assert(adcSequence < 4);
+  uint32_t result = 0;
+  switch (adcModNum) {
+    case 0:
+      switch (adcSequence) {
+        case 0:
+          result = UDMA_CH14_ADC0_0;
+          break;
+
+        case 1:
+          result = UDMA_CH15_ADC0_1;
+          break;
+
+        case 2:
+          result = UDMA_CH16_ADC0_2;
+          break;
+
+        case 3:
+          result = UDMA_CH17_ADC0_3;
+          break;
+      }
+      break;
+
+    case 1:
+      switch (adcSequence) {
+        case 0:
+          result = UDMA_CH24_ADC1_0;
+          break;
+
+        case 1:
+          result = UDMA_CH25_ADC1_1;
+          break;
+
+        case 2:
+          result = UDMA_CH26_ADC1_2;
+          break;
+
+        case 3:
+          result = UDMA_CH27_ADC1_3;
+          break;
+      }
+      break;
+  }
+  return result;
 }
 
 uint32_t gpioPeriAddrFromName(const char& portName) {
@@ -172,6 +244,55 @@ uint32_t adcChannelMaskFromName(const uint32_t& pinNumber, char portName) {
     }
   }
 
+  return result;
+}
+
+uint32_t adcDmaChannelFromSequenceAndMod(const uint32_t& adcModNum, const uint32_t& adcSequence) {
+  assert(adcModNum < 2);
+  assert(adcSequence < 4);
+  uint32_t result = 0;
+  switch (adcModNum) {
+    case 0:
+      switch (adcSequence) {
+        case 0:
+          result = UDMA_CHANNEL_ADC0;
+          break;
+
+        case 1:
+          result = UDMA_CHANNEL_ADC1;
+          break;
+
+        case 2:
+          result = UDMA_CHANNEL_ADC2;
+          break;
+
+        case 3:
+          result = UDMA_CHANNEL_ADC3;
+          break;
+      }
+      break;
+
+    // ADC1 uses secondary channel
+    case 1:
+      switch (adcSequence) {
+        case 0:
+          result = UDMA_SEC_CHANNEL_ADC10;
+          break;
+
+        case 1:
+          result = UDMA_SEC_CHANNEL_ADC11;
+          break;
+
+        case 2:
+          result = UDMA_SEC_CHANNEL_ADC12;
+          break;
+
+        case 3:
+          result = UDMA_SEC_CHANNEL_ADC13;
+          break;
+      }
+      break;
+  }
   return result;
 }
 

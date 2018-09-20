@@ -8,6 +8,7 @@ static const uint32_t MAX_SEQUENCE_SAMPLE = 8;
 class AdcSensor {
  protected:
   uint32_t _adcAddr;
+  uint32_t _adcModNum;
   uint32_t _adcPinClockAddr;
   uint32_t _portAddr;
   uint32_t _pinBitMask;
@@ -38,11 +39,11 @@ class AdcSensor {
   virtual void disable(void);
   virtual ~AdcSensor(void) {}
 
-  uint32_t  getAdcAddr(void) const;
-  uint32_t  getAdcSequencer(void) const;
-  uint32_t  getAdcTotalSequence(void) const;
-  uint32_t  getAdcFifoAddr(void) const;
-  uint32_t* getAdcBuffer(void);
+  uint32_t getAdcAddr(void) const;
+  uint32_t getAdcSequencer(void) const;
+  uint32_t getAdcTotalSequence(void) const;
+  uint32_t getAdcFifoAddr(void) const;
+  uint32_t getAdcModNum(void) const;
 };
 
 #endif

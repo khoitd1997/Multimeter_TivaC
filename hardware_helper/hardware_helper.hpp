@@ -8,6 +8,10 @@ uint32_t adcAddrFromName(const uint32_t& adcModuleNum);
 uint32_t adcFifoOffsetFromName(const uint32_t adcSequenceNum);
 uint32_t adcChannelMaskFromName(const uint32_t& pinNumber, char portName);
 uint32_t adcTotalSequenceFromSequencer(const uint32_t& sequencerNum);
+uint32_t adcDmaIntFlagFromSequencer(const uint32_t& sequencerNum);
+uint32_t adcDmaChannelFlagFromSequencerAndMod(const uint32_t& adcModNum,
+                                              const uint32_t& adcSequence);
+uint32_t adcDmaChannelFromSequenceAndMod(const uint32_t& adcModNum, const uint32_t& adcSequence);
 
 // gpio
 uint32_t gpioPeriAddrFromName(const char& portName);
