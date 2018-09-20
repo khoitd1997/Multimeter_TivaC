@@ -70,4 +70,3 @@ Mkfile.old
 dkms.conf
 
 *.bin
-Debug/
