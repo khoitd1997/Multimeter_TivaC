@@ -13,6 +13,6 @@ void uartTask(void* uartParam);
 
 void uartPrint(char* string);
 
-TaskHandle_t uartConfigure(uint32_t baudRate);
+void uartConfigure(uint32_t baudRate);
 
 #endif

@@ -43,12 +43,14 @@ void uartPrint(char* string) {
   xSemaphoreGive(uartSemaphr);
 }
 
-TaskHandle_t uartConfigure(uint32_t baudRate) {
+void uartConfigure(uint32_t baudRate) {
   // Enable the GPIO Peripheral used by the UART.
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA)) {}
 
   // Enable UART0
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0)) {}
 
   // Configure GPIO Pins for UART mode.
   ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
@@ -64,11 +66,8 @@ TaskHandle_t uartConfigure(uint32_t baudRate) {
   // Initialize the UART for console I/O.
   UARTStdioConfig(0, baudRate, 16000000);
 
-  TaskHandle_t uartHandle;
-
   if (pdPASS !=
-      xTaskCreate(
-          uartTask, "Uart Task", UART_STACK_SIZE, NULL, configMAX_PRIORITIES, &uartHandle)) {
+      xTaskCreate(uartTask, "Uart Task", UART_STACK_SIZE, NULL, configMAX_PRIORITIES - 2, NULL)) {
     UARTprintf("Can't create uart task\n");
     for (;;) {
       // stall since there is no point in proceeding
@@ -76,6 +75,4 @@ TaskHandle_t uartConfigure(uint32_t baudRate) {
   } else {
     UARTprintf("Successfully created uart task\n");
   }
-
-  return uartHandle;
 }

@@ -50,9 +50,7 @@ AdcSensor::AdcSensor(const uint32_t& adcModuleNum,
 
 void AdcSensor::init(uint32_t adcTriggerFlag, bool nonLastDataInt, bool lastDataInt) {
   _adcTriggerFlag = adcTriggerFlag;
-  SysCtlPeripheralEnable(_adcPeriphClockAddr);
-  while (!SysCtlPeripheralReady(_adcPeriphClockAddr)) {
-    // wait for ADC to be ready
+
   }
 
   // enable analog pin
@@ -96,6 +94,8 @@ float AdcSensor::convertRawToVolt(uint32_t* adcBuffer) {
   return (ADC_COEFF * result) / (_adcTotalSequence);
 }
 
+// TODO: optimize reading volt
+// Use both sampler with DMA, interrupts
 float AdcSensor::readVolt(void) {
   while (ADCBusy(_adcAddr)) {
     // wait until the current sampling is done

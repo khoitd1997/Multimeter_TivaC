@@ -26,6 +26,8 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
+#include "test_task.hpp"
+
 // application
 #include "ac_sensor.hpp"
 #include "core_measure_task.hpp"
@@ -50,123 +52,13 @@ void softwareIntHandler(void) {
 }
 
 int main(void) {
+  // 80 MHz
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
-  // for (;;) {}
-  // for (uint32_t counter = 0; counter < 5000; ++counter) {
-  //   // waiting
-  // }
+  uartConfigure(115200);
 
-  // Enable the GPIO Peripheral used by the UART.
-  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+  xTaskCreate(testTask, "Test Task", configMINIMAL_STACK_SIZE + 500, NULL, 3, NULL);
+  vTaskStartScheduler();
 
-  // Enable UART0
-  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-
-  // Configure GPIO Pins for UART mode.
-  ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-  ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-  ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-  // Use the internal 16MHz oscillator as the UART clock source.
-  UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
-
-  // Initialize the UART for console I/O.
-  UARTStdioConfig(0, 115200, 16000000);
-
-  UARTprintf("\n\nMultimeter TivaC\n");
-
-  // // timer test
-  // // GeneralTimer genTimer = GeneralTimer::getTimer();
-  // // uint64_t     tempTime;
-  // // genTimer.startTimer(tempTime);
-  // // for (;;) {
-  // //   if (genTimer.stopTimer(tempTime) > 5000000) {
-  // //     UARTprintf("Timer hit\n");
-  // //     genTimer.startTimer(tempTime);
-  // //   }
-  // // }
-
-  // UARTprintf("\nindex 0 is:");
-  static const uint32_t ALL_ATTR_FLAG =
-      UDMA_ATTR_USEBURST || UDMA_ATTR_ALTSELECT || UDMA_ATTR_REQMASK || UDMA_ATTR_HIGH_PRIORITY;
-  char coreBuffer[MAX_CHAR_PER_PRINT + 1] = "";
-  // uint8_t pui8SourceBuffer[256]              = {1, 1};
-
-  // for (uint32_t index = 0; index < 256; ++index) { pui8SourceBuffer[index] = index; }
-
-  uint32_t pui8DestBuffer1[256] = {0};
-  uint32_t pui8DestBuffer2[256] = {0};
-  float    acVolt               = 0;
-  float    acFreqKhz            = 0;
-
-  // // auto dcVoltSensor                       = AdcSensor(0, 0, 'E', 3, 0);
-  // // auto     acVoltSensor = AcSensor(0.08);
-  // uint32_t counter = 0;
-  // // // dcVoltSensor.init();
-  // // acVoltSensor.init();
-  // // acVoltSensor.enable();
-  // UARTprintf("\nPreparing for control table\n");
-  // uint8_t pui8DMAControlTable[1024];
-  // // UARTprintf("\nindex 0 is:");
-
-  // UARTprintf("\nPreparing for adc multimeter\n");
-  // AdcMultimeter adcModule0 = AdcMultimeter(0, 2, 'E', 3, 0);
-  // adcModule0.init(ADC_TRIGGER_ALWAYS, ADC_PHASE_0);
-  // adcModule0.enable();
-
-  // SysCtlPeripheralEnable(SYSCTL_PERIPH_UDMA);
-  // //
-  // // Wait for the UDMA module to be ready.
-  // //
-  // while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UDMA)) {}
-
-  // // UARTprintf("\nindex 0 is:");
-  // uDMAChannelAttributeDisable(UDMA_CHANNEL_SW, ALL_ATTR_FLAG);
-
-  // uDMAEnable();
-  // // UARTprintf("\nindex 0 is:");
-  // uDMAControlBaseSet(&pui8DMAControlTable[0]);
-  // // UARTprintf("\nindex 0 is:");
-  // uDMAChannelControlSet(UDMA_CHANNEL_SW | UDMA_PRI_SELECT,
-  //                       UDMA_SIZE_32 | UDMA_SRC_INC_NONE | UDMA_DST_INC_NONE | UDMA_ARB_2);
-  // uDMAChannelControlSet(UDMA_CHANNEL_SW | UDMA_ALT_SELECT,
-  //                       UDMA_SIZE_32 | UDMA_SRC_INC_NONE | UDMA_DST_INC_NONE | UDMA_ARB_2);
-
-  // uDMAChannelTransferSet(UDMA_CHANNEL_SW | UDMA_PRI_SELECT,
-  //                        UDMA_MODE_PINGPONG,
-  //                        (void *)(0x40038088),
-  //                        pui8DestBuffer1,
-  //                        1);
-  // uDMAChannelTransferSet(UDMA_CHANNEL_SW | UDMA_ALT_SELECT,
-  //                        UDMA_MODE_PINGPONG,
-  //                        (void *)(0x40038088),
-  //                        pui8DestBuffer2,
-  //                        1);
-  // uDMAChannelAttributeEnable(UDMA_CHANNEL_SW, UDMA_ATTR_HIGH_PRIORITY);
-
-  // uDMAIntRegister(INT_UDMA, softwareIntHandler);
-  // uDMAIntRegister(INT_UDMAERR, softwareIntHandler);
-  // uDMAChannelEnable(UDMA_CHANNEL_SW);
-  // uDMAChannelRequest(UDMA_CHANNEL_SW);
-
-  // // UARTprintf("\nPre for-loop, int: %d", IntIsEnabled(INT_UDMA));
-  for (;;) {
-    // pass
-    UARTprintf("\nindex 0 is: %d\n", pui8DestBuffer1[0]);
-    // for (uint32_t index = 0; index < 500000; ++index) {
-    //   // wait
-    // }
-    if (transferIsDone) {
-      UARTprintf("\nTransfer is done\n");
-      uDMAChannelEnable(UDMA_CHANNEL_SW);
-      uDMAChannelRequest(UDMA_CHANNEL_SW);
-      transferIsDone = false;
-    }
-  }
-
-  // vTaskStartScheduler();
-
-  // vTaskDelete(uartHandle);
-  // vTaskDelete(coreTaskHandle);
+  for (;;) {}
 }
