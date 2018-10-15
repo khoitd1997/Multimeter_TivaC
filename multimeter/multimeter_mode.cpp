@@ -26,8 +26,9 @@
 
 const EventBits_t ALL_EVENT = MeasureMode::AC_VOLT | MeasureMode::DC_VOLT;
 
-const InputInfo  MODE_LIST[] = {{GPIO_INT_PIN_4, MeasureMode::AC_VOLT, GPIO_PORTF_BASE, GPIO_PIN_1},
-                               {GPIO_INT_PIN_0, MeasureMode::DC_VOLT, GPIO_PORTF_BASE, GPIO_PIN_2}};
+InputInfo MODE_LIST[] = {{GPIO_INT_PIN_4, MeasureMode::AC_VOLT, GPIO_PORTF_BASE, GPIO_PIN_1},
+                         {GPIO_INT_PIN_0, MeasureMode::DC_VOLT, GPIO_PORTF_BASE, GPIO_PIN_2}};
+
 const InputInfo* findModeInfo(const MeasureMode& modeTofind) {
   for (uint32_t modeIndex = 0; modeIndex < TOTAL_MODE; ++modeIndex) {
     if ((MODE_LIST[modeIndex]).measureMode == modeTofind) { return &MODE_LIST[modeIndex]; }

@@ -85,8 +85,21 @@ void MeasurementSwitcher::changeTask(const MeasureMode& newMode) {
   // direct new inputs to pins
   GPIOPinWrite(currMode_->ctrlPort, currMode_->ctrlPin, 0);
   GPIOPinWrite(targetMode->ctrlPort, targetMode->ctrlPin, targetMode->ctrlPin);
+
+  // change display content
+  changeDisplayContent(targetMode);
+
+  // vTaskPrioritySet(currMode_->taskHandle, 1);
+  vTaskSuspend(currMode_->taskHandle);
+  vTaskResume(targetMode->taskHandle);
+  // vTaskPrioritySet(targetMode->taskHandle, configMAX_PRIORITIES - 8);
+
   UARTprintf("Changing task from %d to %d\n", currMode_->measureMode, newMode);
   setCurrMode(newMode);
+}
+
+void MeasurementSwitcher::changeDisplayContent(const InputInfo* newMode) {
+  UARTprintf("Changing Display\n");
 }
 
 void MeasurementSwitcher::setCurrMode(const MeasureMode& newModeBits) {
@@ -99,6 +112,9 @@ void MeasurementSwitcher::switcherTask(void* param) {
   EventBits_t statusBits  = 0;
   MeasureMode newModeBits = AC_VOLT;
   auto        switcher    = MeasurementSwitcher::getSwitcher();
+  taskENTER_CRITICAL();
+  switcher.changeTask((switcher.getCurrMode())->measureMode);
+  taskEXIT_CRITICAL();
 
   for (;;) {
     statusBits = xEventGroupWaitBits(modeEventGroup_, ALL_EVENT, pdTRUE, pdFALSE, portMAX_DELAY);

@@ -13,6 +13,8 @@
 #include "semphr.h"
 #include "task.h"
 
+#include "utils/uartstdio.h"
+
 #include "input_handler.hpp"
 #include "uart_util.hpp"
 
@@ -32,6 +34,11 @@ void testTask(void* param) {
 
   for (;;) {
     // acSensor.measureAC(rmsVolt, freq);
+    UARTprintf(static_cast<char*>(param));
+    for (uint32_t waitIndex = 0; waitIndex < 5000000; ++waitIndex) {
+      // artificial wait
+    }
+
     // vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(300));
   }
 }

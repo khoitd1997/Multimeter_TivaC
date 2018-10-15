@@ -23,6 +23,7 @@ class MeasurementSwitcher {
   static MeasurementSwitcher& getSwitcher(void);
   static void                 switcherTask(void* param);
   void                        changeMode(const MeasureMode& modeToChange);
+  void                        changeDisplayContent(const InputInfo* newMode);
 };
 
 #endif

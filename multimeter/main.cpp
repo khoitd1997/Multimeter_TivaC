@@ -1,6 +1,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <cassert>
 #include <cstdio>
 
 // FreeRTOS
@@ -26,6 +27,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
+#include "multimeter_mode.hpp"
 #include "test_task.hpp"
 
 // application
@@ -46,13 +48,33 @@ void __error__(char* pcFilename, uint32_t ui32Line) {}
 
 bool transferIsDone = false;
 
+char task1ID[] = "This is Task 1\n";
+char task2ID[] = "Task 2 Here\n";
+
 int main(void) {
   // 80 MHz
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
   uartConfigure(115200);
 
-  xTaskCreate(testTask, "Test Task", configMINIMAL_STACK_SIZE + 500, NULL, 3, NULL);
+  TaskHandle_t tempHandle = NULL;
+  xTaskCreate(testTask,
+              "Test Task 1",
+              configMINIMAL_STACK_SIZE + 500,
+              task1ID,
+              5,
+              &((MODE_LIST)[0].taskHandle));
+  vTaskSuspend(MODE_LIST[0].taskHandle);
+  assert(NULL != MODE_LIST[0].taskHandle);
+
+  xTaskCreate(testTask,
+              "Test Task 2",
+              configMINIMAL_STACK_SIZE + 500,
+              task2ID,
+              5,
+              &((MODE_LIST)[1].taskHandle));
+  vTaskSuspend(MODE_LIST[1].taskHandle);
+
   MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
 
   vTaskStartScheduler();
