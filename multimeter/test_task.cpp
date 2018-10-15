@@ -13,17 +13,25 @@
 #include "semphr.h"
 #include "task.h"
 
+#include "input_handler.hpp"
 #include "uart_util.hpp"
 
 void testTask(void* param) {
   TickType_t xLastWakeTime = xTaskGetTickCount();
-  AcSensor   acSensor(0.1);
+
+  AdcSensor adcSensor(0, 2, 'E', 3, 0);
+  AcSensor  acSensor(0.1, adcSensor);
   acSensor.init();
   acSensor.enable();
   float rmsVolt = 0;
   float freq    = 0;
+
+  auto inputHandler = InputHandler();
+  inputHandler.init();
+  inputHandler.enable();
+
   for (;;) {
-    acSensor.measureAC(rmsVolt, freq);
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(300));
+    // acSensor.measureAC(rmsVolt, freq);
+    // vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(300));
   }
 }

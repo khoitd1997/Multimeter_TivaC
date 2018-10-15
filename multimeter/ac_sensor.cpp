@@ -26,10 +26,8 @@
 
 volatile bool isMeasuring = false;
 
-const uint32_t AcSensor::_sequencerNum = 2;
-
-AcSensor::AcSensor(const float& voltOffset)
-    : _voltOffset(voltOffset), _adcModule0(0, _sequencerNum, 'E', 3, 0) {}
+AcSensor::AcSensor(const float& voltOffset, AdcSensor& adcSensor)
+    : _voltOffset(voltOffset), _adcModule0(adcSensor) {}
 
 void AcSensor::detectZeroCrossing(const float&    volt,
                                   uint64_t&       firstCrossTime,

@@ -13,18 +13,17 @@ enum ZeroCrossState { UNDEFINED, ZERO_STATE, FIRST_CROSS, SECOND_CROSS };
 
 class AcSensor {
  private:
-  float                 _voltOffset;
-  static const uint32_t _sequencerNum;
+  float _voltOffset;
 
   void detectZeroCrossing(const float&    volt,
                           uint64_t&       firstCrossTime,
                           uint64_t&       secondCrossTime,
                           ZeroCrossState& stateFlag);
 
-  AdcSensor _adcModule0;
+  AdcSensor& _adcModule0;
 
  public:
-  AcSensor(const float& voltOffset);
+  AcSensor(const float& voltOffset, AdcSensor& adcSensor);
   void init();
   void enable();
   void measureAC(float& rmsVolt, float& freqKhz);

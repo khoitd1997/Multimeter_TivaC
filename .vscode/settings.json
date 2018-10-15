@@ -27,6 +27,7 @@
         "utility": "cpp",
         "system_error": "cpp",
         "type_traits": "cpp",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "cstdbool": "cpp"
     }
 }

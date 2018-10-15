@@ -90,6 +90,13 @@
 #define configMAX_CO_ROUTINE_PRIORITIES (2)
 #define configQUEUE_REGISTRY_SIZE 10
 
+#define INCLUDE_xTimerPendFunctionCall 1
+#define INCLUDE_xEventGroupSetBitFromISR 1
+#define configUSE_TIMERS 1
+#define configTIMER_QUEUE_LENGTH 3
+#define configTIMER_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 50
+#define configTIMER_TASK_PRIORITY 15
+
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
 
