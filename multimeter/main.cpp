@@ -33,23 +33,18 @@
 #include "core_measure_task.hpp"
 #include "freeRTOS_hook.h"
 #include "general_timer/general_timer.hpp"
+#include "measurement_switcher.hpp"
 #include "tiva_utils/bit_manipulation.h"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200
 
 #ifdef DEBUG
-void __error__(char *pcFilename, uint32_t ui32Line) {}
+void __error__(char* pcFilename, uint32_t ui32Line) {}
 
 #endif
 
 bool transferIsDone = false;
-
-void softwareIntHandler(void) {
-  if (bit_get(uDMAIntStatus(), BIT(UDMA_CHANNEL_SW))) { transferIsDone = true; }
-  transferIsDone = true;
-  uDMAIntClear(BIT(UDMA_CHANNEL_SW));
-}
 
 int main(void) {
   // 80 MHz
@@ -58,6 +53,8 @@ int main(void) {
   uartConfigure(115200);
 
   xTaskCreate(testTask, "Test Task", configMINIMAL_STACK_SIZE + 500, NULL, 3, NULL);
+  MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
+
   vTaskStartScheduler();
 
   for (;;) {}

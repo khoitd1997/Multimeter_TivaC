@@ -36,21 +36,34 @@
 
 #include "measurement_switcher.hpp"
 
+#include "multimeter_mode.hpp"
+
+static const uint32_t ALL_INPUT_INT = GPIO_INT_PIN_4 | GPIO_INT_PIN_0;
+
+uint32_t interruptFlag;
+
+// TODO: Debounce buttons
 void inputISRHandler(void) {
   static MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
   UARTprintf("Inside the ISR\n");
-  const uint32_t intStatus = GPIOIntStatus(GPIO_PORTF_BASE, true);
+  const uint32_t intStatus = ALL_INPUT_INT & GPIOIntStatus(GPIO_PORTF_BASE, true);
 
-  if (bit_get(intStatus, GPIO_INT_PIN_4)) {
-    UARTprintf("Got SW1\n");
-    switcher.changeMode(MeasureMode::AC_VOLT);
-    GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
-  }
+  // check if there are other input interrupts
+  for (auto userInput : MODE_LIST) {
+    if (bit_get(intStatus, userInput.interruptFlag)) {
+      // clear early based on datasheet recommendation
+      GPIOIntClear(GPIO_PORTF_BASE, userInput.interruptFlag);
 
-  if (bit_get(intStatus, GPIO_INT_PIN_0)) {
-    UARTprintf("Got SW2\n");
-    switcher.changeMode(MeasureMode::DC_VOLT);
-    GPIOIntClear(GPIO_PORTF_BASE, GPIO_INT_PIN_0);
+      if (!other_bit_set(intStatus, userInput.interruptFlag)) {
+        // case where only one interrupt received
+        switcher.changeMode(userInput.measureMode);
+
+      } else {
+        // got other interrupts, so move on to them
+        UARTprintf("Got duplicate\n");
+      }
+      break;
+    }
   }
 }
 

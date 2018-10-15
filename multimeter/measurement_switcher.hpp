@@ -8,16 +8,20 @@
 
 #include "tiva_utils/bit_manipulation.h"
 
-enum MeasureMode : EventBits_t { AC_VOLT = BIT(0), DC_VOLT = BIT(1) };
+#include "multimeter_mode.hpp"
 
 class MeasurementSwitcher {
  private:
-  static EventGroupHandle_t modeEventGroup_;
-  MeasureMode               currMode_;
+  static volatile EventGroupHandle_t modeEventGroup_;
+  const InputInfo*                   currMode_;
+  void                               changeTask(const MeasureMode& newMode);
   MeasurementSwitcher(void);
 
  public:
+  void                        setCurrMode(const MeasureMode& newModeBits);
+  const InputInfo*            getCurrMode(void);
   static MeasurementSwitcher& getSwitcher(void);
+  static void                 switcherTask(void* param);
   void                        changeMode(const MeasureMode& modeToChange);
 };
 

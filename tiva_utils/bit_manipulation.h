@@ -13,6 +13,8 @@ extern "C" {
 #define bit_write(c, p, m) (c ? bit_set(p, m) : bit_clear(p, m))
 #define BIT(x) (0x01 << (x))
 #define LONGBIT(x) ((unsigned long)0x00000001 << (x))
+
+#define other_bit_set(p, m) ((p) & (~m))  // check if other bit is set, true if they are
 // From < http://
 // www.avrfreaks.net/forum/tut-c-bit-manipulation-aka-programming-101?name=PNphpBB2&file=viewtopic&t=37871>
 
