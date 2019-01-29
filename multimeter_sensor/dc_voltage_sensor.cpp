@@ -16,9 +16,11 @@
 #include "tiva_utils/bit_manipulation.h"
 
 // voltage divider value in ohm
+// TODO: Finalize resistor values
 static const float R1 = 3000;
 static const float R2 = 4000;
 // static const float DC_COEFF = R1 * (R1 + R2);
+// TODO: Change the coeff back after testing
 static const float DC_COEFF = 1;
 
 DcVoltageSensor::DcVoltageSensor()

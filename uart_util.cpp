@@ -53,9 +53,9 @@ void uartConfigure(uint32_t baudRate) {
   while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0)) {}
 
   // Configure GPIO Pins for UART mode.
-  ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-  ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-  ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+  GPIOPinConfigure(GPIO_PA0_U0RX);
+  GPIOPinConfigure(GPIO_PA1_U0TX);
+  GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
   // Use the internal 16MHz oscillator as the UART clock source.
   UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
@@ -66,13 +66,14 @@ void uartConfigure(uint32_t baudRate) {
   // Initialize the UART for console I/O.
   UARTStdioConfig(0, baudRate, 16000000);
 
-  if (pdPASS !=
-      xTaskCreate(uartTask, "Uart Task", UART_STACK_SIZE, NULL, configMAX_PRIORITIES - 2, NULL)) {
-    UARTprintf("Can't create uart task\n");
-    for (;;) {
-      // stall since there is no point in proceeding
-    }
-  } else {
-    UARTprintf("Successfully created uart task\n");
-  }
+  //   if (pdPASS !=
+  //       xTaskCreate(uartTask, "Uart Task", UART_STACK_SIZE, NULL, configMAX_PRIORITIES - 2,
+  //       NULL)) {
+  //     UARTprintf("Can't create uart task\n");
+  //     for (;;) {
+  //       // stall since there is no point in proceeding
+  //     }
+  //   } else {
+  //     UARTprintf("Successfully created uart task\n");
+  //   }
 }

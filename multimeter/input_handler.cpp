@@ -45,7 +45,7 @@ uint32_t interruptFlag;
 // TODO: Debounce buttons
 void inputISRHandler(void) {
   static MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
-  UARTprintf("Inside the ISR\n");
+  UARTprintf("Inside the ISR\n");  // nice
   const uint32_t intStatus = ALL_INPUT_INT & GPIOIntStatus(GPIO_PORTF_BASE, true);
 
   // check if there are other input interrupts
@@ -54,6 +54,8 @@ void inputISRHandler(void) {
       // clear early based on datasheet recommendation
       GPIOIntClear(GPIO_PORTF_BASE, userInput.interruptFlag);
 
+      // TODO: reevaluate whether needing to check other bits since user interrupt does not have
+      // nesting
       if (!other_bit_set(intStatus, userInput.interruptFlag)) {
         // case where only one interrupt received
         switcher.changeMode(userInput.measureMode);

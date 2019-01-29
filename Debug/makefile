@@ -27,11 +27,8 @@ ORDERED_OBJS += \
 "./Tivaware_Dep/utils/softuart.obj" \
 "./Tivaware_Dep/utils/uartstdio.obj" \
 "./Tivaware_Dep/utils/ustdlib.obj" \
-"./adc_sensor/adc_sensor.obj" \
-"./dma_manager/dma_manager.obj" \
 "./general_timer/general_timer.obj" \
 "./hardware_helper/hardware_helper.obj" \
-"./multimeter/ac_sensor.obj" \
 "./multimeter/core_measure_task.obj" \
 "./multimeter/freeRTOS_hook.obj" \
 "./multimeter/input_handler.obj" \
@@ -39,6 +36,9 @@ ORDERED_OBJS += \
 "./multimeter/measurement_switcher.obj" \
 "./multimeter/multimeter_mode.obj" \
 "./multimeter/test_task.obj" \
+"./multimeter_sensor/adc.obj" \
+"./multimeter_sensor/dc_voltage_sensor.obj" \
+"./multimeter_sensor/sensor.obj" \
 "../tm4c123gh6pm.cmd" \
 "../Tivaware_Dep/IQmath/ccs/IQmathLib/Debug/IQmathLib.lib" \
 "../Tivaware_Dep/driverlib/ccs/Debug/driverlib.lib" \
@@ -65,11 +65,10 @@ RMDIR := rm -rf
 -include Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/subdir_vars.mk
 -include Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/subdir_vars.mk
 -include Tivaware_Dep/utils/subdir_vars.mk
--include adc_sensor/subdir_vars.mk
--include dma_manager/subdir_vars.mk
 -include general_timer/subdir_vars.mk
 -include hardware_helper/subdir_vars.mk
 -include multimeter/subdir_vars.mk
+-include multimeter_sensor/subdir_vars.mk
 -include subdir_rules.mk
 -include Tivaware_Dep/IQmath/ccs/IQmathLib/Debug/subdir_rules.mk
 -include Tivaware_Dep/driverlib/ccs/Debug/subdir_rules.mk
@@ -80,11 +79,10 @@ RMDIR := rm -rf
 -include Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/subdir_rules.mk
 -include Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/subdir_rules.mk
 -include Tivaware_Dep/utils/subdir_rules.mk
--include adc_sensor/subdir_rules.mk
--include dma_manager/subdir_rules.mk
 -include general_timer/subdir_rules.mk
 -include hardware_helper/subdir_rules.mk
 -include multimeter/subdir_rules.mk
+-include multimeter_sensor/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -216,12 +214,12 @@ freertos_demo.bin: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "startup_ccs.obj" "uart_util.obj" "user_io_task.obj" "Tivaware_Dep/driverlib/epi_workaround_ccs.obj" "Tivaware_Dep/drivers/buttons.obj" "Tivaware_Dep/drivers/rgb.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/list.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.obj" "Tivaware_Dep/utils/softuart.obj" "Tivaware_Dep/utils/uartstdio.obj" "Tivaware_Dep/utils/ustdlib.obj" "adc_sensor/adc_sensor.obj" "dma_manager/dma_manager.obj" "general_timer/general_timer.obj" "hardware_helper/hardware_helper.obj" 
-	-$(RM) "multimeter/ac_sensor.obj" "multimeter/core_measure_task.obj" "multimeter/freeRTOS_hook.obj" "multimeter/input_handler.obj" "multimeter/main.obj" "multimeter/measurement_switcher.obj" "multimeter/multimeter_mode.obj" "multimeter/test_task.obj" 
+	-$(RM) "startup_ccs.obj" "uart_util.obj" "user_io_task.obj" "Tivaware_Dep/driverlib/epi_workaround_ccs.obj" "Tivaware_Dep/drivers/buttons.obj" "Tivaware_Dep/drivers/rgb.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/list.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.obj" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.obj" "Tivaware_Dep/utils/softuart.obj" "Tivaware_Dep/utils/uartstdio.obj" "Tivaware_Dep/utils/ustdlib.obj" "general_timer/general_timer.obj" "hardware_helper/hardware_helper.obj" "multimeter/core_measure_task.obj" "multimeter/freeRTOS_hook.obj" 
+	-$(RM) "multimeter/input_handler.obj" "multimeter/main.obj" "multimeter/measurement_switcher.obj" "multimeter/multimeter_mode.obj" "multimeter/test_task.obj" "multimeter_sensor/adc.obj" "multimeter_sensor/dc_voltage_sensor.obj" "multimeter_sensor/sensor.obj" 
 	-$(RM) "startup_ccs.d" "user_io_task.d" "Tivaware_Dep/drivers/buttons.d" "Tivaware_Dep/drivers/rgb.d" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.d" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.d" "Tivaware_Dep/third_party/FreeRTOS/Source/list.d" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.d" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.d" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.d" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.d" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.d" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.d" "Tivaware_Dep/utils/softuart.d" "Tivaware_Dep/utils/uartstdio.d" "Tivaware_Dep/utils/ustdlib.d" "multimeter/freeRTOS_hook.d" 
-	-$(RM) "uart_util.d" "adc_sensor/adc_sensor.d" "dma_manager/dma_manager.d" "general_timer/general_timer.d" "hardware_helper/hardware_helper.d" "multimeter/ac_sensor.d" "multimeter/core_measure_task.d" "multimeter/input_handler.d" "multimeter/main.d" "multimeter/measurement_switcher.d" "multimeter/multimeter_mode.d" "multimeter/test_task.d" 
-	-$(RM) "startup_ccs.asm" "uart_util.asm" "user_io_task.asm" "Tivaware_Dep/driverlib/epi_workaround_ccs.asm" "Tivaware_Dep/drivers/buttons.asm" "Tivaware_Dep/drivers/rgb.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/list.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.asm" "Tivaware_Dep/utils/softuart.asm" "Tivaware_Dep/utils/uartstdio.asm" "Tivaware_Dep/utils/ustdlib.asm" "adc_sensor/adc_sensor.asm" "dma_manager/dma_manager.asm" "general_timer/general_timer.asm" "hardware_helper/hardware_helper.asm" 
-	-$(RM) "multimeter/ac_sensor.asm" "multimeter/core_measure_task.asm" "multimeter/freeRTOS_hook.asm" "multimeter/input_handler.asm" "multimeter/main.asm" "multimeter/measurement_switcher.asm" "multimeter/multimeter_mode.asm" "multimeter/test_task.asm" 
+	-$(RM) "uart_util.d" "general_timer/general_timer.d" "hardware_helper/hardware_helper.d" "multimeter/core_measure_task.d" "multimeter/input_handler.d" "multimeter/main.d" "multimeter/measurement_switcher.d" "multimeter/multimeter_mode.d" "multimeter/test_task.d" "multimeter_sensor/adc.d" "multimeter_sensor/dc_voltage_sensor.d" "multimeter_sensor/sensor.d" 
+	-$(RM) "startup_ccs.asm" "uart_util.asm" "user_io_task.asm" "Tivaware_Dep/driverlib/epi_workaround_ccs.asm" "Tivaware_Dep/drivers/buttons.asm" "Tivaware_Dep/drivers/rgb.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/croutine.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/event_groups.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/list.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/queue.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/stream_buffer.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/tasks.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/timers.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/port.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.asm" "Tivaware_Dep/third_party/FreeRTOS/Source/portable/MemMang/heap_2.asm" "Tivaware_Dep/utils/softuart.asm" "Tivaware_Dep/utils/uartstdio.asm" "Tivaware_Dep/utils/ustdlib.asm" "general_timer/general_timer.asm" "hardware_helper/hardware_helper.asm" "multimeter/core_measure_task.asm" "multimeter/freeRTOS_hook.asm" 
+	-$(RM) "multimeter/input_handler.asm" "multimeter/main.asm" "multimeter/measurement_switcher.asm" "multimeter/multimeter_mode.asm" "multimeter/test_task.asm" "multimeter_sensor/adc.asm" "multimeter_sensor/dc_voltage_sensor.asm" "multimeter_sensor/sensor.asm" 
 	-$(RM) "Tivaware_Dep/driverlib/epi_workaround_ccs.d" 
 	-$(RM) "Tivaware_Dep/third_party/FreeRTOS/Source/portable/CCS/ARM_CM4F/portasm.d" 
 	-@echo 'Finished clean'

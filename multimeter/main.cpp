@@ -31,8 +31,8 @@
 // #include "test_task.hpp"
 
 // application
-#include "dc_voltage_sensor.hpp"
 #include "freeRTOS_hook.h"
+#include "multimeter_sensor/dc_voltage_sensor.hpp"
 #include "uart_util.hpp"
 
 // #include "ac_sensor.hpp"
@@ -84,7 +84,7 @@ int main(void) {
   dcSensor.init();
   dcSensor.enable();
   float ret;
-  char  tempStr[200];
+  char  tempStr[400];
 
   UARTprintf("Preparing to enter super loop\n");
   for (;;) {

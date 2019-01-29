@@ -89,10 +89,8 @@ void MeasurementSwitcher::changeTask(const MeasureMode& newMode) {
   // change display content
   changeDisplayContent(targetMode);
 
-  // vTaskPrioritySet(currMode_->taskHandle, 1);
   vTaskSuspend(currMode_->taskHandle);
   vTaskResume(targetMode->taskHandle);
-  // vTaskPrioritySet(targetMode->taskHandle, configMAX_PRIORITIES - 8);
 
   UARTprintf("Changing task from %d to %d\n", currMode_->measureMode, newMode);
   setCurrMode(newMode);
