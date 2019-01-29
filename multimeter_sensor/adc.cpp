@@ -7,19 +7,14 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 
-Adc::Adc(const uint32_t& baseAddr,
-         const uint32_t& totalSequence,
-         const uint32_t& sequenceNum,
-         const uint32_t& channelMask)
-    : _baseAddr(baseAddr),
-      _totalStep(totalSequence),
-      _sequenceNum(sequenceNum),
-      _channelMask(channelMask) {}
+Adc::Adc(const uint32_t& baseAddr, const uint32_t& totalSequence, const uint32_t& sequenceNum)
+    : _baseAddr(baseAddr), _totalStep(totalSequence), _sequenceNum(sequenceNum) {}
 
 void Adc::init(const uint32_t& adcPeriphClock,
                const uint32_t& adcPinClock,
                const uint32_t& adcPinPort,
                const uint32_t& adcPinBitMask,
+               const uint32_t& channelMask,
                const uint32_t& hwOversamplFactor) {
   SysCtlPeripheralEnable(adcPeriphClock);
   while (!SysCtlPeripheralReady(adcPeriphClock)) {
@@ -36,11 +31,11 @@ void Adc::init(const uint32_t& adcPeriphClock,
   // configure individual sample in a sequence
   uint32_t step = 0;
   for (step = 0; step < _totalStep - 1; ++step) {
-    ADCSequenceStepConfigure(_baseAddr, _sequenceNum, step, _channelMask);
+    ADCSequenceStepConfigure(_baseAddr, _sequenceNum, step, channelMask);
   }
 
   // | ADC_CTL_IE
-  ADCSequenceStepConfigure(_baseAddr, _sequenceNum, step, ADC_CTL_END | _channelMask);
+  ADCSequenceStepConfigure(_baseAddr, _sequenceNum, step, ADC_CTL_END | channelMask);
 
   // TODO: Enabled dither
   ADCHardwareOversampleConfigure(_baseAddr, hwOversamplFactor);
@@ -48,7 +43,7 @@ void Adc::init(const uint32_t& adcPeriphClock,
   // configure oversampling software read to have one sample per read
   // | ADC_CTL_IE
   ADCSoftwareOversampleConfigure(_baseAddr, _sequenceNum, _totalStep);
-  ADCSoftwareOversampleStepConfigure(_baseAddr, _sequenceNum, 0, ADC_CTL_END | _channelMask);
+  ADCSoftwareOversampleStepConfigure(_baseAddr, _sequenceNum, 0, ADC_CTL_END | channelMask);
 
   //   ADCIntRegister(_baseAddr, _sequenceNum, samplingIntHandler);
 }

@@ -32,6 +32,7 @@
 
 // application
 #include "freeRTOS_hook.h"
+#include "multimeter_sensor/current_sensor.hpp"
 #include "multimeter_sensor/dc_voltage_sensor.hpp"
 #include "uart_util.hpp"
 
@@ -80,18 +81,23 @@ int main(void) {
   //   MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
 
   //   vTaskStartScheduler();
-  DcVoltageSensor dcSensor;
-  dcSensor.init();
-  dcSensor.enable();
+  //   DcVoltageSensor dcSensor;
+  //   dcSensor.init();
+  //   dcSensor.enable();
+
+  CurrentSensor currentSensor;
+  currentSensor.init();
+  currentSensor.enable();
   float ret;
   char  tempStr[400];
 
   UARTprintf("Preparing to enter super loop\n");
   for (;;) {
-    ret = dcSensor.read();
-    sprintf(tempStr, "Voltage is %f\n", ret);
+    // ret = dcSensor.read();
+    ret = currentSensor.read();
+    sprintf(tempStr, "Current is %f\n", ret);
     UARTprintf(tempStr);
-    for (auto i = 0; i < 5000000; ++i) {
+    for (auto i = 0; i < 1000000; ++i) {
       // delay loop
     }
   }

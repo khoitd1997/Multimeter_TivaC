@@ -13,8 +13,6 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-#include "tiva_utils/bit_manipulation.h"
-
 // voltage divider value in ohm
 // TODO: Finalize resistor values
 static const float R1 = 3000;
@@ -23,12 +21,11 @@ static const float R2 = 4000;
 // TODO: Change the coeff back after testing
 static const float DC_COEFF = 1;
 
-DcVoltageSensor::DcVoltageSensor()
-    : _adc(ADC0_BASE, 8, 0, ADC_CTL_CH0), Sensor(SensorType::DC_VOLT) {}
+DcVoltageSensor::DcVoltageSensor() : _adc(ADC0_BASE, 8, 0), Sensor(SensorType::DC_VOLT) {}
 
 float DcVoltageSensor::read(void) { return _adc.read() * DC_COEFF; }
 void  DcVoltageSensor::init(void) {
-  _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_3, 8);
+  _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_3, ADC_CTL_CH0, 8);
 }
 void DcVoltageSensor::disable(void) { _adc.disable(); }
 void DcVoltageSensor::enable(void) { _adc.enable(); }

@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-enum SensorType : uint8_t { AC_VOLT = 0, DC_VOLT };
+enum SensorType : uint8_t { AC_VOLT = 0, DC_VOLT, CURRENT };
 
 class Sensor {
  public:
