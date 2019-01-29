@@ -10,6 +10,7 @@ class DcVoltageSensor : public Sensor {
 
  public:
   DcVoltageSensor();
+  ~DcVoltageSensor() {}
 
   float read(void);
   void  init(void);
