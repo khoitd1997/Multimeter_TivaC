@@ -27,17 +27,19 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-#include "multimeter_mode.hpp"
-#include "test_task.hpp"
+// #include "multimeter_mode.hpp"
+// #include "test_task.hpp"
 
 // application
-#include "ac_sensor.hpp"
-#include "core_measure_task.hpp"
+#include "dc_voltage_sensor.hpp"
 #include "freeRTOS_hook.h"
-#include "general_timer/general_timer.hpp"
-#include "measurement_switcher.hpp"
-#include "tiva_utils/bit_manipulation.h"
 #include "uart_util.hpp"
+
+// #include "ac_sensor.hpp"
+// #include "core_measure_task.hpp"
+// #include "general_timer/general_timer.hpp"
+// #include "measurement_switcher.hpp"
+#include "tiva_utils/bit_manipulation.h"
 
 #define UART_BAUD 115200
 
@@ -55,29 +57,42 @@ int main(void) {
   // 80 MHz
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
-  uartConfigure(115200);
+  uartConfigure(UART_BAUD);
 
-  TaskHandle_t tempHandle = NULL;
-  xTaskCreate(testTask,
-              "Test Task 1",
-              configMINIMAL_STACK_SIZE + 500,
-              task1ID,
-              5,
-              &((MODE_LIST)[0].taskHandle));
-  vTaskSuspend(MODE_LIST[0].taskHandle);
-  assert(NULL != MODE_LIST[0].taskHandle);
+  //   TaskHandle_t tempHandle = NULL;
+  //   xTaskCreate(testTask,
+  //               "Test Task 1",
+  //               configMINIMAL_STACK_SIZE + 500,
+  //               task1ID,
+  //               5,
+  //               &((MODE_LIST)[0].taskHandle));
+  //   vTaskSuspend(MODE_LIST[0].taskHandle);
+  //   assert(NULL != MODE_LIST[0].taskHandle);
 
-  xTaskCreate(testTask,
-              "Test Task 2",
-              configMINIMAL_STACK_SIZE + 500,
-              task2ID,
-              5,
-              &((MODE_LIST)[1].taskHandle));
-  vTaskSuspend(MODE_LIST[1].taskHandle);
+  //   xTaskCreate(testTask,
+  //               "Test Task 2",
+  //               configMINIMAL_STACK_SIZE + 500,
+  //               task2ID,
+  //               5,
+  //               &((MODE_LIST)[1].taskHandle));
+  //   vTaskSuspend(MODE_LIST[1].taskHandle);
 
-  MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
+  //   MeasurementSwitcher& switcher = MeasurementSwitcher::getSwitcher();
 
-  vTaskStartScheduler();
+  //   vTaskStartScheduler();
+  DcVoltageSensor dcSensor;
+  dcSensor.init();
+  dcSensor.enable();
+  float ret;
+  char  tempStr[200];
 
-  for (;;) {}
+  UARTprintf("Preparing to enter super loop\n");
+  for (;;) {
+    ret = dcSensor.read();
+    sprintf(tempStr, "Voltage is %f\n", ret);
+    UARTprintf(tempStr);
+    for (auto i = 0; i < 5000000; ++i) {
+      // delay loop
+    }
+  }
 }
