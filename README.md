@@ -9,7 +9,7 @@ Features:
     - Voltage: Voltage divider for DC, full-bridge rectifier circuit for AC
     - Current: use INA169 Adafruit breakout board
     - Resistance: Use voltage divider
-- Display: LCD display of measurement
+- Display: OLED display using SSD1306
 - Misc Features:
     - RTC for time keeping: DS1307 breakout from Adafruit
     - Temperature, humidity: HTU21D from sparkfun
