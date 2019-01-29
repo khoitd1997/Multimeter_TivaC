@@ -74,8 +74,8 @@
 #define configCPU_CLOCK_HZ ((unsigned long)80000000)
 #define configTICK_RATE_HZ ((portTickType)100)
 
-#define configMINIMAL_STACK_SIZE ((unsigned short)200)
-#define configTOTAL_HEAP_SIZE ((size_t)(15000))  // originally 30000, this is in bytes
+#define configMINIMAL_STACK_SIZE ((unsigned short)400)
+#define configTOTAL_HEAP_SIZE ((size_t)(10000))  // originally 30000, this is in bytes
 
 #define configMAX_TASK_NAME_LEN (20)
 #define configUSE_TRACE_FACILITY 1

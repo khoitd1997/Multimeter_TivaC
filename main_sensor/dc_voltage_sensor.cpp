@@ -17,7 +17,7 @@
 // TODO: Finalize resistor values
 static const float R1 = 3000;
 static const float R2 = 4000;
-// static const float DC_COEFF = R1 * (R1 + R2);
+// static const float DC_COEFF = (R1 + R2) / R1;
 // TODO: Change the coeff back after testing
 static const float DC_COEFF = 1;
 
