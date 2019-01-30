@@ -27,7 +27,11 @@
 #include "utils/uartstdio.h"
 
 MainSensorManager::MainSensorManager(void)
-    : _dcSensor(), _acSensor(_dcSensor), _currentSensor(), _task(NULL) {
+    : _dcSensor(),
+      _acSensor(_dcSensor),
+      _currentSensor(),
+      _task(NULL),
+      _sensors({&_dcSensor, &_acSensor, &_currentSensor}) {
   if (pdPASS != xTaskCreate(MainSensorManager::manager,
                             "Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
@@ -36,14 +40,10 @@ MainSensorManager::MainSensorManager(void)
                             &(this->_task))) {
     for (;;) { UARTprintf("Failed to create task"); }
   }
-  _dcSensor.init();
-  _sensors[SensorType::DC_VOLT] = &_dcSensor;
-
-  _acSensor.init();
-  _sensors[SensorType::AC_VOLT] = &_acSensor;
-
-  _currentSensor.init();
-  _sensors[SensorType::CURRENT] = &_currentSensor;
+  for (auto& sensor : _sensors) {
+    sensor->init();
+    sensor->disable();
+  }
 
   UARTprintf("Finished creating tasks\n");
 }
@@ -54,19 +54,30 @@ TaskHandle_t MainSensorManager::getTask(void) {
 }
 
 void MainSensorManager::manager(void* param) {
-  auto managerObj = static_cast<MainSensorManager*>(param);
-  auto currSensor = managerObj->_sensors[0];
+  auto    managerObj = static_cast<MainSensorManager*>(param);
+  int32_t index      = 0;
+  auto    sensor     = managerObj->_sensors[index];
+  sensor->enable();
 
   UARTprintf("Preparing to enter manager superloop\n");
   for (;;) {
     uint32_t notifyVal = 0;
+    auto     pending   = xTaskNotifyWait(0x00, ULONG_MAX, &notifyVal, 0);
 
-    auto pending = xTaskNotifyWait(0x00, ULONG_MAX, &notifyVal, 0);
+    if (pdTRUE == pending) {
+      sensor->disable();
+      index += static_cast<int32_t>(notifyVal);
+      // wrap value around
+      index = (index < 0) ? SensorType::TOTAL_SENSOR - 1 : index;
+      index = (index > SensorType::TOTAL_SENSOR - 1) ? 0 : index;
 
-    if (pdTRUE == pending) { currSensor = managerObj->_sensors[notifyVal]; }
+      sensor = managerObj->_sensors[index];
+      UARTprintf("Index is: %d\n", index);
+      sensor->enable();
+    }
     char tempStr[100];
-    auto ret = currSensor->read();
-    sprintf(tempStr, "AC is %f\n", ret);
-    UARTprintf(tempStr);
+    auto ret = sensor->read();
+    // sprintf(tempStr, "AC is %f\n", ret);
+    // UARTprintf(tempStr);
   }
 }

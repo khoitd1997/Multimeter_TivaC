@@ -15,16 +15,16 @@
 class MainSensorManager {
  private:
   TaskHandle_t    _task;
-  Sensor*         _sensors[SensorType::TOTAL_SENSOR];
   DcVoltageSensor _dcSensor;
   AcVoltageSensor _acSensor;
   CurrentSensor   _currentSensor;
+  Sensor*         _sensors[SensorType::TOTAL_SENSOR];
 
   MainSensorManager(void);
+  static void manager(void* param);
 
  public:
   static TaskHandle_t getTask(void);
-  static void         manager(void* param);
 };
 
 #endif

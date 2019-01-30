@@ -35,6 +35,7 @@
 // #include "main_sensor/ac_voltage_sensor.hpp"
 // #include "main_sensor/current_sensor.hpp"
 // #include "main_sensor/dc_voltage_sensor.hpp"
+#include "input_handler.hpp"
 #include "main_sensor/main_sensor_manager.hpp"
 #include "uart_util.hpp"
 
@@ -67,33 +68,12 @@ int main(void) {
 
   UARTprintf("Creating tasks\n");
 
-  TaskHandle_t tempHandle = NULL;
-
-  //   xTaskCreate(testTask,
-  //               "Test Task 2",
-  //               configMINIMAL_STACK_SIZE + 500,
-  //               task2ID,
-  //               5,
-  //               &((MODE_LIST)[1].taskHandle));
-  //   vTaskSuspend(MODE_LIST[1].taskHandle);
-
-  auto sensorManager = MainSensorManager::getTask();
-  UARTprintf("Preparing to start schedulear\n");
+  auto sensorManagerTask = MainSensorManager::getTask();
+  InputHandler::create(sensorManagerTask);
+  UARTprintf("Preparing to start scheduler\n");
   vTaskStartScheduler();
 
   UARTprintf("Scheduler failed\n");
-  for (;;) {
-    // ret = dcSensor.read();
-    // ret = acSensor.read();
-    // sprintf(tempStr, "AC is %f\n", ret);
-    // UARTprintf(tempStr);
 
-    // for (auto i = 0; i < 100; ++i) {
-    //   // delay loop
-    // }
-
-    // for (auto i = 0; i < 1000000; ++i) {
-    //   // delay loop
-    // }
-  }
+  for (;;) {}
 }
