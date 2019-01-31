@@ -60,20 +60,6 @@ void uartConfigure(uint32_t baudRate) {
   // Use the internal 16MHz oscillator as the UART clock source.
   UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
 
-  // create semphore for buffer
-  uartSemaphr = xSemaphoreCreateBinary();
-
   // Initialize the UART for console I/O.
   UARTStdioConfig(0, baudRate, 16000000);
-
-  //   if (pdPASS !=
-  //       xTaskCreate(uartTask, "Uart Task", UART_STACK_SIZE, NULL, configMAX_PRIORITIES - 2,
-  //       NULL)) {
-  //     UARTprintf("Can't create uart task\n");
-  //     for (;;) {
-  //       // stall since there is no point in proceeding
-  //     }
-  //   } else {
-  //     UARTprintf("Successfully created uart task\n");
-  //   }
 }
