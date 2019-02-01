@@ -67,7 +67,6 @@ void MainSensorManager::manager(void* param) {
 
   UARTprintf("Preparing to enter manager superloop\n");
   for (;;) {
-    auto     startTime = xTaskGetTickCount();
     uint32_t notifyVal = 0;
     auto     pending   = xTaskNotifyWait(0x00, ULONG_MAX, &notifyVal, 0);
 
@@ -85,17 +84,9 @@ void MainSensorManager::manager(void* param) {
     }
     auto ret = sensor->read();
 
-    // while (1) {}
-
     // char tempStr[100];
     // sprintf(tempStr, "AC is %f\n", ret);
     // UARTprintf(tempStr);
-
-    auto runTime = xTaskGetTickCount() - startTime;
-    // UARTprintf("Start is %d, Run time is %d, delay is %d\n",
-    //            startTime,
-    //            xTaskGetTickCount(),
-    //            samplingPeriod);
 
     vTaskDelayUntil(&lastWakeTime, samplingPeriod);
   }

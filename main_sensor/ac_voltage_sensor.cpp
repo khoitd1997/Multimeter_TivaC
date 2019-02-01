@@ -35,7 +35,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-const uint32_t AC_SAMPLING_PERIOD_MS = 2;
+const uint32_t = 2;
 
 // modified from ARM CMSIS library
 static float arm_rms_f32(float* pSrc, uint32_t blockSize) {
@@ -96,17 +96,6 @@ float AcVoltageSensor::read(void) {
   if (SAMPLE_PER_READ - 1 == _currSample) {
     _currSample = 0;
     _lastVal    = arm_rms_f32(_samplingBuf, SAMPLE_PER_READ);
-
-    // char tempStr[100];
-    // sprintf(tempStr,
-    //         "Sample is %f %f %f %f, result is %f\n",
-    //         _samplingBuf[0],
-    //         _samplingBuf[1],
-    //         _samplingBuf[2],
-    //         _samplingBuf[3],
-    //         _lastVal);
-    // UARTprintf(tempStr);
-
   } else {
     ++_currSample;
   }
