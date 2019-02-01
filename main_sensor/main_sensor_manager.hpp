@@ -22,11 +22,11 @@ class MainSensorManager {
   ResistanceSensor _resistanceSensor;
   Sensor*          _sensors[SensorType::TOTAL_SENSOR];
 
-  MainSensorManager(void);
+  MainSensorManager(const UBaseType_t priority);
   static void manager(void* param);
 
  public:
-  static TaskHandle_t getTask(void);
+  static TaskHandle_t getTask(const UBaseType_t priority);
 };
 
 #endif

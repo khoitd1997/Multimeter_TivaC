@@ -26,9 +26,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-UBaseType_t MANAGER_PRIORITY = configMAX_PRIORITIES - 4;
-
-MainSensorManager::MainSensorManager(void)
+MainSensorManager::MainSensorManager(const UBaseType_t priority)
     : _dcSensor(),
       _acSensor(_dcSensor),
       _currentSensor(),
@@ -36,10 +34,10 @@ MainSensorManager::MainSensorManager(void)
       _task(NULL),
       _sensors({&_dcSensor, &_acSensor, &_currentSensor, &_resistanceSensor}) {
   if (pdPASS != xTaskCreate(MainSensorManager::manager,
-                            "Manager Task",
+                            "Main Sensor Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
                             this,
-                            MANAGER_PRIORITY,
+                            priority,
                             &(this->_task))) {
     for (;;) { UARTprintf("Failed to create task"); }
   }
@@ -51,9 +49,9 @@ MainSensorManager::MainSensorManager(void)
   UARTprintf("Finished creating tasks\n");
 }
 
-TaskHandle_t MainSensorManager::getTask(void) {
-  static MainSensorManager manager;
-  return manager._task;
+TaskHandle_t MainSensorManager::getTask(const UBaseType_t priority) {
+  static MainSensorManager m(priority);
+  return m._task;
 }
 
 void MainSensorManager::manager(void* param) {
