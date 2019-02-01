@@ -25,6 +25,7 @@
 #include "inc/hw_types.h"
 
 // application
+#include "display/display_manager.hpp"
 #include "freeRTOS_hook.h"
 #include "input_handler.hpp"
 #include "main_sensor/main_sensor_manager.hpp"
@@ -37,6 +38,10 @@ void __error__(char* pcFilename, uint32_t ui32Line) {}
 
 #endif
 
+// TODO: Change priority after test
+UBaseType_t MAIN_SENSOR_PRIORITY = configMAX_PRIORITIES - 6;
+UBaseType_t DISPLAY_PRIORITY     = configMAX_PRIORITIES - 4;
+
 int main(void) {
   // 80 MHz
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
@@ -45,8 +50,10 @@ int main(void) {
 
   UARTprintf("Creating tasks\n");
 
-  auto sensorManagerTask = MainSensorManager::getTask();
-  InputHandler::create(sensorManagerTask);
+  //   auto sensorManagerTask = MainSensorManager::getTask(MAIN_SENSOR_PRIORITY);
+  //   InputHandler::create(sensorManagerTask);
+  DisplayManager::create(DISPLAY_PRIORITY, NULL, 0);
+
   UARTprintf("Preparing to start scheduler\n");
   vTaskStartScheduler();
 
