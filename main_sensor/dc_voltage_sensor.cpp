@@ -21,7 +21,10 @@ static const float R2 = 4000;
 // TODO: Change the coeff back after testing
 static const float DC_COEFF = 1;
 
-DcVoltageSensor::DcVoltageSensor() : _adc(ADC0_BASE, 8, 0), Sensor(SensorType::DC_VOLT) {}
+const uint32_t DC_SAMPLING_PERIOD_MS = 10;
+
+DcVoltageSensor::DcVoltageSensor()
+    : _adc(ADC0_BASE, 8, 0), Sensor(SensorType::DC_VOLT, DC_SAMPLING_PERIOD_MS) {}
 
 float DcVoltageSensor::read(void) { return _adc.read() * DC_COEFF; }
 void  DcVoltageSensor::init(void) {

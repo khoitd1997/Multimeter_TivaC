@@ -3,11 +3,6 @@
 
 #include <cstdint>
 
-static const uint32_t ADC_RESOLUTION      = 4096;
-static const float    ADC_MAX_VOLTAGE     = 3.3;
-static const uint32_t OVERSAMPLING_FACTOR = 2;
-static const float    ADC_COEFF           = ADC_MAX_VOLTAGE / ADC_RESOLUTION;
-
 class Adc {
  private:
   uint32_t _baseAddr;

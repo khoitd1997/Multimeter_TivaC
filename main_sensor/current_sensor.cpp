@@ -13,9 +13,11 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-static const float SHUNT_RESISTOR = 1;  // ohm of current shunt resistor
+const uint32_t     CURRENT_SAMPLING_PERIOD_MS = 10;
+static const float SHUNT_RESISTOR             = 1;  // ohm of current shunt resistor
 
-CurrentSensor::CurrentSensor() : _adc(ADC1_BASE, 8, 0), Sensor(SensorType::CURRENT) {}
+CurrentSensor::CurrentSensor()
+    : _adc(ADC1_BASE, 8, 0), Sensor(SensorType::CURRENT, CURRENT_SAMPLING_PERIOD_MS) {}
 
 float CurrentSensor::read(void) { return _adc.read() / SHUNT_RESISTOR; }
 void  CurrentSensor::init(void) {

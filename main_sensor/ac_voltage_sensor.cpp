@@ -19,6 +19,7 @@
 #include "ac_voltage_sensor.hpp"
 
 #include <math.h>
+#include <stdio.h>
 
 // peripheral
 #include "driverlib/adc.h"
@@ -27,14 +28,17 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/udma.h"
+#include "utils/uartstdio.h"
 
 // hardware
 #include "inc/hw_adc.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
+const uint32_t AC_SAMPLING_PERIOD_MS = 2;
+
 // modified from ARM CMSIS library
-float arm_rms_f32(float* pSrc, uint32_t blockSize) {
+static float arm_rms_f32(float* pSrc, uint32_t blockSize) {
   float    sum = 0.0f; /* Accumulator */
   float    in;         /* Tempoprary variable to store input value */
   uint32_t blkCnt;     /* loop counter */
@@ -84,7 +88,7 @@ AcVoltageSensor::AcVoltageSensor(DcVoltageSensor& dcSensor)
       _currSample(0),
       _samplingBuf({0}),
       _lastVal(0),
-      Sensor(SensorType::AC_VOLT) {}
+      Sensor(SensorType::AC_VOLT, AC_SAMPLING_PERIOD_MS) {}
 
 float AcVoltageSensor::read(void) {
   _samplingBuf[_currSample] = _dcSensor.read();
@@ -92,6 +96,17 @@ float AcVoltageSensor::read(void) {
   if (SAMPLE_PER_READ - 1 == _currSample) {
     _currSample = 0;
     _lastVal    = arm_rms_f32(_samplingBuf, SAMPLE_PER_READ);
+
+    // char tempStr[100];
+    // sprintf(tempStr,
+    //         "Sample is %f %f %f %f, result is %f\n",
+    //         _samplingBuf[0],
+    //         _samplingBuf[1],
+    //         _samplingBuf[2],
+    //         _samplingBuf[3],
+    //         _lastVal);
+    // UARTprintf(tempStr);
+
   } else {
     ++_currSample;
   }

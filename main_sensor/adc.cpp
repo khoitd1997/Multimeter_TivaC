@@ -7,6 +7,10 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 
+static const uint32_t ADC_RESOLUTION  = 4096;
+static const float    ADC_MAX_VOLTAGE = 3.3;
+static const float    ADC_COEFF       = ADC_MAX_VOLTAGE / ADC_RESOLUTION;
+
 Adc::Adc(const uint32_t& baseAddr, const uint32_t& totalSequence, const uint32_t& sequenceNum)
     : _baseAddr(baseAddr), _totalStep(totalSequence), _sequenceNum(sequenceNum) {}
 

@@ -9,8 +9,9 @@ enum SensorType : uint32_t { DC_VOLT = 0, AC_VOLT, CURRENT, TOTAL_SENSOR };
 class Sensor {
  public:
   const SensorType type;
+  const uint32_t   samplingPeriodMs;
 
-  Sensor(const SensorType &sensorType);
+  Sensor(const SensorType& sensorType, const uint32_t& samplPeriod);
   virtual ~Sensor() {}
 
   virtual float read(void)    = 0;

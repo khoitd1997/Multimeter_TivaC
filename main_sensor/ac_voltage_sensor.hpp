@@ -4,7 +4,7 @@
 #include "dc_voltage_sensor.hpp"
 #include "sensor.hpp"
 
-static const uint32_t SAMPLE_PER_READ = 20;
+static const uint32_t SAMPLE_PER_READ = 64;
 
 class AcVoltageSensor : public Sensor {
  private:

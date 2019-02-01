@@ -26,6 +26,8 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
+UBaseType_t MANAGER_PRIORITY = configMAX_PRIORITIES - 4;
+
 MainSensorManager::MainSensorManager(void)
     : _dcSensor(),
       _acSensor(_dcSensor),
@@ -36,7 +38,7 @@ MainSensorManager::MainSensorManager(void)
                             "Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
                             this,
-                            configMAX_PRIORITIES - 4,
+                            MANAGER_PRIORITY,
                             &(this->_task))) {
     for (;;) { UARTprintf("Failed to create task"); }
   }
@@ -55,12 +57,17 @@ TaskHandle_t MainSensorManager::getTask(void) {
 
 void MainSensorManager::manager(void* param) {
   auto    managerObj = static_cast<MainSensorManager*>(param);
-  int32_t index      = 0;
+  int32_t index      = 1;  // TODO: Change it back after test
   auto    sensor     = managerObj->_sensors[index];
+
+  auto lastWakeTime   = xTaskGetTickCount();
+  auto samplingPeriod = pdMS_TO_TICKS(sensor->samplingPeriodMs);
+
   sensor->enable();
 
   UARTprintf("Preparing to enter manager superloop\n");
   for (;;) {
+    auto     startTime = xTaskGetTickCount();
     uint32_t notifyVal = 0;
     auto     pending   = xTaskNotifyWait(0x00, ULONG_MAX, &notifyVal, 0);
 
@@ -74,10 +81,22 @@ void MainSensorManager::manager(void* param) {
       sensor = managerObj->_sensors[index];
       UARTprintf("Index is: %d\n", index);
       sensor->enable();
+      samplingPeriod = pdMS_TO_TICKS(sensor->samplingPeriodMs);
     }
-    char tempStr[100];
     auto ret = sensor->read();
+
+    // while (1) {}
+
+    // char tempStr[100];
     // sprintf(tempStr, "AC is %f\n", ret);
     // UARTprintf(tempStr);
+
+    auto runTime = xTaskGetTickCount() - startTime;
+    // UARTprintf("Start is %d, Run time is %d, delay is %d\n",
+    //            startTime,
+    //            xTaskGetTickCount(),
+    //            samplingPeriod);
+
+    vTaskDelayUntil(&lastWakeTime, samplingPeriod);
   }
 }
