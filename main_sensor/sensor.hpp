@@ -4,7 +4,7 @@
 #include <cstdint>
 
 // enum used for array indexing of sensor lists
-enum SensorType : uint32_t { DC_VOLT = 0, AC_VOLT, CURRENT, TOTAL_SENSOR };
+enum SensorType : uint32_t { DC_VOLT = 0, AC_VOLT, CURRENT, RESISTANCE, TOTAL_SENSOR };
 
 class Sensor {
  public:

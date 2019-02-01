@@ -32,8 +32,9 @@ MainSensorManager::MainSensorManager(void)
     : _dcSensor(),
       _acSensor(_dcSensor),
       _currentSensor(),
+      _resistanceSensor(),
       _task(NULL),
-      _sensors({&_dcSensor, &_acSensor, &_currentSensor}) {
+      _sensors({&_dcSensor, &_acSensor, &_currentSensor, &_resistanceSensor}) {
   if (pdPASS != xTaskCreate(MainSensorManager::manager,
                             "Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
@@ -57,7 +58,7 @@ TaskHandle_t MainSensorManager::getTask(void) {
 
 void MainSensorManager::manager(void* param) {
   auto    managerObj = static_cast<MainSensorManager*>(param);
-  int32_t index      = 1;  // TODO: Change it back after test
+  int32_t index      = 3;  // TODO: Change it back after test
   auto    sensor     = managerObj->_sensors[index];
 
   auto lastWakeTime   = xTaskGetTickCount();
@@ -84,9 +85,9 @@ void MainSensorManager::manager(void* param) {
     }
     auto ret = sensor->read();
 
-    // char tempStr[100];
-    // sprintf(tempStr, "AC is %f\n", ret);
-    // UARTprintf(tempStr);
+    char tempStr[100];
+    sprintf(tempStr, "AC is %f\n", ret);
+    UARTprintf(tempStr);
 
     vTaskDelayUntil(&lastWakeTime, samplingPeriod);
   }
