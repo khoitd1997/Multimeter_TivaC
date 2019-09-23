@@ -63,3 +63,6 @@
 *.bin
 **.asm
 **.mk
+/Debug/
+**/.vscode/*
+build/*
