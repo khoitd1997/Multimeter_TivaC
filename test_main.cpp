@@ -57,6 +57,22 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 //
 //*****************************************************************************
 
+#include "FreeRTOS.h"
+#include "task.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName) {
+  // This function can not return, so loop forever.  Interrupts are disabled
+  // on entry to this function, so no processor interrupts will interrupt
+  // this loop.
+  for (;;) {}
+}
+#ifdef __cplusplus
+}
+#endif
+
 const auto ledPin = GPIO_PIN_3;
 
 int main(void) {

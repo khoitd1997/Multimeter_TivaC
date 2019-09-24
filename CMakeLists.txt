@@ -10,4 +10,4 @@ add_subdirectory(extra_sensor)
 add_subdirectory(display)
 
 add_executable(multimeter.elf tm4c123gh6pm_startup_ccs_gcc.c test_main.cpp)
-target_link_libraries(multimeter.elf swo display_manager)
+target_link_libraries(multimeter.elf swo display_manager free_rtos)
