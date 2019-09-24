@@ -4,7 +4,13 @@
         "*.tdd": "makefile",
         "*.cfg": "tcl",
         "*.svd": "xml",
+        "*.emProject": "xml",
+        "*.emSession": "xml",
         "*.hpp": "cpp",
+        "*.ks": "shellscript",
+        "*.rasi": "css",
+        "*.in": "cmake",
+        "conanfile.txt": "toml",
         "switch_task.h": "c",
         "uart.h": "c",
         "led_task.h": "c",
@@ -29,7 +35,8 @@
         "type_traits": "cpp",
         "cstdint": "cpp",
         "cstdbool": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "ds3231.h": "c"
     },
     "editor.formatOnSave": true
 }

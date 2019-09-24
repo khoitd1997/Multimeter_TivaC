@@ -6,6 +6,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/tivaware)
 
 add_subdirectory(Tiva_Extra)
 add_subdirectory(FreeRTOS)
+add_subdirectory(extra_sensor)
 add_subdirectory(display)
 
 add_executable(multimeter.elf tm4c123gh6pm_startup_ccs_gcc.c test_main.cpp)
