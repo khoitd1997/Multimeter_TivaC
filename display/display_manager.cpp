@@ -19,8 +19,8 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-#include "tiva_SSD1306_Driver/src/oled_font_source_pro.h"
-#include "tiva_SSD1306_Driver/src/ssd1306.h"
+#include "oled_font_source_pro.h"
+#include "ssd1306.h"
 
 DisplayManager::DisplayManager(const UBaseType_t    priority,
                                StreamBufferHandle_t streamList[],
@@ -53,7 +53,7 @@ void DisplayManager::manager(void *param) {
   auto managerObj = static_cast<DisplayManager *>(param);
 
   managerObj->printStartupScreen();
-  UARTprintf("Preparing to enter display manager loop %d\n", *testPtr);
+  //   UARTprintf("Preparing to enter display manager loop %d\n", *testPtr);
   for (;;) {}
 }
 

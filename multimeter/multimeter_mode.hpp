@@ -6,7 +6,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 
-#include "tiva_utils/bit_manipulation.h"
+#include "bit_manipulation.h"
 
 enum MeasureMode : EventBits_t { AC_VOLT = BIT(0), DC_VOLT = BIT(1) };
 

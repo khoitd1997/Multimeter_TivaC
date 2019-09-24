@@ -8,7 +8,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # Ti specific
 
-set(tiva_compiler_flags "-mcpu=cortex-m4  -march=armv7e-m  -mthumb  -mfloat-abi=hard  -mfpu=fpv4-sp-d16  -DPART_TM4C123GH6PM  -Og  -ffunction-sections  -fdata-sections  -g  -gdwarf-3  -gstrict-dwarf  -Wall -MD --specs=nosys.specs -fno-exceptions ")
+set(tiva_compiler_flags "-mcpu=cortex-m4  -march=armv7e-m  -mthumb  -mfloat-abi=hard  -mfpu=fpv4-sp-d16 -DTARGET_IS_TM4C123_RB1 -DPART_TM4C123GH6PM  -Og  -ffunction-sections  -fdata-sections  -g  -gdwarf-3  -gstrict-dwarf  -Wall -MD --specs=nosys.specs -fno-exceptions ")
 set(CMAKE_CXX_FLAGS "${tiva_compiler_flags} -fno-rtti " )
 set(CMAKE_C_FLAGS ${tiva_compiler_flags})
 

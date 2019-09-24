@@ -18,7 +18,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-#include "tiva_utils/bit_manipulation.h"
+#include "bit_manipulation.h"
 
 static const auto LEFT_BUTTON     = GPIO_INT_PIN_4;
 static const auto RIGHT_BUTTON    = GPIO_INT_PIN_0;

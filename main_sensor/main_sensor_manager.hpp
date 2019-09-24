@@ -11,7 +11,7 @@
 #include "dc_voltage_sensor.hpp"
 #include "resistance_sensor.hpp"
 
-#include "tiva_utils/bit_manipulation.h"
+#include "bit_manipulation.h"
 
 class MainSensorManager {
  private:
