@@ -65,5 +65,9 @@
 **.mk
 /Debug/
 **/.vscode/*
+!**/.vscode/tasks.json
+!**/.vscode/settings.json
+!**/.vscode/launch.json
 build/*
 .settings/*
+.gdb_history

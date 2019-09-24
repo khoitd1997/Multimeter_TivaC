@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/multimeter.elf",
+            "name": "Debug Tiva",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "TM4C123GH6PM",
+            "svdFile": "TM4C123GH6PM.svd",
+            "preLaunchTask": "build+run"
+        }
+    ]
+}

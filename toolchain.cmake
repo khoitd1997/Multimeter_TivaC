@@ -12,6 +12,9 @@ set(tiva_compiler_flags "-mcpu=cortex-m4  -march=armv7e-m  -mthumb  -mfloat-abi=
 set(CMAKE_CXX_FLAGS "${tiva_compiler_flags} -fno-rtti " )
 set(CMAKE_C_FLAGS ${tiva_compiler_flags})
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DPART_TM4C123GH6PM -Og -ffunction-sections -fdata-sections -g -gdwarf-3 -gstrict-dwarf -Wall -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T ${CMAKE_CURRENT_SOURCE_DIR}/tm4c123gh6pm.lds --entry ResetISR "
+  )
+
 find_program(CMAKE_C_COMPILER arm-none-eabi-gcc)
 find_program(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 

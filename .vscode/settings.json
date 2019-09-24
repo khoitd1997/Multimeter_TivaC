@@ -30,5 +30,6 @@
         "cstdint": "cpp",
         "cstdbool": "cpp",
         "cstring": "cpp"
-    }
+    },
+    "editor.formatOnSave": true
 }
