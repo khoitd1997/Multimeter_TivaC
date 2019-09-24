@@ -73,30 +73,11 @@ extern void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName)
 }
 #endif
 
-const auto ledPin = GPIO_PIN_3;
+const auto ledPin = GPIO_PIN_1;
 
-int main(void) {
+static void blinkLED(void *param) {
   volatile uint32_t ui32Loop;
 
-  //
-  // Enable the GPIO port that is used for the on-board LED.
-  //
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
-  //
-  // Check if the peripheral access is enabled.
-  //
-  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {}
-
-  //
-  // Enable the GPIO pin for the LED (PF3).  Set the direction as output, and
-  // enable the GPIO pin for digital function.
-  //
-  GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, ledPin);
-
-  //
-  // Loop forever.
-  //
   while (1) {
     //
     // Turn on the LED.
@@ -118,4 +99,38 @@ int main(void) {
     //
     for (ui32Loop = 0; ui32Loop < 200000; ui32Loop++) {}
   }
+}
+
+int main(void) {
+  //
+  // Enable the GPIO port that is used for the on-board LED.
+  //
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+  //
+  // Check if the peripheral access is enabled.
+  //
+  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {}
+
+  //
+  // Enable the GPIO pin for the LED (PF3).  Set the direction as output, and
+  // enable the GPIO pin for digital function.
+  //
+  GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, ledPin);
+
+  if (pdPASS != xTaskCreate(blinkLED,
+                            "Test Task",
+                            configMINIMAL_STACK_SIZE + 200,
+                            nullptr,
+                            configMAX_PRIORITIES - 4,
+                            nullptr)) {
+    for (;;) {}
+  }
+
+  //
+  // Loop forever.
+  //
+  vTaskStartScheduler();
+
+  for (;;) {}
 }
