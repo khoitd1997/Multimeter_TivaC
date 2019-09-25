@@ -1,4 +1,4 @@
-file build/multimeter.elf
+file build/multimeter/multimeter.elf
 target remote localhost:2331
 monitor halt
 monitor reset

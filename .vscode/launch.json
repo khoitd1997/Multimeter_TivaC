@@ -6,7 +6,7 @@
     "configurations": [
         {
             "cwd": "${workspaceRoot}",
-            "executable": "./build/multimeter.elf",
+            "executable": "./build/multimeter/multimeter.elf",
             "name": "Debug Tiva",
             "request": "launch",
             "type": "cortex-debug",
