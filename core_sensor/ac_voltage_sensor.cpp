@@ -84,11 +84,11 @@ static float arm_rms_f32(float* pSrc, uint32_t blockSize) {
 }
 
 AcVoltageSensor::AcVoltageSensor(DcVoltageSensor& dcSensor)
-    : _dcSensor(dcSensor),
-      _currSample(0),
-      _samplingBuf({0}),
-      _lastVal(0),
-      Sensor(SensorType::AC_VOLT, AC_SAMPLING_PERIOD_MS) {}
+    : Sensor(SensorType::AC_VOLT, AC_SAMPLING_PERIOD_MS),
+      _dcSensor{dcSensor},
+      _currSample{0},
+      _samplingBuf{0},
+      _lastVal{0} {}
 
 float AcVoltageSensor::read(void) {
   _samplingBuf[_currSample] = _dcSensor.read();

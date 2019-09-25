@@ -25,10 +25,10 @@
 #include "inc/hw_types.h"
 
 // application
+#include "core_sensor/core_sensor_manager.hpp"
 #include "display/display_manager.hpp"
 #include "freeRTOS_hook.h"
 #include "input_handler.hpp"
-#include "main_sensor/main_sensor_manager.hpp"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200
@@ -39,7 +39,7 @@ void __error__(char* pcFilename, uint32_t ui32Line) {}
 #endif
 
 // TODO: Change priority after test
-UBaseType_t MAIN_SENSOR_PRIORITY = configMAX_PRIORITIES - 6;
+UBaseType_t CORE_SENSOR_PRIORITY = configMAX_PRIORITIES - 6;
 UBaseType_t DISPLAY_PRIORITY     = configMAX_PRIORITIES - 4;
 
 int main(void) {
@@ -50,7 +50,7 @@ int main(void) {
 
   UARTprintf("Creating tasks\n");
 
-  //   auto sensorManagerTask = MainSensorManager::getTask(MAIN_SENSOR_PRIORITY);
+  //   auto sensorManagerTask = MainSensorManager::getTask(CORE_SENSOR_PRIORITY);
   //   InputHandler::create(sensorManagerTask);
   DisplayManager::create(DISPLAY_PRIORITY, NULL, 0);
 

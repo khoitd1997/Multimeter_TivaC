@@ -1,4 +1,4 @@
-#include "main_sensor_manager.hpp"
+#include "core_sensor_manager.hpp"
 
 // FreeRTOS
 #include "FreeRTOS.h"
@@ -25,6 +25,8 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+
+#include "bit_manipulation.h"
 
 MainSensorManager::MainSensorManager(const UBaseType_t priority)
     : _dcSensor(),

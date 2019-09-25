@@ -1,5 +1,5 @@
-#ifndef _MAIN_SENSOR_MANAGER_HPP
-#define _MAIN_SENSOR_MANAGER_HPP
+#ifndef _CORE_SENSOR_MANAGER_HPP
+#define _CORE_SENSOR_MANAGER_HPP
 
 #include <cstdint>
 
@@ -10,8 +10,6 @@
 #include "current_sensor.hpp"
 #include "dc_voltage_sensor.hpp"
 #include "resistance_sensor.hpp"
-
-#include "bit_manipulation.h"
 
 class MainSensorManager {
  private:

@@ -7,8 +7,8 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(tiva_compiler_flags "-mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard  -mfpu=fpv4-sp-d16 -DTARGET_IS_TM4C123_RB1 -DPART_TM4C123GH6PM -Og -ffunction-sections -fdata-sections -g -gdwarf-3 -gstrict-dwarf -Wall -MD --specs=nosys.specs -fno-exceptions ")
-set(CMAKE_CXX_FLAGS "${tiva_compiler_flags} -fno-rtti " )
-set(CMAKE_C_FLAGS ${tiva_compiler_flags})
+set(CMAKE_CXX_FLAGS "${tiva_compiler_flags} -fno-rtti -Wno-comment" )
+set(CMAKE_C_FLAGS "${tiva_compiler_flags} -Wno-comment")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DPART_TM4C123GH6PM -Og -ffunction-sections -fdata-sections -g -gdwarf-3 -gstrict-dwarf -Wall -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T ${CMAKE_CURRENT_SOURCE_DIR}/tm4c123gh6pm.lds --entry ResetISR "
  )
