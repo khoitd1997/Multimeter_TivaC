@@ -25,8 +25,8 @@
 #include "inc/hw_types.h"
 
 // application
-#include "core_sensor/core_sensor_manager.hpp"
-#include "display/display_manager.hpp"
+#include "core_sensor_manager.hpp"
+#include "display_manager.hpp"
 #include "freeRTOS_hook.h"
 #include "input_handler.hpp"
 #include "uart_util.hpp"

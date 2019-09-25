@@ -47,7 +47,7 @@ void inputISRHandler(void) {
     lastInput = currTick;
 
     BaseType_t higherTaskWoken;
-    int32_t    inc;
+    int32_t    inc = 0;
     if (bit_get(intStatus, LEFT_BUTTON)) {
       inc = -1;
     } else if (bit_get(intStatus, RIGHT_BUTTON)) {
