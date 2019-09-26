@@ -1,0 +1,10 @@
+add_library(core_sensor
+            ac_voltage_sensor.cpp
+            adc.cpp
+            core_sensor_manager.cpp
+            current_sensor.cpp
+            dc_voltage_sensor.cpp
+            resistance_sensor.cpp
+            sensor.cpp)
+target_include_directories(core_sensor PUBLIC .)
+target_link_libraries(core_sensor PUBLIC free_rtos PRIVATE tiva_utils)

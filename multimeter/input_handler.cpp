@@ -18,7 +18,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-#include "tiva_utils/bit_manipulation.h"
+#include "bit_manipulation.h"
 
 static const auto LEFT_BUTTON     = GPIO_INT_PIN_4;
 static const auto RIGHT_BUTTON    = GPIO_INT_PIN_0;
@@ -47,7 +47,7 @@ void inputISRHandler(void) {
     lastInput = currTick;
 
     BaseType_t higherTaskWoken;
-    int32_t    inc;
+    int32_t    inc = 0;
     if (bit_get(intStatus, LEFT_BUTTON)) {
       inc = -1;
     } else if (bit_get(intStatus, RIGHT_BUTTON)) {

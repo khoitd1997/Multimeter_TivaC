@@ -31,7 +31,7 @@
 #include "core_measure_task.hpp"
 #include "freeRTOS_hook.h"
 #include "general_timer/general_timer.hpp"
-#include "tiva_utils/bit_manipulation.h"
+#include "bit_manipulation.h"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200

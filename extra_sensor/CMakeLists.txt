@@ -1,0 +1,2 @@
+add_subdirectory(ds3231_tivaC)
+add_subdirectory(htu21d_tivaC)

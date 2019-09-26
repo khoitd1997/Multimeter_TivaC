@@ -1,12 +1,6 @@
-[submodule "Tivaware_Dep"]
-	path = Tivaware_Dep
-	url = https://github.com/khoitd1997/Tivaware_Dep.git
 [submodule "extra_sensor/ds3231_tivaC"]
 	path = extra_sensor/ds3231_tivaC
 	url = https://github.com/khoitd1997/ds3231_tivaC.git
-[submodule "Tiva_Extra"]
-	path = Tiva_Extra
-	url = https://github.com/khoitd1997/Tiva_Extra.git
 [submodule "extra_sensor/htu21d_tivaC"]
 	path = extra_sensor/htu21d_tivaC
 	url = https://github.com/khoitd1997/htu21d_tivaC.git
