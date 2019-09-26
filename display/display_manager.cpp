@@ -22,10 +22,16 @@
 #include "oled_font_source_pro.h"
 #include "ssd1306.h"
 
+#include "input_handler.hpp"
+
+#include "swo_segger.h"
+
 DisplayManager::DisplayManager(const UBaseType_t    priority,
                                StreamBufferHandle_t streamList[],
                                const uint32_t       totalStream)
-    : _streams(streamList), _totalStream(totalStream) {
+    : _streams{streamList},
+      _totalStream{totalStream},
+      inputEventQueue{xQueueCreate(5, sizeof(input_handler::EventType))} {
   if (pdPASS != xTaskCreate(DisplayManager::manager,
                             "Display Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
@@ -43,18 +49,23 @@ DisplayManager::DisplayManager(const UBaseType_t    priority,
   UARTprintf("Finished creating display manager tasks\n");
 }
 
-void DisplayManager::create(const UBaseType_t    priority,
-                            StreamBufferHandle_t streamList[],
-                            const uint32_t       totalStream) {
+DisplayManager &DisplayManager::get(const UBaseType_t    priority,
+                                    StreamBufferHandle_t streamList[],
+                                    const uint32_t       totalStream) {
   static DisplayManager d(priority, streamList, totalStream);
+  return d;
 }
 
 void DisplayManager::manager(void *param) {
   auto managerObj = static_cast<DisplayManager *>(param);
 
-  managerObj->printStartupScreen();
-  //   UARTprintf("Preparing to enter display manager loop %d\n", *testPtr);
-  for (;;) {}
+  //   managerObj->printStartupScreen();
+  for (;;) {
+    input_handler::EventType type;
+    if (xQueueReceive(managerObj->inputEventQueue, &type, portMAX_DELAY)) {
+      SWO_PrintStringLine("received event notif");
+    }
+  }
 }
 
 void DisplayManager::printStartupScreen(void) {

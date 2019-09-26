@@ -51,8 +51,16 @@ int main(void) {
   UARTprintf("Creating tasks\n");
 
   //   auto sensorManagerTask = MainSensorManager::getTask(CORE_SENSOR_PRIORITY);
-  //   InputHandler::create(sensorManagerTask);
-  DisplayManager::create(DISPLAY_PRIORITY, NULL, 0);
+
+  // clang-format off
+  const input_handler::EventSubscriptionRequest reqs[kTotalTask] = {
+    {
+        DisplayManager::get(DISPLAY_PRIORITY, NULL, 0).inputEventQueue,
+        static_cast<uint32_t>(input_handler::EventCategory::BRIGHTNESS)
+    }
+  };
+  // clang-format on
+  input_handler::create(reqs);
 
   UARTprintf("Preparing to start scheduler\n");
   vTaskStartScheduler();

@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "FreeRTOS.h"
+#include "queue.h"
 #include "stream_buffer.h"
 
 // typedef struct {
@@ -22,9 +23,10 @@ class DisplayManager {
   void        printStartupScreen(void);
 
  public:
-  static void create(const UBaseType_t    priority,
-                     StreamBufferHandle_t streamList[],
-                     const uint32_t       totalStream);
+  QueueHandle_t          inputEventQueue = nullptr;
+  static DisplayManager &get(const UBaseType_t    priority,
+                             StreamBufferHandle_t streamList[],
+                             const uint32_t       totalStream);
 };
 
 #endif

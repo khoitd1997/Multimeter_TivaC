@@ -19,47 +19,50 @@
 #include "utils/uartstdio.h"
 
 #include "bit_manipulation.h"
+#include "swo_segger.h"
 
-static const auto LEFT_BUTTON     = GPIO_INT_PIN_4;
-static const auto RIGHT_BUTTON    = GPIO_INT_PIN_0;
-static const auto DEBOUNCE_PERIOD = pdMS_TO_TICKS(400);
+namespace input_handler {
 
-static TaskHandle_t manager = NULL;
+static const auto LEFT_BUTTON             = GPIO_INT_PIN_4;
+static const auto RIGHT_BUTTON            = GPIO_INT_PIN_0;
+static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(400);
+static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
 
-InputHandler::InputHandler(const TaskHandle_t& sensorManager) {
-  manager = sensorManager;
-  init();
-  enable();
-}
+EventSubscriptionRequest subscriptions[kTotalTask];
 
-void InputHandler::create(const TaskHandle_t& sensorManager) {
-  static InputHandler inputHandler(sensorManager);
-}
-
-void inputISRHandler(void) {
+static void inputISRHandler(void) {
   const auto intStatus = GPIOIntStatus(GPIO_PORTF_BASE, true);
-  GPIOIntClear(GPIO_PORTF_BASE, RIGHT_BUTTON | LEFT_BUTTON);
+  GPIOIntClear(GPIO_PORTF_BASE, BRIGHTNESS_CTRL_BUTTONS);
 
   static TickType_t lastInput = 0;
-  auto              currTick  = xTaskGetTickCountFromISR();
+  const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > DEBOUNCE_PERIOD) {
-    UARTprintf("Inside the ISR\n");
+    SWO_PrintStringLine("handling input");
     lastInput = currTick;
 
-    BaseType_t higherTaskWoken;
-    int32_t    inc = 0;
-    if (bit_get(intStatus, LEFT_BUTTON)) {
-      inc = -1;
-    } else if (bit_get(intStatus, RIGHT_BUTTON)) {
-      inc = 1;
+    BaseType_t    higherTaskWoken;
+    EventCategory category = EventCategory::NONE;
+    EventType     type     = EventType::NONE;
+
+    if (bit_get(intStatus, BRIGHTNESS_CTRL_BUTTONS)) {
+      category = EventCategory::BRIGHTNESS;
+      if (bit_get(intStatus, LEFT_BUTTON)) {
+        type = EventType::BRIGHTNESS_INC;
+      } else if (bit_get(intStatus, RIGHT_BUTTON)) {
+        type = EventType::BRIGHTNESS_DEC;
+      }
     }
-    xTaskNotifyFromISR(
-        manager, static_cast<uint32_t>(inc), eSetValueWithOverwrite, &higherTaskWoken);
+
+    for (auto sub : subscriptions) {
+      if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
+        xQueueSendToBackFromISR(sub.queue, &type, &higherTaskWoken);
+      }
+    }
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }
 
-void InputHandler::init(void) {
+static void init(void) {
   SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
   while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {}
 
@@ -86,7 +89,15 @@ void InputHandler::init(void) {
   IntPrioritySet(INT_GPIOF, 7 << 5);
 }
 
-void InputHandler::enable(void) {
+static void enable(void) {
   GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
   GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_0);
 }
+
+void create(const EventSubscriptionRequest reqs[kTotalTask]) {
+  for (auto i = 0; i < kTotalTask; ++i) { subscriptions[i] = reqs[i]; }
+
+  init();
+  enable();
+}
+}  // namespace input_handler
