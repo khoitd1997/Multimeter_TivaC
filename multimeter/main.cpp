@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cstdio>
 
+#include <vector>
+
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
@@ -53,14 +55,13 @@ int main(void) {
   //   auto sensorManagerTask = MainSensorManager::getTask(CORE_SENSOR_PRIORITY);
 
   // clang-format off
-  const input_handler::EventSubscriptionRequest reqs[kTotalTask] = {
-    {
-        DisplayManager::get(DISPLAY_PRIORITY, NULL, 0).inputEventQueue,
-        static_cast<uint32_t>(input_handler::EventCategory::BRIGHTNESS)
-    }
-  };
+  input_handler::create({
+      {
+       DisplayManager::get(DISPLAY_PRIORITY, NULL, 0).inputEventQueue,
+       static_cast<uint32_t>(input_handler::EventCategory::BRIGHTNESS)
+      }
+  });
   // clang-format on
-  input_handler::create(reqs);
 
   UARTprintf("Preparing to start scheduler\n");
   vTaskStartScheduler();

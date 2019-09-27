@@ -3,13 +3,13 @@
 
 #include <cstdint>
 
+#include <vector>
+
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "task.h"
 
 #include "bit_manipulation.h"
-
-static const auto kTotalTask = 4;
 
 namespace input_handler {
 
@@ -42,7 +42,7 @@ struct EventSubscriptionRequest {
   uint32_t      categories;       // OR combination of InputEventCategory
 };
 
-void create(const EventSubscriptionRequest reqs[kTotalTask]);
+void create(const std::vector<EventSubscriptionRequest>& reqs);
 }  // namespace input_handler
 
 #endif

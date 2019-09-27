@@ -28,7 +28,7 @@ static const auto RIGHT_BUTTON            = GPIO_INT_PIN_0;
 static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(400);
 static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
 
-EventSubscriptionRequest subscriptions[kTotalTask];
+static std::vector<EventSubscriptionRequest> subscriptions;
 
 static void inputISRHandler(void) {
   const auto intStatus = GPIOIntStatus(GPIO_PORTF_BASE, true);
@@ -40,9 +40,9 @@ static void inputISRHandler(void) {
     SWO_PrintStringLine("handling input");
     lastInput = currTick;
 
-    BaseType_t    higherTaskWoken;
-    EventCategory category = EventCategory::NONE;
-    EventType     type     = EventType::NONE;
+    BaseType_t    higherTaskWoken = pdFALSE;
+    EventCategory category        = EventCategory::NONE;
+    EventType     type            = EventType::NONE;
 
     if (bit_get(intStatus, BRIGHTNESS_CTRL_BUTTONS)) {
       category = EventCategory::BRIGHTNESS;
@@ -53,7 +53,7 @@ static void inputISRHandler(void) {
       }
     }
 
-    for (auto sub : subscriptions) {
+    for (const auto& sub : subscriptions) {
       if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
         xQueueSendToBackFromISR(sub.queue, &type, &higherTaskWoken);
       }
@@ -94,8 +94,8 @@ static void enable(void) {
   GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_0);
 }
 
-void create(const EventSubscriptionRequest reqs[kTotalTask]) {
-  for (auto i = 0; i < kTotalTask; ++i) { subscriptions[i] = reqs[i]; }
+void create(const std::vector<EventSubscriptionRequest>& reqs) {
+  subscriptions = reqs;
 
   init();
   enable();
