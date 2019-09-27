@@ -18,19 +18,41 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
+#include "rotary_encoder.hpp"
+
 #include "bit_manipulation.h"
 #include "swo_segger.h"
 
 namespace input_handler {
 
-static const auto LEFT_BUTTON             = GPIO_INT_PIN_4;
-static const auto RIGHT_BUTTON            = GPIO_INT_PIN_0;
-static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(200);  // TODO(khoi): Revisit this
+static const auto LEFT_BUTTON  = GPIO_INT_PIN_4;
+static const auto RIGHT_BUTTON = GPIO_INT_PIN_0;
+
+// TODO(khoi): Revisit this
+static const auto DEBOUNCE_PERIOD        = pdMS_TO_TICKS(50);
+static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(50);
+
 static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
+
+// TODO(khoi): Investigate why default constructor is always called here
+static RotaryEncoder* encoder = nullptr;
+
+static void testInt(void) {
+  encoder->clearInterrupt();
+
+  static TickType_t lastInput = 0;
+  const auto        currTick  = xTaskGetTickCountFromISR();
+  if ((currTick - lastInput) > kRotaryEncoderDebounce) {
+    lastInput = currTick;
+    SWO_PrintStringLine("inside rotary interrupt");
+  }
+}
 
 static std::vector<EventSubscriptionRequest> subscriptions;
 
 static void inputISRHandler(void) {
+  encoder->pinAHigh();
+
   const auto intStatus = GPIOIntStatus(GPIO_PORTF_BASE, true);
   GPIOIntClear(GPIO_PORTF_BASE, BRIGHTNESS_CTRL_BUTTONS);
 
@@ -96,6 +118,9 @@ static void enable(void) {
 
 void create(const std::vector<EventSubscriptionRequest>& reqs) {
   subscriptions = reqs;
+  static RotaryEncoder e{
+      SYSCTL_PERIPH_GPIOD, GPIO_PORTD_BASE, GPIO_PIN_2, GPIO_INT_PIN_2, GPIO_PIN_3, testInt};
+  encoder = &e;
 
   init();
   enable();

@@ -76,6 +76,10 @@ void DisplayManager::managerTask(void *param) {
                                      ? 0
                                      : manager->getBrightness() - kBrightnessAdjStep);
           break;
+        default:
+          SWO_PrintStringLine("unhandled input event type");
+          for (;;) {}
+          break;
       }
     }
   }

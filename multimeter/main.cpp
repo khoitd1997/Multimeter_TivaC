@@ -31,6 +31,7 @@
 #include "display_manager.hpp"
 #include "freeRTOS_hook.h"
 #include "input_handler.hpp"
+#include "swo_segger.h"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200
@@ -50,8 +51,6 @@ int main(void) {
 
   uartConfigure(UART_BAUD);
 
-  UARTprintf("Creating tasks\n");
-
   //   auto sensorManagerTask = MainSensorManager::getTask(CORE_SENSOR_PRIORITY);
 
   // clang-format off
@@ -63,10 +62,10 @@ int main(void) {
   });
   // clang-format on
 
-  UARTprintf("Preparing to start scheduler\n");
+  SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();
 
-  UARTprintf("Scheduler failed\n");
+  SWO_PrintStringLine("Scheduler failed\n");
 
   for (;;) {}
 }
