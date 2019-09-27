@@ -25,7 +25,7 @@ namespace input_handler {
 
 static const auto LEFT_BUTTON             = GPIO_INT_PIN_4;
 static const auto RIGHT_BUTTON            = GPIO_INT_PIN_0;
-static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(400);
+static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(200);  // TODO(khoi): Revisit this
 static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
 
 static std::vector<EventSubscriptionRequest> subscriptions;
