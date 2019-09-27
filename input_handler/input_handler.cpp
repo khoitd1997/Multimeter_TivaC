@@ -23,23 +23,23 @@
 #include "bit_manipulation.h"
 #include "swo_segger.h"
 
+// TODO(khoi): Investigate why default constructor is always called for static variables
+
 namespace input_handler {
+static std::vector<EventSubscriptionRequest> subscriptions;
 
-static const auto LEFT_BUTTON  = GPIO_INT_PIN_4;
-static const auto RIGHT_BUTTON = GPIO_INT_PIN_0;
+static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(100);
+static void       measureModeHandler(const bool isClockwise);
+typedef RotaryEncoder<SYSCTL_PERIPH_GPIOD,
+                      GPIO_PORTD_BASE,
+                      GPIO_PIN_2,
+                      GPIO_INT_PIN_2,
+                      GPIO_PIN_3,
+                      measureModeHandler>
+                                 MeasureModeRotaryEncoder;
+static MeasureModeRotaryEncoder* encoder = nullptr;
 
-// TODO(khoi): Revisit this
-static const auto DEBOUNCE_PERIOD        = pdMS_TO_TICKS(50);
-static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(50);
-
-static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
-
-// TODO(khoi): Investigate why default constructor is always called here
-static RotaryEncoder* encoder = nullptr;
-
-static void testInt(void) {
-  encoder->clearInterrupt();
-
+static void measureModeHandler(const bool isClockwise) {
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kRotaryEncoderDebounce) {
@@ -48,11 +48,11 @@ static void testInt(void) {
   }
 }
 
-static std::vector<EventSubscriptionRequest> subscriptions;
-
-static void inputISRHandler(void) {
-  encoder->pinAHigh();
-
+static const auto LEFT_BUTTON             = GPIO_INT_PIN_4;
+static const auto RIGHT_BUTTON            = GPIO_INT_PIN_0;
+static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
+static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(50);
+static void       inputISRHandler(void) {
   const auto intStatus = GPIOIntStatus(GPIO_PORTF_BASE, true);
   GPIOIntClear(GPIO_PORTF_BASE, BRIGHTNESS_CTRL_BUTTONS);
 
@@ -109,20 +109,17 @@ static void init(void) {
 
   GPIOIntRegister(GPIO_PORTF_BASE, inputISRHandler);
   IntPrioritySet(INT_GPIOF, 7 << 5);
-}
 
-static void enable(void) {
   GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
   GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_0);
 }
 
 void create(const std::vector<EventSubscriptionRequest>& reqs) {
   subscriptions = reqs;
-  static RotaryEncoder e{
-      SYSCTL_PERIPH_GPIOD, GPIO_PORTD_BASE, GPIO_PIN_2, GPIO_INT_PIN_2, GPIO_PIN_3, testInt};
+
+  static MeasureModeRotaryEncoder e;
   encoder = &e;
 
   init();
-  enable();
 }
 }  // namespace input_handler
