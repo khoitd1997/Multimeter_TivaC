@@ -36,7 +36,7 @@ CoreSensorManager::CoreSensorManager(const UBaseType_t priority)
       _task(NULL),
       _sensors({&_dcSensor, &_acSensor, &_currentSensor, &_resistanceSensor}) {
   if (pdPASS != xTaskCreate(CoreSensorManager::manager,
-                            "Main Sensor Manager Task",
+                            "Core Sensor Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
                             this,
                             priority,
@@ -72,6 +72,7 @@ void CoreSensorManager::manager(void* param) {
     auto     pending   = xTaskNotifyWait(0x00, ULONG_MAX, &notifyVal, 0);
 
     if (pdTRUE == pending) {
+      // NOTE: how sensors are selected by relay affect whether the code works
       sensor->disable();
       index += static_cast<int32_t>(notifyVal);
       // wrap value around

@@ -21,11 +21,18 @@ static const float VDD = 3.3;
 const uint32_t RESISTANCE_SAMPLING_PERIOD_MS = 10;
 
 ResistanceSensor::ResistanceSensor()
-    : _adc(ADC0_BASE, 4, 2), Sensor(SensorType::RESISTANCE, RESISTANCE_SAMPLING_PERIOD_MS) {}
+    : _adc(ADC0_BASE, 4, 2),
+      Sensor(SensorType::RESISTANCE,
+             RESISTANCE_SAMPLING_PERIOD_MS,
+             SYSCTL_PERIPH_GPIOB,
+             GPIO_PORTB_BASE,
+             GPIO_PIN_5,
+             true) {}
 
-float ResistanceSensor::read(void) { return ((VDD * R1) / _adc.read()) - R1; }
-void  ResistanceSensor::init(void) {
+float ResistanceSensor::read() { return ((VDD * R1) / _adc.read()) - R1; }
+void  ResistanceSensor::init() {
   _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_1, ADC_CTL_CH2, 4);
 }
-void ResistanceSensor::disable(void) { _adc.disable(); }
-void ResistanceSensor::enable(void) { _adc.enable(); }
+
+void ResistanceSensor::disableCallback() { _adc.disable(); }
+void ResistanceSensor::enableCallback() { _adc.enable(); }

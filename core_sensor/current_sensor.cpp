@@ -24,5 +24,5 @@ float CurrentSensor::read(void) { return _adc.read() / SHUNT_RESISTOR_OHM; }
 void  CurrentSensor::init(void) {
   _adc.init(SYSCTL_PERIPH_ADC1, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_2, ADC_CTL_CH1, 8);
 }
-void CurrentSensor::disable(void) { _adc.disable(); }
-void CurrentSensor::enable(void) { _adc.enable(); }
+void CurrentSensor::disableCallback() { _adc.disable(); }
+void CurrentSensor::enableCallback() { _adc.enable(); }

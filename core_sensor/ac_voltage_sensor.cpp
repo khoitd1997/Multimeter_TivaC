@@ -84,7 +84,12 @@ static float arm_rms_f32(float* pSrc, uint32_t blockSize) {
 }
 
 AcVoltageSensor::AcVoltageSensor(DcVoltageSensor& dcSensor)
-    : Sensor(SensorType::AC_VOLT, AC_SAMPLING_PERIOD_MS),
+    : Sensor(SensorType::AC_VOLT,
+             AC_SAMPLING_PERIOD_MS,
+             SYSCTL_PERIPH_GPIOB,
+             GPIO_PORTB_BASE,
+             GPIO_PIN_4,
+             false),
       _dcSensor{dcSensor},
       _currSample{0},
       _samplingBuf{0},
@@ -104,5 +109,5 @@ float AcVoltageSensor::read(void) {
   return _lastVal;
 }
 void AcVoltageSensor::init(void) { _dcSensor.init(); }
-void AcVoltageSensor::disable(void) { _dcSensor.disable(); }
-void AcVoltageSensor::enable(void) { _dcSensor.enable(); }
+void AcVoltageSensor::disableCallback() { _dcSensor.disable(); }
+void AcVoltageSensor::enableCallback() { _dcSensor.enable(); }

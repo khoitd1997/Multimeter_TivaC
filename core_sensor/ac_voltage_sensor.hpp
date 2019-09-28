@@ -18,8 +18,8 @@ class AcVoltageSensor : public Sensor {
 
   float read(void);
   void  init(void);
-  void  disable(void);
-  void  enable(void);
+  void  disableCallback();
+  void  enableCallback();
 };
 
 #endif
