@@ -51,7 +51,7 @@ int main(void) {
 
   uartConfigure(UART_BAUD);
 
-  //   auto sensorManagerTask = MainSensorManager::getTask(CORE_SENSOR_PRIORITY);
+  //   auto sensorManagerTask = CoreSensorManager::getTask(CORE_SENSOR_PRIORITY);
 
   // clang-format off
   input_handler::create({

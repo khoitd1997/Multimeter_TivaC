@@ -3,6 +3,8 @@
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
+#include "queue.h"
+#include "stream_buffer.h"
 #include "task.h"
 
 #include "inc/hw_gpio.h"
@@ -29,9 +31,7 @@
 DisplayManager::DisplayManager(const UBaseType_t    priority,
                                StreamBufferHandle_t streamList[],
                                const uint32_t       totalStream)
-    : _streams{streamList},
-      _totalStream{totalStream},
-      inputEventQueue{xQueueCreate(5, sizeof(input_handler::EventType))} {
+    : _streams{streamList}, _totalStream{totalStream} {
   if (pdPASS != xTaskCreate(DisplayManager::managerTask,
                             "Display Manager Task",
                             configMINIMAL_STACK_SIZE + 200,

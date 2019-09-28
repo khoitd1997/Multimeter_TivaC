@@ -11,7 +11,9 @@
 #include "dc_voltage_sensor.hpp"
 #include "resistance_sensor.hpp"
 
-class MainSensorManager {
+#include "base_task.hpp"
+
+class CoreSensorManager {
  private:
   TaskHandle_t     _task;
   DcVoltageSensor  _dcSensor;
@@ -20,7 +22,7 @@ class MainSensorManager {
   ResistanceSensor _resistanceSensor;
   Sensor*          _sensors[SensorType::TOTAL_SENSOR];
 
-  MainSensorManager(const UBaseType_t priority);
+  CoreSensorManager(const UBaseType_t priority);
   static void manager(void* param);
 
  public:

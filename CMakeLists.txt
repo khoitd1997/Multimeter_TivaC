@@ -7,8 +7,11 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/tivaware)
 add_subdirectory(tivaware)
 add_subdirectory(Tiva_Extra)
 add_subdirectory(FreeRTOS)
+
+add_subdirectory(input_handler)
+
+add_subdirectory(common)
 add_subdirectory(extra_sensor)
 add_subdirectory(core_sensor)
 add_subdirectory(display)
-add_subdirectory(input_handler)
 add_subdirectory(multimeter)

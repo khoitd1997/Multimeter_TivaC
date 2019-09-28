@@ -28,14 +28,14 @@
 
 #include "bit_manipulation.h"
 
-MainSensorManager::MainSensorManager(const UBaseType_t priority)
+CoreSensorManager::CoreSensorManager(const UBaseType_t priority)
     : _dcSensor(),
       _acSensor(_dcSensor),
       _currentSensor(),
       _resistanceSensor(),
       _task(NULL),
       _sensors({&_dcSensor, &_acSensor, &_currentSensor, &_resistanceSensor}) {
-  if (pdPASS != xTaskCreate(MainSensorManager::manager,
+  if (pdPASS != xTaskCreate(CoreSensorManager::manager,
                             "Main Sensor Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
                             this,
@@ -51,13 +51,13 @@ MainSensorManager::MainSensorManager(const UBaseType_t priority)
   UARTprintf("Finished creating tasks\n");
 }
 
-TaskHandle_t MainSensorManager::getTask(const UBaseType_t priority) {
-  static MainSensorManager m(priority);
+TaskHandle_t CoreSensorManager::getTask(const UBaseType_t priority) {
+  static CoreSensorManager m(priority);
   return m._task;
 }
 
-void MainSensorManager::manager(void* param) {
-  auto    managerObj = static_cast<MainSensorManager*>(param);
+void CoreSensorManager::manager(void* param) {
+  auto    managerObj = static_cast<CoreSensorManager*>(param);
   int32_t index      = 3;  // TODO: Change it back after test
   auto    sensor     = managerObj->_sensors[index];
 
