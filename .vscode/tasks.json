@@ -4,22 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "type": "shell",
-            "command": "cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake && cmake --build ."
-        },
-        {
-            "label": "run",
-            "type": "shell",
-            "command": "JLinkGDBServer -device TM4C123GH6PM -if SWD -speed 16000&;gdb -x flash.gdbinit -batch"
-        },
-        {
             "label": "build+run",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "build",
-                "run"
-            ],
+            "type": "shell",
+            "command": "cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake && cmake --build . && JLinkGDBServer -device TM4C123GH6PM -if SWD -speed 16000&; cd ${workspaceRoot} && gdb -x flash.gdbinit -batch",
             "presentation": {
                 "focus": false,
                 "panel": "shared",
@@ -30,6 +17,6 @@
                 "kind": "build",
                 "isDefault": true
             }
-        }
+        },
     ]
 }

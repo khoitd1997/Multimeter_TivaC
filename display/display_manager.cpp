@@ -22,11 +22,17 @@
 #include "oled_font_source_pro.h"
 #include "ssd1306.h"
 
+#include "input_handler.hpp"
+
+#include "swo_segger.h"
+
 DisplayManager::DisplayManager(const UBaseType_t    priority,
                                StreamBufferHandle_t streamList[],
                                const uint32_t       totalStream)
-    : _streams(streamList), _totalStream(totalStream) {
-  if (pdPASS != xTaskCreate(DisplayManager::manager,
+    : _streams{streamList},
+      _totalStream{totalStream},
+      inputEventQueue{xQueueCreate(5, sizeof(input_handler::EventType))} {
+  if (pdPASS != xTaskCreate(DisplayManager::managerTask,
                             "Display Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
                             this,
@@ -38,23 +44,45 @@ DisplayManager::DisplayManager(const UBaseType_t    priority,
   ssd1306Init();
   ssd1306TurnOn(true);
   ssd1306ClearDisplay();
-  ssd1306AdjustContrast(250);
+  setBrightness(250);
 
   UARTprintf("Finished creating display manager tasks\n");
 }
 
-void DisplayManager::create(const UBaseType_t    priority,
-                            StreamBufferHandle_t streamList[],
-                            const uint32_t       totalStream) {
+DisplayManager &DisplayManager::get(const UBaseType_t    priority,
+                                    StreamBufferHandle_t streamList[],
+                                    const uint32_t       totalStream) {
   static DisplayManager d(priority, streamList, totalStream);
+  return d;
 }
 
-void DisplayManager::manager(void *param) {
-  auto managerObj = static_cast<DisplayManager *>(param);
+void DisplayManager::managerTask(void *param) {
+  auto manager = static_cast<DisplayManager *>(param);
 
-  managerObj->printStartupScreen();
-  //   UARTprintf("Preparing to enter display manager loop %d\n", *testPtr);
-  for (;;) {}
+  manager->printStartupScreen();
+  for (;;) {
+    input_handler::EventType type;
+    // TODO(khoi): Make this a queue set later
+    if (xQueueReceive(manager->inputEventQueue, &type, portMAX_DELAY)) {
+      SWO_PrintStringLine("received event notif");
+      switch (type) {
+        case input_handler::EventType::BRIGHTNESS_INC:
+          manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
+                                     ? 255
+                                     : manager->getBrightness() + kBrightnessAdjStep);
+          break;
+        case input_handler::EventType::BRIGHTNESS_DEC:
+          manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
+                                     ? 0
+                                     : manager->getBrightness() - kBrightnessAdjStep);
+          break;
+        default:
+          SWO_PrintStringLine("unhandled input event type");
+          for (;;) {}
+          break;
+      }
+    }
+  }
 }
 
 void DisplayManager::printStartupScreen(void) {
@@ -65,10 +93,17 @@ void DisplayManager::printStartupScreen(void) {
   ssd1306PrintString("  TivaC Multimeter", 0, 0, source_pro_set);
   ssd1306PrintString("     Starting", 1, 0, source_pro_set);
 
-  while (--totalRepeat) {
-    vTaskDelayUntil(&lastWakeTime, sceneDelay);
-    ssd1306AdjustContrast(0);
-    vTaskDelayUntil(&lastWakeTime, sceneDelay);
-    ssd1306AdjustContrast(250);
-  }
+  //   while (--totalRepeat) {
+  //     vTaskDelayUntil(&lastWakeTime, sceneDelay);
+  //     setBrightness(0);
+  //     vTaskDelayUntil(&lastWakeTime, sceneDelay);
+  //     setBrightness(250);
+  //   }
 }
+
+void DisplayManager::setBrightness(const uint8_t brightness) {
+  _currBrightness = brightness;
+  ssd1306AdjustContrast(_currBrightness);
+}
+
+uint8_t DisplayManager::getBrightness() { return _currBrightness; }

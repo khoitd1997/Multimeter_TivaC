@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cstdio>
 
+#include <vector>
+
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
@@ -29,6 +31,7 @@
 #include "display_manager.hpp"
 #include "freeRTOS_hook.h"
 #include "input_handler.hpp"
+#include "swo_segger.h"
 #include "uart_util.hpp"
 
 #define UART_BAUD 115200
@@ -48,16 +51,21 @@ int main(void) {
 
   uartConfigure(UART_BAUD);
 
-  UARTprintf("Creating tasks\n");
-
   //   auto sensorManagerTask = MainSensorManager::getTask(CORE_SENSOR_PRIORITY);
-  //   InputHandler::create(sensorManagerTask);
-  DisplayManager::create(DISPLAY_PRIORITY, NULL, 0);
 
-  UARTprintf("Preparing to start scheduler\n");
+  // clang-format off
+  input_handler::create({
+      {
+       DisplayManager::get(DISPLAY_PRIORITY, NULL, 0).inputEventQueue,
+       static_cast<uint32_t>(input_handler::EventCategory::BRIGHTNESS)
+      }
+  });
+  // clang-format on
+
+  SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();
 
-  UARTprintf("Scheduler failed\n");
+  SWO_PrintStringLine("Scheduler failed\n");
 
   for (;;) {}
 }
