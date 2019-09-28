@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <cstring>
 
+#include <algorithm>
+
 // clang-format off
 #include "inc/hw_gpio.h"
 #include "inc/hw_ints.h"
@@ -28,6 +30,15 @@
 
 namespace input_handler {
 static std::vector<EventSubscriptionRequest> subscriptions;
+void                                         notifySubscriber(const EventType     type,
+                                                              const EventCategory category,
+                                                              BaseType_t*         higherTaskWoken) {
+  for (const auto& sub : subscriptions) {
+    if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
+      xQueueSendToBackFromISR(sub.queue, &type, higherTaskWoken);
+    }
+  }
+}
 
 static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(100);
 static void       measureModeHandler(const bool isClockwise);
@@ -41,11 +52,29 @@ typedef RotaryEncoder<SYSCTL_PERIPH_GPIOD,
 static MeasureModeRotaryEncoder* encoder = nullptr;
 
 static void measureModeHandler(const bool isClockwise) {
+  static auto       currMode  = EventType::MEASURE_DC;
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kRotaryEncoderDebounce) {
-    lastInput = currTick;
+    BaseType_t higherTaskWoken = pdFALSE;
+    const auto prevMode        = currMode;
+    lastInput                  = currTick;
     SWO_PrintStringLine("inside rotary interrupt");
+
+    if (isClockwise) {
+      currMode =
+          static_cast<EventType>(std::min(static_cast<uint32_t>(currMode) << 1,
+                                          static_cast<uint32_t>(EventType::MEASURE_RESISTANCE)));
+    } else {
+      currMode = static_cast<EventType>(std::max(static_cast<uint32_t>(currMode) >> 1,
+                                                 static_cast<uint32_t>(EventType::MEASURE_DC)));
+    }
+
+    if (prevMode != currMode) {
+      notifySubscriber(currMode, EventCategory::MEASURE, &higherTaskWoken);
+    }
+
+    portYIELD_FROM_ISR(higherTaskWoken);
   }
 }
 
@@ -82,11 +111,7 @@ static void                          brightnessHandler(const uint32_t intStatus)
       }
     }
 
-    for (const auto& sub : subscriptions) {
-      if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
-        xQueueSendToBackFromISR(sub.queue, &type, &higherTaskWoken);
-      }
-    }
+    notifySubscriber(type, category, &higherTaskWoken);
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }
