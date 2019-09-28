@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 
+// clang-format off
 #include "inc/hw_gpio.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -15,9 +16,9 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
-#include "utils/uartstdio.h"
+// clang-format on
 
+#include "button_group.hpp"
 #include "rotary_encoder.hpp"
 
 #include "bit_manipulation.h"
@@ -48,17 +49,23 @@ static void measureModeHandler(const bool isClockwise) {
   }
 }
 
-static const auto LEFT_BUTTON             = GPIO_INT_PIN_4;
-static const auto RIGHT_BUTTON            = GPIO_INT_PIN_0;
-static const auto BRIGHTNESS_CTRL_BUTTONS = LEFT_BUTTON | RIGHT_BUTTON;
-static const auto DEBOUNCE_PERIOD         = pdMS_TO_TICKS(50);
-static void       inputISRHandler(void) {
-  const auto intStatus = GPIOIntStatus(GPIO_PORTF_BASE, true);
-  GPIOIntClear(GPIO_PORTF_BASE, BRIGHTNESS_CTRL_BUTTONS);
-
+static void       brightnessHandler(const uint32_t intStatus);
+static const auto kBrightnessIncButton    = GPIO_INT_PIN_4;
+static const auto kBrightnessDecButton    = GPIO_INT_PIN_0;
+static const auto BRIGHTNESS_CTRL_BUTTONS = kBrightnessIncButton | kBrightnessDecButton;
+static const auto kBrightnessDebounce     = pdMS_TO_TICKS(80);
+typedef ButtonGroup<SYSCTL_PERIPH_GPIOF,
+                    GPIO_PORTF_BASE,
+                    INT_GPIOF,
+                    GPIO_PIN_0 | GPIO_PIN_4,
+                    BRIGHTNESS_CTRL_BUTTONS,
+                    brightnessHandler>
+                                     BrightnessControlButtonGroup;
+static BrightnessControlButtonGroup* brightnessCtrl = nullptr;
+static void                          brightnessHandler(const uint32_t intStatus) {
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
-  if ((currTick - lastInput) > DEBOUNCE_PERIOD) {
+  if ((currTick - lastInput) > kBrightnessDebounce) {
     SWO_PrintStringLine("handling input");
     lastInput = currTick;
 
@@ -68,9 +75,9 @@ static void       inputISRHandler(void) {
 
     if (bit_get(intStatus, BRIGHTNESS_CTRL_BUTTONS)) {
       category = EventCategory::BRIGHTNESS;
-      if (bit_get(intStatus, LEFT_BUTTON)) {
+      if (bit_get(intStatus, kBrightnessIncButton)) {
         type = EventType::BRIGHTNESS_INC;
-      } else if (bit_get(intStatus, RIGHT_BUTTON)) {
+      } else if (bit_get(intStatus, kBrightnessDecButton)) {
         type = EventType::BRIGHTNESS_DEC;
       }
     }
@@ -84,42 +91,13 @@ static void       inputISRHandler(void) {
   }
 }
 
-static void init(void) {
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {}
-
-  // button stuffs for PF4
-  GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4);
-  GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-
-  GPIOIntDisable(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
-  GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4);
-  GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_FALLING_EDGE);
-
-  // PF0
-  HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
-  HWREG(GPIO_PORTF_BASE + GPIO_O_CR) |= 0x01;
-  GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_0);
-  GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-
-  GPIOIntDisable(GPIO_PORTF_BASE, GPIO_INT_PIN_0);
-  GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_0);
-  GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_FALLING_EDGE);
-  HWREG(GPIO_PORTF_BASE + GPIO_O_LOCK) = 0;
-
-  GPIOIntRegister(GPIO_PORTF_BASE, inputISRHandler);
-  IntPrioritySet(INT_GPIOF, 7 << 5);
-
-  GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_4);
-  GPIOIntEnable(GPIO_PORTF_BASE, GPIO_INT_PIN_0);
-}
-
 void create(const std::vector<EventSubscriptionRequest>& reqs) {
   subscriptions = reqs;
 
+  static BrightnessControlButtonGroup b;
+  brightnessCtrl = &b;
+
   static MeasureModeRotaryEncoder e;
   encoder = &e;
-
-  init();
 }
 }  // namespace input_handler
