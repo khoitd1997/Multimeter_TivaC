@@ -3,15 +3,16 @@
 
 #include <cstdint>
 
+#include "base_task.hpp"
+
 #include "FreeRTOS.h"
-#include "queue.h"
 #include "stream_buffer.h"
 
 // typedef struct {
 //   uint32_t
 // } DisplayReq;
 
-class DisplayManager {
+class DisplayManager : public BaseTask {
  private:
   StreamBufferHandle_t *_streams;
   const uint32_t        _totalStream;
@@ -29,7 +30,6 @@ class DisplayManager {
   uint8_t              getBrightness();
 
  public:
-  QueueHandle_t          inputEventQueue = nullptr;
   static DisplayManager &get(const UBaseType_t    priority,
                              StreamBufferHandle_t streamList[],
                              const uint32_t       totalStream);

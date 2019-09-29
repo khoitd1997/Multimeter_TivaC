@@ -3,6 +3,8 @@
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
+#include "queue.h"
+#include "stream_buffer.h"
 #include "task.h"
 
 #include "inc/hw_gpio.h"
@@ -29,9 +31,7 @@
 DisplayManager::DisplayManager(const UBaseType_t    priority,
                                StreamBufferHandle_t streamList[],
                                const uint32_t       totalStream)
-    : _streams{streamList},
-      _totalStream{totalStream},
-      inputEventQueue{xQueueCreate(5, sizeof(input_handler::EventType))} {
+    : _streams{streamList}, _totalStream{totalStream} {
   if (pdPASS != xTaskCreate(DisplayManager::managerTask,
                             "Display Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
@@ -61,11 +61,11 @@ void DisplayManager::managerTask(void *param) {
 
   manager->printStartupScreen();
   for (;;) {
-    input_handler::EventType type;
+    input_handler::EventNotification notif;
     // TODO(khoi): Make this a queue set later
-    if (xQueueReceive(manager->inputEventQueue, &type, portMAX_DELAY)) {
+    if (xQueueReceive(manager->inputEventQueue, &notif, portMAX_DELAY)) {
       SWO_PrintStringLine("received event notif");
-      switch (type) {
+      switch (notif.type) {
         case input_handler::EventType::BRIGHTNESS_INC:
           manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
                                      ? 255

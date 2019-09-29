@@ -12,10 +12,11 @@ class ResistanceSensor : public Sensor {
   ResistanceSensor();
   ~ResistanceSensor() {}
 
-  float read(void);
-  void  init(void);
-  void  disable(void);
-  void  enable(void);
+  float read();
+  void  init();
+
+  void disableCallback();
+  void enableCallback();
 };
 
 #endif

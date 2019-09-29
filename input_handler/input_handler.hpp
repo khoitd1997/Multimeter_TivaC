@@ -14,32 +14,43 @@
 namespace input_handler {
 
 enum class EventCategory : uint32_t {
-  NONE       = 0,
-  BLUETOOTH  = BIT(0),
-  MEASURE    = BIT(1),
-  BRIGHTNESS = BIT(2)
+  CATEGORY_NONE = 0,
+  BLUETOOTH     = BIT(0),
+  MEASURE       = BIT(1),
+  BRIGHTNESS    = BIT(2)
 };
-enum class EventType : uint32_t {
-  NONE = 0,
+enum EventType : int {
+  TYPE_NONE = 0,
 
   // BLUETOOH CATEGORY
-  BLUETOOTH_ON  = BIT(0),
-  BLUETOOTH_OFF = BIT(1),
+  START_BLUETOOTH,
+  BLUETOOTH_ON,
+  BLUETOOTH_OFF,
+  END_BLUETOOTH,
 
   // MEASURE CATEGORY
-  MEASURE_DC         = BIT(2),
-  MEASURE_AC         = BIT(3),
-  MEASURE_CURRENT    = BIT(4),
-  MEASURE_RESISTANCE = BIT(5),
+  START_MEASURE,
+  MEASURE_AC,
+  MEASURE_DC,
+  MEASURE_CURRENT,
+  MEASURE_RESISTANCE,
+  END_MEASURE,
 
   // BRIGHTNESS CATEGORY
-  BRIGHTNESS_INC = BIT(6),
-  BRIGHTNESS_DEC = BIT(7)
+  START_BRIGHTNESS,
+  BRIGHTNESS_INC,
+  BRIGHTNESS_DEC,
+  END_BRIGHTNESS
 };
 
 struct EventSubscriptionRequest {
   QueueHandle_t queue = nullptr;  // the queue to send event notif to
   uint32_t      categories;       // OR combination of InputEventCategory
+};
+
+struct EventNotification {
+  EventCategory category;
+  EventType     type;
 };
 
 void create(const std::vector<EventSubscriptionRequest>& reqs);

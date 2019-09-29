@@ -2,7 +2,6 @@ add_executable(multimeter.elf
                ../tm4c123gh6pm_startup_ccs_gcc.c
                freeRTOS_hook.c
                main.cpp
-               multimeter_mode.cpp
                uart_util.cpp
                test_task.cpp)
 target_link_libraries(multimeter.elf
