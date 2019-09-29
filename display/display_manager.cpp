@@ -2,7 +2,6 @@
 
 // FreeRTOS
 #include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
 #include "queue.h"
 #include "stream_buffer.h"
 #include "task.h"
@@ -28,32 +27,17 @@
 
 #include "swo_segger.h"
 
-DisplayManager::DisplayManager(const UBaseType_t    priority,
-                               StreamBufferHandle_t streamList[],
-                               const uint32_t       totalStream)
-    : _streams{streamList}, _totalStream{totalStream} {
-  if (pdPASS != xTaskCreate(DisplayManager::managerTask,
-                            "Display Manager Task",
-                            configMINIMAL_STACK_SIZE + 200,
-                            this,
-                            priority,
-                            NULL)) {
-    for (;;) { UARTprintf("Failed to create display manager task"); }
-  }
-
+DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize,
+                               const UBaseType_t            priority,
+                               StreamBufferHandle_t         streamList[],
+                               const uint32_t               totalStream)
+    : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority},
+      _streams{streamList},
+      _totalStream{totalStream} {
   ssd1306Init();
   ssd1306TurnOn(true);
   ssd1306ClearDisplay();
   setBrightness(250);
-
-  UARTprintf("Finished creating display manager tasks\n");
-}
-
-DisplayManager &DisplayManager::get(const UBaseType_t    priority,
-                                    StreamBufferHandle_t streamList[],
-                                    const uint32_t       totalStream) {
-  static DisplayManager d(priority, streamList, totalStream);
-  return d;
 }
 
 void DisplayManager::managerTask(void *param) {
