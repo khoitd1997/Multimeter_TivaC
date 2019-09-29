@@ -10,5 +10,6 @@ target_link_libraries(multimeter.elf
                       input_handler
                       free_rtos
                       core_sensor
+                      extra_sensor
                       tiva_utils
                       tivaware_utils)

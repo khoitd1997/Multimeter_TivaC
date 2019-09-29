@@ -3,8 +3,6 @@
 
 #include <cstdint>
 
-#include <vector>
-
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "task.h"
@@ -13,7 +11,7 @@
 
 namespace input_handler {
 
-enum class EventCategory : uint32_t {
+enum EventCategory : int32_t {
   CATEGORY_NONE = 0,
   BLUETOOTH     = BIT(0),
   MEASURE       = BIT(1),
@@ -53,7 +51,7 @@ struct EventNotification {
   EventType     type;
 };
 
-void create(const std::vector<EventSubscriptionRequest>& reqs);
+void create(const EventSubscriptionRequest* reqs, const int reqSize);
 }  // namespace input_handler
 
 #endif

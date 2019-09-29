@@ -29,12 +29,14 @@
 // TODO(khoi): Investigate why default constructor is always called for static variables
 
 namespace input_handler {
-static std::vector<EventSubscriptionRequest> subscriptions;
-void                                         notifySubscriber(const EventType     type,
-                                                              const EventCategory category,
-                                                              BaseType_t*         higherTaskWoken) {
+static const EventSubscriptionRequest* subscriptions;
+static int                             subscriptionSize;
+void                                   notifySubscriber(const EventType     type,
+                                                        const EventCategory category,
+                                                        BaseType_t*         higherTaskWoken) {
   const EventNotification notif{category, type};
-  for (const auto& sub : subscriptions) {
+  for (auto i = 0; i < subscriptionSize; ++i) {
+    const auto sub = subscriptions[i];
     if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
       xQueueSendToBackFromISR(sub.queue, &notif, higherTaskWoken);
     }
@@ -121,8 +123,9 @@ static void                          brightnessHandler(const uint32_t intStatus)
   }
 }
 
-void create(const std::vector<EventSubscriptionRequest>& reqs) {
-  subscriptions = reqs;
+void create(const EventSubscriptionRequest* reqs, const int reqSize) {
+  subscriptions    = reqs;
+  subscriptionSize = reqSize;
 
   static BrightnessControlButtonGroup b;
   brightnessCtrl = &b;
