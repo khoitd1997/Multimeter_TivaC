@@ -2,7 +2,6 @@
 
 // FreeRTOS
 #include "FreeRTOS.h"
-#include "FreeRTOSConfig.h"
 #include "task.h"
 
 #include <climits>
@@ -31,32 +30,23 @@
 
 #include "input_handler.hpp"
 
-CoreSensorManager::CoreSensorManager(const UBaseType_t priority)
-    : _task(NULL),
+CoreSensorManager::CoreSensorManager(const configSTACK_DEPTH_TYPE stackSize,
+                                     const UBaseType_t            priority)
+    : BaseTask{CoreSensorManager::managerTask,
+               "Core Sensor Manager Task",
+               stackSize,
+               this,
+               priority},
+      _task(NULL),
       _dcSensor(),
       _acSensor(_dcSensor),
       _currentSensor(),
       _resistanceSensor(),
       _sensors({&_acSensor, &_dcSensor, &_currentSensor, &_resistanceSensor}) {
-  if (pdPASS != xTaskCreate(CoreSensorManager::managerTask,
-                            "Core Sensor Manager Task",
-                            configMINIMAL_STACK_SIZE + 200,
-                            this,
-                            priority,
-                            &(this->_task))) {
-    for (;;) { UARTprintf("Failed to create task"); }
-  }
   for (auto& sensor : _sensors) {
     sensor->init();
     sensor->disable();
   }
-
-  UARTprintf("Finished creating tasks\n");
-}
-
-CoreSensorManager& CoreSensorManager::get(const UBaseType_t priority) {
-  static CoreSensorManager m(priority);
-  return m;
 }
 
 void CoreSensorManager::managerTask(void* param) {
@@ -91,8 +81,8 @@ void CoreSensorManager::managerTask(void* param) {
 
     auto ret = sensor->read();
 
-    char tempStr[100];
-    sprintf(tempStr, "AC is %f\n", ret);
+    // char tempStr[100];
+    // sprintf(tempStr, "AC is %f\n", ret);
     // UARTprintf(tempStr);
 
     vTaskDelayUntil(&lastWakeTime, samplingPeriod);

@@ -1,6 +1,7 @@
 #include "freeRTOS_hook.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 
 // peripheral
 #include "driverlib/gpio.h"
@@ -15,12 +16,15 @@
 #include "inc/hw_types.h"
 
 #include "FreeRTOS.h"
+#include "swo_segger.h"
 #include "task.h"
 
 void vApplicationStackOverflowHook(xTaskHandle *pxTask, char *pcTaskName) {
   // This function can not return, so loop forever.  Interrupts are disabled
   // on entry to this function, so no processor interrupts will interrupt
   // this loop.
-  UARTprintf("\nOverflowed task: %s\n", pcTaskName);
+  char buf[100] = {0};
+  sprintf(buf, "\nOverflowed task: %s", pcTaskName);
+  SWO_PrintStringLine(buf);
   for (;;) {}
 }

@@ -1,9 +1,9 @@
-#ifndef _CORE_SENSOR_MANAGER_HPP
-#define _CORE_SENSOR_MANAGER_HPP
+#pragma once
 
 #include <cstdint>
 
 #include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
 #include "task.h"
 
 #include "ac_voltage_sensor.hpp"
@@ -22,11 +22,8 @@ class CoreSensorManager : public BaseTask {
   ResistanceSensor _resistanceSensor;
   Sensor*          _sensors[SensorType::TOTAL_SENSOR];
 
-  CoreSensorManager(const UBaseType_t priority);
   static void managerTask(void* param);
 
  public:
-  static CoreSensorManager& get(const UBaseType_t priority);
+  CoreSensorManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority);
 };
-
-#endif
