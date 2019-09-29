@@ -13,7 +13,7 @@
 
 #include "base_task.hpp"
 
-class CoreSensorManager {
+class CoreSensorManager : public BaseTask {
  private:
   TaskHandle_t     _task;
   DcVoltageSensor  _dcSensor;
@@ -23,10 +23,10 @@ class CoreSensorManager {
   Sensor*          _sensors[SensorType::TOTAL_SENSOR];
 
   CoreSensorManager(const UBaseType_t priority);
-  static void manager(void* param);
+  static void managerTask(void* param);
 
  public:
-  static TaskHandle_t getTask(const UBaseType_t priority);
+  static CoreSensorManager& get(const UBaseType_t priority);
 };
 
 #endif

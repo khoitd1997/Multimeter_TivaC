@@ -9,4 +9,4 @@ add_library(core_sensor
 target_include_directories(core_sensor PUBLIC .)
 target_link_libraries(core_sensor
                       PUBLIC free_rtos task_common
-                      PRIVATE tiva_utils)
+                      PRIVATE tiva_utils input_handler swo)

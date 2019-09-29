@@ -33,9 +33,10 @@ static std::vector<EventSubscriptionRequest> subscriptions;
 void                                         notifySubscriber(const EventType     type,
                                                               const EventCategory category,
                                                               BaseType_t*         higherTaskWoken) {
+  const EventNotification notif{category, type};
   for (const auto& sub : subscriptions) {
     if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
-      xQueueSendToBackFromISR(sub.queue, &type, higherTaskWoken);
+      xQueueSendToBackFromISR(sub.queue, &notif, higherTaskWoken);
     }
   }
 }
@@ -62,16 +63,16 @@ static void measureModeHandler(const bool isClockwise) {
     SWO_PrintStringLine("inside rotary interrupt");
 
     if (isClockwise) {
-      currMode =
-          static_cast<EventType>(std::min(static_cast<uint32_t>(currMode) << 1,
-                                          static_cast<uint32_t>(EventType::MEASURE_RESISTANCE)));
+      currMode = static_cast<EventType>(std::min(currMode + 1, EventType::END_MEASURE - 1));
     } else {
-      currMode = static_cast<EventType>(std::max(static_cast<uint32_t>(currMode) >> 1,
-                                                 static_cast<uint32_t>(EventType::MEASURE_DC)));
+      currMode = static_cast<EventType>(std::max(currMode - 1, EventType::START_MEASURE + 1));
     }
 
     if (prevMode != currMode) {
+      SWO_PrintStringLine("notifying subscribers");
       notifySubscriber(currMode, EventCategory::MEASURE, &higherTaskWoken);
+    } else {
+      SWO_PrintStringLine("same mode");
     }
 
     portYIELD_FROM_ISR(higherTaskWoken);
@@ -99,8 +100,8 @@ static void                          brightnessHandler(const uint32_t intStatus)
     lastInput = currTick;
 
     BaseType_t    higherTaskWoken = pdFALSE;
-    EventCategory category        = EventCategory::NONE;
-    EventType     type            = EventType::NONE;
+    EventCategory category        = EventCategory::CATEGORY_NONE;
+    EventType     type            = EventType::TYPE_NONE;
 
     if (bit_get(intStatus, BRIGHTNESS_CTRL_BUTTONS)) {
       category = EventCategory::BRIGHTNESS;

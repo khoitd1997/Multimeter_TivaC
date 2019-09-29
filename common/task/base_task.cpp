@@ -3,6 +3,6 @@
 #include "input_handler.hpp"
 
 BaseTask::BaseTask(const int queueSize)
-    : inputEventQueue{xQueueCreate(queueSize, sizeof(input_handler::EventType))} {}
+    : inputEventQueue{xQueueCreate(queueSize, sizeof(input_handler::EventNotification))} {}
 
 BaseTask::~BaseTask() {}

@@ -27,15 +27,18 @@
 #include "utils/uartstdio.h"
 
 #include "bit_manipulation.h"
+#include "swo_segger.h"
+
+#include "input_handler.hpp"
 
 CoreSensorManager::CoreSensorManager(const UBaseType_t priority)
-    : _dcSensor(),
+    : _task(NULL),
+      _dcSensor(),
       _acSensor(_dcSensor),
       _currentSensor(),
       _resistanceSensor(),
-      _task(NULL),
-      _sensors({&_dcSensor, &_acSensor, &_currentSensor, &_resistanceSensor}) {
-  if (pdPASS != xTaskCreate(CoreSensorManager::manager,
+      _sensors({&_acSensor, &_dcSensor, &_currentSensor, &_resistanceSensor}) {
+  if (pdPASS != xTaskCreate(CoreSensorManager::managerTask,
                             "Core Sensor Manager Task",
                             configMINIMAL_STACK_SIZE + 200,
                             this,
@@ -51,15 +54,15 @@ CoreSensorManager::CoreSensorManager(const UBaseType_t priority)
   UARTprintf("Finished creating tasks\n");
 }
 
-TaskHandle_t CoreSensorManager::getTask(const UBaseType_t priority) {
+CoreSensorManager& CoreSensorManager::get(const UBaseType_t priority) {
   static CoreSensorManager m(priority);
-  return m._task;
+  return m;
 }
 
-void CoreSensorManager::manager(void* param) {
-  auto    managerObj = static_cast<CoreSensorManager*>(param);
-  int32_t index      = 3;  // TODO: Change it back after test
-  auto    sensor     = managerObj->_sensors[index];
+void CoreSensorManager::managerTask(void* param) {
+  auto    manager = static_cast<CoreSensorManager*>(param);
+  int32_t index   = 0;  // TODO: Change it back after test
+  auto    sensor  = manager->_sensors[index];
 
   auto lastWakeTime   = xTaskGetTickCount();
   auto samplingPeriod = pdMS_TO_TICKS(sensor->samplingPeriodMs);
@@ -68,27 +71,29 @@ void CoreSensorManager::manager(void* param) {
 
   UARTprintf("Preparing to enter manager superloop\n");
   for (;;) {
-    uint32_t notifyVal = 0;
-    auto     pending   = xTaskNotifyWait(0x00, ULONG_MAX, &notifyVal, 0);
-
-    if (pdTRUE == pending) {
+    input_handler::EventNotification notif;
+    int32_t                          newIndex = index;
+    while (xQueueReceive(manager->inputEventQueue, &notif, 0)) {
       // NOTE: how sensors are selected by relay affect whether the code works
-      sensor->disable();
-      index += static_cast<int32_t>(notifyVal);
-      // wrap value around
-      index = (index < 0) ? SensorType::TOTAL_SENSOR - 1 : index;
-      index = (index > SensorType::TOTAL_SENSOR - 1) ? 0 : index;
 
-      sensor = managerObj->_sensors[index];
-      UARTprintf("Index is: %d\n", index);
+      if (input_handler::EventCategory::MEASURE == notif.category) {
+        newIndex = notif.type - input_handler::EventType::START_MEASURE - 1;
+      }
+    }
+
+    if (index != newIndex) {
+      index = newIndex;
+      sensor->disable();
+      sensor = manager->_sensors[index];
       sensor->enable();
       samplingPeriod = pdMS_TO_TICKS(sensor->samplingPeriodMs);
     }
+
     auto ret = sensor->read();
 
     char tempStr[100];
     sprintf(tempStr, "AC is %f\n", ret);
-    UARTprintf(tempStr);
+    // UARTprintf(tempStr);
 
     vTaskDelayUntil(&lastWakeTime, samplingPeriod);
   }

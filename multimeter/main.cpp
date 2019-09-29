@@ -51,14 +51,18 @@ int main(void) {
 
   uartConfigure(UART_BAUD);
 
-  //   auto sensorManagerTask = CoreSensorManager::getTask(CORE_SENSOR_PRIORITY);
+  //   auto sensorManagerTask = ;
 
   // clang-format off
   input_handler::create({
-      {
-       DisplayManager::get(DISPLAY_PRIORITY, NULL, 0).inputEventQueue,
-       static_cast<uint32_t>(input_handler::EventCategory::BRIGHTNESS)
-      }
+    {
+      DisplayManager::get(DISPLAY_PRIORITY, NULL, 0).inputEventQueue,
+      static_cast<uint32_t>(input_handler::EventCategory::BRIGHTNESS)
+    },
+    {
+      CoreSensorManager::get(CORE_SENSOR_PRIORITY).inputEventQueue,
+      static_cast<uint32_t>(input_handler::EventCategory::MEASURE)
+    }
   });
   // clang-format on
 

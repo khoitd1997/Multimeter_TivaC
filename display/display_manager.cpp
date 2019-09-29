@@ -61,11 +61,11 @@ void DisplayManager::managerTask(void *param) {
 
   manager->printStartupScreen();
   for (;;) {
-    input_handler::EventType type;
+    input_handler::EventNotification notif;
     // TODO(khoi): Make this a queue set later
-    if (xQueueReceive(manager->inputEventQueue, &type, portMAX_DELAY)) {
+    if (xQueueReceive(manager->inputEventQueue, &notif, portMAX_DELAY)) {
       SWO_PrintStringLine("received event notif");
-      switch (type) {
+      switch (notif.type) {
         case input_handler::EventType::BRIGHTNESS_INC:
           manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
                                      ? 255
