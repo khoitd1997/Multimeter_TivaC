@@ -63,9 +63,13 @@ static void measureModeHandler(const bool isClockwise) {
     SWO_PrintStringLine("inside rotary interrupt");
 
     if (isClockwise) {
-      currMode = static_cast<EventType>(std::min(currMode + 1, EventType::END_MEASURE - 1));
+      currMode = static_cast<EventType>(currMode + 1);
+      currMode = static_cast<EventType>(
+          currMode >= EventType::END_MEASURE ? EventType::START_MEASURE + 1 : currMode);
     } else {
-      currMode = static_cast<EventType>(std::max(currMode - 1, EventType::START_MEASURE + 1));
+      currMode = static_cast<EventType>(currMode - 1);
+      currMode = static_cast<EventType>(
+          currMode <= EventType::START_MEASURE ? EventType::END_MEASURE - 1 : currMode);
     }
 
     if (prevMode != currMode) {
