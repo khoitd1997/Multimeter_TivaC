@@ -20,8 +20,6 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 
-#include "input_handler.hpp"
-
 #include "swo_segger.h"
 
 #include "ds3231.h"

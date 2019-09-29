@@ -13,7 +13,9 @@
 
 #include "base_task.hpp"
 
-class CoreSensorManager : public BaseTask {
+#include "user_input_subscriber.hpp"
+
+class CoreSensorManager : public BaseTask, public UserInputSubscriber {
  private:
   TaskHandle_t     _task;
   DcVoltageSensor  _dcSensor;

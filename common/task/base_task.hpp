@@ -13,10 +13,8 @@ class BaseTask {
            const char *const            pcName,
            const configSTACK_DEPTH_TYPE usStackDepth,
            void *                       pvParameters,
-           const UBaseType_t            uxPriority,
-           const int                    queueSize = 5);
+           const UBaseType_t            uxPriority);
   virtual ~BaseTask() = 0;
 
-  TaskHandle_t  taskHandle;
-  QueueHandle_t inputEventQueue = nullptr;
+  TaskHandle_t taskHandle;
 };

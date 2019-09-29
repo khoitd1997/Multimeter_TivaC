@@ -28,8 +28,6 @@
 #include "bit_manipulation.h"
 #include "swo_segger.h"
 
-#include "input_handler.hpp"
-
 CoreSensorManager::CoreSensorManager(const configSTACK_DEPTH_TYPE stackSize,
                                      const UBaseType_t            priority)
     : BaseTask{CoreSensorManager::managerTask,
@@ -61,13 +59,13 @@ void CoreSensorManager::managerTask(void* param) {
 
   UARTprintf("Preparing to enter manager superloop\n");
   for (;;) {
-    input_handler::EventNotification notif;
-    int32_t                          newIndex = index;
+    UserInputEventNotif notif;
+    int32_t             newIndex = index;
     while (xQueueReceive(manager->inputEventQueue, &notif, 0)) {
       // NOTE: how sensors are selected by relay affect whether the code works
 
-      if (input_handler::EventCategory::MEASURE == notif.category) {
-        newIndex = notif.type - input_handler::EventType::START_MEASURE - 1;
+      if (UserInputEventCategory::MEASURE == notif.category) {
+        newIndex = notif.type - UserInputEventType::START_MEASURE - 1;
       }
     }
 

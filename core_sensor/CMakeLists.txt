@@ -8,5 +8,5 @@ add_library(core_sensor
             sensor.cpp)
 target_include_directories(core_sensor PUBLIC .)
 target_link_libraries(core_sensor
-                      PUBLIC free_rtos task_common
-                      PRIVATE tiva_utils input_handler swo)
+                      PUBLIC free_rtos task_common user_input_subscriber
+                      PRIVATE tiva_utils swo)

@@ -28,11 +28,12 @@
 #include "core_sensor_manager.hpp"
 #include "display_manager.hpp"
 #include "extra_sensor_manager.hpp"
+#include "user_input_manager.hpp"
 
 #include "freeRTOS_hook.h"
-#include "input_handler.hpp"
 #include "swo_segger.h"
 #include "uart_util.hpp"
+#include "user_input_manager.hpp"
 
 #define UART_BAUD 115200
 
@@ -52,13 +53,9 @@ int main(void) {
   static DisplayManager     displayManager{
       configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
   static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
-
-  static const input_handler::EventSubscriptionRequest reqs[] = {
-      {displayManager.inputEventQueue, input_handler::EventCategory::BRIGHTNESS},
-      {coreSensorManager.inputEventQueue, input_handler::EventCategory::MEASURE}};
-
-  input_handler::create(
-      reqs, static_cast<int>(sizeof(reqs) / sizeof(input_handler::EventSubscriptionRequest)));
+  static UserInputManager  inputManager(
+      {{displayManager.inputEventQueue, UserInputEventCategory::BRIGHTNESS},
+       {coreSensorManager.inputEventQueue, UserInputEventCategory::MEASURE}});
 
   SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();

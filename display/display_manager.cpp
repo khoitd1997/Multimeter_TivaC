@@ -23,8 +23,6 @@
 #include "oled_font_source_pro.h"
 #include "ssd1306.h"
 
-#include "input_handler.hpp"
-
 #include "swo_segger.h"
 
 DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize,
@@ -45,17 +43,17 @@ void DisplayManager::managerTask(void *param) {
 
   manager->printStartupScreen();
   for (;;) {
-    input_handler::EventNotification notif;
+    UserInputEventNotif notif;
     // TODO(khoi): Make this a queue set later
     if (xQueueReceive(manager->inputEventQueue, &notif, portMAX_DELAY)) {
       SWO_PrintStringLine("received event notif");
       switch (notif.type) {
-        case input_handler::EventType::BRIGHTNESS_INC:
+        case UserInputEventType::BRIGHTNESS_INC:
           manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
                                      ? 255
                                      : manager->getBrightness() + kBrightnessAdjStep);
           break;
-        case input_handler::EventType::BRIGHTNESS_DEC:
+        case UserInputEventType::BRIGHTNESS_DEC:
           manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
                                      ? 0
                                      : manager->getBrightness() - kBrightnessAdjStep);

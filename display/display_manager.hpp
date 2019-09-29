@@ -3,15 +3,13 @@
 
 #include "base_task.hpp"
 
+#include "user_input_subscriber.hpp"
+
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "stream_buffer.h"
 
-// typedef struct {
-//   uint32_t
-// } DisplayReq;
-
-class DisplayManager : public BaseTask {
+class DisplayManager : public BaseTask, public UserInputSubscriber {
  private:
   StreamBufferHandle_t *_streams;
   const uint32_t        _totalStream;

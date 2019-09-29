@@ -7,7 +7,7 @@ add_executable(multimeter.elf
 target_link_libraries(multimeter.elf
                       swo
                       display
-                      input_handler
+                      user_input_manager
                       free_rtos
                       core_sensor
                       extra_sensor
