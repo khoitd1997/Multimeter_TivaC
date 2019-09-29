@@ -47,18 +47,18 @@ int main(void) {
 
   uartConfigure(UART_BAUD);
 
-  static DisplayManager displayManager{
-      configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
-  static CoreSensorManager  coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
+  SWO_PrintStringLine("Initializing tasks");
   static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 8};
+  static DisplayManager     displayManager{
+      configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
+  static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
 
   static const input_handler::EventSubscriptionRequest reqs[] = {
       {displayManager.inputEventQueue, input_handler::EventCategory::BRIGHTNESS},
       {coreSensorManager.inputEventQueue, input_handler::EventCategory::MEASURE}};
 
-  // clang-format off
-  input_handler::create(reqs, static_cast<int>(sizeof(reqs) / sizeof(input_handler::EventSubscriptionRequest)));
-  // clang-format on
+  input_handler::create(
+      reqs, static_cast<int>(sizeof(reqs) / sizeof(input_handler::EventSubscriptionRequest)));
 
   SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();

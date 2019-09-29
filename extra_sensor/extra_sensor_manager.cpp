@@ -30,7 +30,7 @@
 ExtraSensorManager::ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize,
                                        const UBaseType_t            priority)
     : BaseTask{ExtraSensorManager::managerTask, "Extra Manager", stackSize, this, priority},
-      htu21dConfig{I2C1_BASE, Htu21d_resolution::HTU21D_HUMIDITY_11_TEMP_11} {
+      htu21dConfig{I2C1_BASE, Htu21d_resolution::HTU21D_HUMIDITY_8_TEMP_12} {
   ds3231_init();
 
   htu21d_init(&htu21dConfig);
