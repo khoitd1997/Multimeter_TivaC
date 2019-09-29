@@ -39,8 +39,10 @@ ExtraSensorManager::ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize,
 }
 
 void ExtraSensorManager::managerTask(void *param) {
-  auto        manager      = static_cast<ExtraSensorManager *>(param);
-  auto        lastWakeTime = xTaskGetTickCount();
+  auto       manager      = static_cast<ExtraSensorManager *>(param);
+  auto       lastWakeTime = xTaskGetTickCount();
+  const auto taskPeriod   = pdMS_TO_TICKS(500);
+  // const auto taskPeriod = pdMS_TO_TICKS(60000);
   Ds3231_time currTime{.is_12_form = false};
   char        buf[100] = {0};
 
@@ -56,23 +58,21 @@ void ExtraSensorManager::managerTask(void *param) {
 
   for (;;) {
     htu21d_start_temp_read(&manager->htu21dConfig);
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
+    vTaskDelayUntil(&lastWakeTime, taskPeriod / 2);
     float temperature = 0;
     while (htu21d_check_temp_read(&(manager->htu21dConfig), &temperature) == HTU21D_ERROR_NO_DATA) {
       // wait
     }
-    sprintf(buf, "temp: %f", temperature);
-    SWO_PrintStringLine(buf);
 
     htu21d_start_humid_read(&manager->htu21dConfig);
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
+    vTaskDelayUntil(&lastWakeTime, taskPeriod - taskPeriod / 2);
     float humidity = 0;
     while (htu21d_check_humid_read(&(manager->htu21dConfig), &humidity) == HTU21D_ERROR_NO_DATA) {
       // wait
     }
-    sprintf(buf, "humid: %f", humidity);
-    SWO_PrintStringLine(buf);
 
+    sprintf(buf, "temp: %f, humid: %f", temperature, humidity);
+    SWO_PrintStringLine(buf);
     ds3231_get_time(&currTime);
     sprintf(buf,
             "time: %d/%d/%d %d:%d:%d",
@@ -83,8 +83,5 @@ void ExtraSensorManager::managerTask(void *param) {
             currTime.minute,
             currTime.second);
     SWO_PrintStringLine(buf);
-
-    // vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(60000));
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(500));
   }
 }
