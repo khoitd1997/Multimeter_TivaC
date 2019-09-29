@@ -1,5 +1,7 @@
 #include "extra_sensor_manager.hpp"
 
+#include <stdio.h>
+
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -12,6 +14,7 @@
 #include "inc/hw_types.h"
 
 #include "driverlib/gpio.h"
+#include "driverlib/i2c.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
@@ -23,29 +26,65 @@
 
 #include "swo_segger.h"
 
-ExtraSensorManager::ExtraSensorManager(const UBaseType_t            priority,
-                                       const configSTACK_DEPTH_TYPE stackSize)
-    : BaseTask{ExtraSensorManager::managerTask,
-               "Extra Sensor Manager Task",
-               stackSize,
-               this,
-               priority} {}
+#include "ds3231.h"
+#include "htu21d.h"
+
+ExtraSensorManager::ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize,
+                                       const UBaseType_t            priority)
+    : BaseTask{ExtraSensorManager::managerTask, "Extra Manager", stackSize, this, priority},
+      htu21dConfig{I2C1_BASE, Htu21d_resolution::HTU21D_HUMIDITY_11_TEMP_11} {
+  ds3231_init();
+
+  htu21d_init(&htu21dConfig);
+}
 
 void ExtraSensorManager::managerTask(void *param) {
-  auto manager = static_cast<ExtraSensorManager *>(param);
+  auto        manager      = static_cast<ExtraSensorManager *>(param);
+  auto        lastWakeTime = xTaskGetTickCount();
+  Ds3231_time currTime{.is_12_form = false};
+  char        buf[100] = {0};
 
-  // for (;;) {
-  //   input_handler::EventNotification notif;
-  //   if (xQueueReceive(manager->inputEventQueue, &notif, portMAX_DELAY)) {
-  //     SWO_PrintStringLine("received event notif");
-  //     switch (notif.type) {
-  //       case input_handler::EventType::BRIGHTNESS_INC:
-  //         break;
-  //       default:
-  //         SWO_PrintStringLine("unhandled input event type");
-  //         for (;;) {}
-  //         break;
-  //     }
-  //   }
-  // }
+  // Ds3231_time calibrateTime = {.is_12_form = false,
+  //                              .second     = 0,
+  //                              .minute     = 53,
+  //                              .hour       = 23,
+  //                              .weekDay    = Ds3231_week_day::SATURDAY,
+  //                              .day        = 28,
+  //                              .month      = 9,
+  //                              .year       = 2019};
+  // ds3231_set_time(&calibrateTime, true);
+
+  for (;;) {
+    htu21d_start_temp_read(&manager->htu21dConfig);
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
+    float temperature = 0;
+    while (htu21d_check_temp_read(&(manager->htu21dConfig), &temperature) == HTU21D_ERROR_NO_DATA) {
+      // wait
+    }
+    sprintf(buf, "temp: %f", temperature);
+    SWO_PrintStringLine(buf);
+
+    htu21d_start_humid_read(&manager->htu21dConfig);
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
+    float humidity = 0;
+    while (htu21d_check_humid_read(&(manager->htu21dConfig), &humidity) == HTU21D_ERROR_NO_DATA) {
+      // wait
+    }
+    sprintf(buf, "humid: %f", humidity);
+    SWO_PrintStringLine(buf);
+
+    ds3231_get_time(&currTime);
+    sprintf(buf,
+            "time: %d/%d/%d %d:%d:%d",
+            currTime.month,
+            currTime.day,
+            currTime.year,
+            currTime.hour,
+            currTime.minute,
+            currTime.second);
+    SWO_PrintStringLine(buf);
+
+    // vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(60000));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(500));
+  }
 }

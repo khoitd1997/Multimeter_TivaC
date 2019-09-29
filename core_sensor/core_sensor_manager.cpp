@@ -81,8 +81,8 @@ void CoreSensorManager::managerTask(void* param) {
 
     auto ret = sensor->read();
 
-    char tempStr[100];
-    sprintf(tempStr, "AC is %f\n", ret);
+    // char tempStr[100];
+    // sprintf(tempStr, "AC is %f\n", ret);
     // UARTprintf(tempStr);
 
     vTaskDelayUntil(&lastWakeTime, samplingPeriod);

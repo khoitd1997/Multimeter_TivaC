@@ -48,11 +48,9 @@ int main(void) {
   uartConfigure(UART_BAUD);
 
   static DisplayManager displayManager{
-      configMINIMAL_STACK_SIZE + 200, configMAX_PRIORITIES - 4, nullptr, 0};
-  static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE + 200,
-                                             configMAX_PRIORITIES - 6};
-  // static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES -
-  // 10};
+      configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
+  static CoreSensorManager  coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
+  static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 8};
 
   static const input_handler::EventSubscriptionRequest reqs[] = {
       {displayManager.inputEventQueue, input_handler::EventCategory::BRIGHTNESS},

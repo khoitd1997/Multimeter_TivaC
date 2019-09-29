@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "htu21d.h"
+
 #include "base_task.hpp"
 
 #include "FreeRTOS.h"
@@ -12,5 +14,7 @@ class ExtraSensorManager : public BaseTask {
   static void managerTask(void *param);
 
  public:
-  ExtraSensorManager(const UBaseType_t priority, const configSTACK_DEPTH_TYPE stackSize);
+  ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority);
+
+  Htu21d htu21dConfig;
 };
