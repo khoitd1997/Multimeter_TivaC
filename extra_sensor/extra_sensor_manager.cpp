@@ -19,8 +19,6 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
-#include "utils/uartstdio.h"
 
 #include "input_handler.hpp"
 
@@ -39,10 +37,9 @@ ExtraSensorManager::ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize,
 }
 
 void ExtraSensorManager::managerTask(void *param) {
-  auto       manager      = static_cast<ExtraSensorManager *>(param);
-  auto       lastWakeTime = xTaskGetTickCount();
-  const auto taskPeriod   = pdMS_TO_TICKS(500);
-  // const auto taskPeriod = pdMS_TO_TICKS(60000);
+  auto        manager      = static_cast<ExtraSensorManager *>(param);
+  auto        lastWakeTime = xTaskGetTickCount();
+  const auto  taskPeriod   = pdMS_TO_TICKS(60000);
   Ds3231_time currTime{.is_12_form = false};
   char        buf[100] = {0};
 
@@ -75,7 +72,7 @@ void ExtraSensorManager::managerTask(void *param) {
     SWO_PrintStringLine(buf);
     ds3231_get_time(&currTime);
     sprintf(buf,
-            "time: %d/%d/%d %d:%d:%d",
+            "time: %d/%d/%u %d:%d:%d",
             currTime.month,
             currTime.day,
             currTime.year,
