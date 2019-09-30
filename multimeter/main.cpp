@@ -55,9 +55,11 @@ int main(void) {
   static DisplayManager     displayManager{
       configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
   static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
-  static UserInputManager  inputManager(
-      {{displayManager.inputEventQueue, ActionCategory::BRIGHTNESS},
-       {coreSensorManager.inputEventQueue, ActionCategory::MEASURE}});
+  static UserInputManager  inputManager;
+
+  coreSensorManager.setSubscriptions({{displayManager.coreNotifQueue}});
+  inputManager.setSubcriptions({{displayManager.inputNotifQueue, ActionCategory::BRIGHTNESS},
+                                {coreSensorManager.inputNotifQueue, ActionCategory::MEASURE}});
 
   SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();

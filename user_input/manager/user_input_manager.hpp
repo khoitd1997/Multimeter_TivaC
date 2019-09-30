@@ -31,13 +31,11 @@
 #include "rotary_encoder.hpp"
 
 class UserInputManager {
- public:
-  UserInputManager(const std::vector<UserInputEventSubReq>& reqs);
-
+ private:
   template <typename T>
   void notifySubscriber(const T actionType, BaseType_t* higherTaskWoken) {
     const UserInputEventNotif notif{AllActionContainer{actionType}};
-    for (const auto& sub : subs) {
+    for (const auto& sub : _subs) {
       if (actionIsInCategories<T>(sub.categories)) {
         xQueueSendToBackFromISR(sub.queue, &notif, higherTaskWoken);
       }
@@ -69,5 +67,9 @@ class UserInputManager {
                                BrightnessControlButtonGroup;
   BrightnessControlButtonGroup brightnessCtrl;
 
-  const std::vector<UserInputEventSubReq> subs;
+  std::vector<UserInputEventSubReq> _subs;
+
+ public:
+  UserInputManager();
+  void setSubcriptions(const std::vector<UserInputEventSubReq>& reqs);
 };

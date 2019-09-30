@@ -45,23 +45,56 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize,
 void DisplayManager::managerTask(void *param) {
   auto manager = static_cast<DisplayManager *>(param);
 
+  auto queueSet = xQueueCreateSet(2);
+  xQueueAddToSet(manager->inputNotifQueue, queueSet);
+  xQueueAddToSet(manager->coreNotifQueue, queueSet);
+
   manager->printStartupScreen();
   for (;;) {
-    UserInputEventNotif notif;
-    // TODO(khoi): Make this a queue set later
-    if (xQueueReceive(manager->inputEventQueue, &notif, portMAX_DELAY)) {
-      SWO_PrintStringLine("received event notif");
-      if (std::holds_alternative<BrightnessAction>(notif.action)) {
-        switch (std::get<BrightnessAction>(notif.action)) {
-          case BrightnessAction::BRIGHTNESS_INC:
-            manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
-                                       ? 255
-                                       : manager->getBrightness() + kBrightnessAdjStep);
+    QueueSetMemberHandle_t activeQueue;
+
+    while (activeQueue = xQueueSelectFromSet(queueSet, portMAX_DELAY)) {
+      UserInputEventNotif userNotif;
+      CoreSensorNotif     coreNotif;
+
+      if (activeQueue == manager->inputNotifQueue) {
+        xQueueReceive(manager->inputNotifQueue, &userNotif, 0);
+        if (std::holds_alternative<BrightnessAction>(userNotif.action)) {
+          switch (std::get<BrightnessAction>(userNotif.action)) {
+            case BrightnessAction::BRIGHTNESS_INC:
+              manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
+                                         ? 255
+                                         : manager->getBrightness() + kBrightnessAdjStep);
+              break;
+            case BrightnessAction::BRIGHTNESS_DEC:
+              manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
+                                         ? 0
+                                         : manager->getBrightness() - kBrightnessAdjStep);
+              break;
+            default:
+              SWO_PrintStringLine("unhandled input event type");
+              for (;;) {}
+              break;
+          }
+        } else {
+          for (;;) {
+            // didn't subscribe for this
+          }
+        }
+      } else if (activeQueue == manager->coreNotifQueue) {
+        xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
+        switch (coreNotif.measureType) {
+          case MeasureAction::MEASURE_AC:
+            SWO_PrintStringLine("Received AC");
             break;
-          case BrightnessAction::BRIGHTNESS_DEC:
-            manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
-                                       ? 0
-                                       : manager->getBrightness() - kBrightnessAdjStep);
+          case MeasureAction::MEASURE_DC:
+            SWO_PrintStringLine("Received DC");
+            break;
+          case MeasureAction::MEASURE_CURRENT:
+            SWO_PrintStringLine("Received Current");
+            break;
+          case MeasureAction::MEASURE_RESISTANCE:
+            SWO_PrintStringLine("Received Resistance");
             break;
           default:
             SWO_PrintStringLine("unhandled input event type");
@@ -70,7 +103,7 @@ void DisplayManager::managerTask(void *param) {
         }
       } else {
         for (;;) {
-          // didn't subscribe for this
+          // don't know this queue
         }
       }
     }

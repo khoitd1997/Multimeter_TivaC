@@ -11,8 +11,9 @@
 #include "swo_segger.h"
 
 static UserInputManager* manager = nullptr;
-UserInputManager::UserInputManager(const std::vector<UserInputEventSubReq>& reqs) : subs{reqs} {
-  manager = this;
+UserInputManager::UserInputManager() { manager = this; }
+void UserInputManager::setSubcriptions(const std::vector<UserInputEventSubReq>& reqs) {
+  _subs = reqs;
 }
 
 void UserInputManager::measureModeHandler(const bool isClockwise) {

@@ -1,11 +1,7 @@
 #pragma once
 
-#include <variant>
-
 #include "FreeRTOS.h"
 #include "queue.h"
-
-#include "bit_manipulation.h"
 
 #include "action_def.hpp"
 
@@ -23,5 +19,5 @@ class UserInputSubscriber {
   UserInputSubscriber(const int queueSize = 5);
   virtual ~UserInputSubscriber() = 0;
 
-  QueueHandle_t inputEventQueue = nullptr;
+  QueueHandle_t inputNotifQueue = nullptr;
 };

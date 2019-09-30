@@ -3,13 +3,14 @@
 
 #include "base_task.hpp"
 
+#include "core_sensor_subscriber.hpp"
 #include "user_input_subscriber.hpp"
 
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "stream_buffer.h"
 
-class DisplayManager : public BaseTask, public UserInputSubscriber {
+class DisplayManager : public BaseTask, public UserInputSubscriber, public CoreSensorSubscriber {
  private:
   StreamBufferHandle_t *_streams;
   const uint32_t        _totalStream;
