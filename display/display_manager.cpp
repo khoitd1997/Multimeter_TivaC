@@ -54,10 +54,8 @@ void DisplayManager::managerTask(void *param) {
     QueueSetMemberHandle_t activeQueue;
 
     while (activeQueue = xQueueSelectFromSet(queueSet, portMAX_DELAY)) {
-      UserInputEventNotif userNotif;
-      CoreSensorNotif     coreNotif;
-
       if (activeQueue == manager->inputNotifQueue) {
+        UserInputEventNotif userNotif;
         xQueueReceive(manager->inputNotifQueue, &userNotif, 0);
         if (std::holds_alternative<BrightnessAction>(userNotif.action)) {
           switch (std::get<BrightnessAction>(userNotif.action)) {
@@ -82,6 +80,7 @@ void DisplayManager::managerTask(void *param) {
           }
         }
       } else if (activeQueue == manager->coreNotifQueue) {
+        CoreSensorNotif coreNotif;
         xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
         switch (coreNotif.measureType) {
           case MeasureAction::MEASURE_AC:

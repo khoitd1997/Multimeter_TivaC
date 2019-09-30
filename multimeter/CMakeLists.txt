@@ -10,6 +10,6 @@ target_link_libraries(multimeter.elf
                       user_input_manager
                       free_rtos
                       core_sensor_manager
-                      extra_sensor
+                      extra_sensor_manager
                       tiva_utils
                       tivaware_utils)

@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.cu": "c",
+        "*.tdd": "makefile",
+        "*.cfg": "tcl",
+        "*.svd": "xml",
+        "*.hpp": "cpp",
+        "bit_manipulation.h": "c",
+        "i2c.h": "c",
+        "uart.h": "c"
+    }
+}

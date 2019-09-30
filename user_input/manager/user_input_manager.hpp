@@ -37,12 +37,12 @@ class UserInputManager {
     const UserInputEventNotif notif{AllActionContainer{actionType}};
     for (const auto& sub : _subs) {
       if (actionIsInCategories<T>(sub.categories)) {
-        xQueueSendToBackFromISR(sub.queue, &notif, higherTaskWoken);
+        xQueueOverwriteFromISR(sub.queue, &notif, higherTaskWoken);
       }
     }
   }
 
-  static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(100);
+  static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(60);
   static void       measureModeHandler(const bool isClockwise);
   typedef RotaryEncoder<SYSCTL_PERIPH_GPIOD,
                         GPIO_PORTD_BASE,

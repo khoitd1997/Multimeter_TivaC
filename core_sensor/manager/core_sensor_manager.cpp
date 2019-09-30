@@ -2,6 +2,7 @@
 
 // FreeRTOS
 #include "FreeRTOS.h"
+#include "free_rtos_utils.hpp"
 #include "task.h"
 
 #include <climits>
@@ -95,7 +96,10 @@ void CoreSensorManager::managerTask(void* param) {
     auto ret = manager->_activeSensor->read();
 
     CoreSensorNotif coreNotif{manager->_activeAction, ret};
-    for (const auto& sub : manager->_subs) { xQueueOverwrite(sub.queue, &coreNotif); }
+    {
+      free_rtos_utils::SuspendLockGuard l();
+      for (const auto& sub : manager->_subs) { xQueueOverwrite(sub.queue, &coreNotif); }
+    }
 
     // char tempStr[100];
     // sprintf(tempStr, "AC is %f\n", ret);
