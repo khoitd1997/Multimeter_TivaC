@@ -4,6 +4,7 @@
 
 // FreeRTOS
 #include "FreeRTOS.h"
+#include "free_rtos_utils.hpp"
 #include "queue.h"
 #include "stream_buffer.h"
 #include "task.h"
@@ -45,9 +46,8 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize,
 void DisplayManager::managerTask(void *param) {
   auto manager = static_cast<DisplayManager *>(param);
 
-  auto queueSet = xQueueCreateSet(2);
-  xQueueAddToSet(manager->inputNotifQueue, queueSet);
-  xQueueAddToSet(manager->coreNotifQueue, queueSet);
+  auto queueSet =
+      free_rtos_utils::createQueueSet({manager->inputNotifQueue, manager->coreNotifQueue});
 
   manager->printStartupScreen();
   for (;;) {
