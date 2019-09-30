@@ -1,5 +1,7 @@
 #include "display_manager.hpp"
 
+#include <variant>
+
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -22,6 +24,8 @@
 
 #include "oled_font_source_pro.h"
 #include "ssd1306.h"
+
+#include "action_def.hpp"
 
 #include "swo_segger.h"
 
@@ -47,21 +51,27 @@ void DisplayManager::managerTask(void *param) {
     // TODO(khoi): Make this a queue set later
     if (xQueueReceive(manager->inputEventQueue, &notif, portMAX_DELAY)) {
       SWO_PrintStringLine("received event notif");
-      switch (notif.type) {
-        case UserInputEventType::BRIGHTNESS_INC:
-          manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
-                                     ? 255
-                                     : manager->getBrightness() + kBrightnessAdjStep);
-          break;
-        case UserInputEventType::BRIGHTNESS_DEC:
-          manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
-                                     ? 0
-                                     : manager->getBrightness() - kBrightnessAdjStep);
-          break;
-        default:
-          SWO_PrintStringLine("unhandled input event type");
-          for (;;) {}
-          break;
+      if (std::holds_alternative<BrightnessAction>(notif.action)) {
+        switch (std::get<BrightnessAction>(notif.action)) {
+          case BrightnessAction::BRIGHTNESS_INC:
+            manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
+                                       ? 255
+                                       : manager->getBrightness() + kBrightnessAdjStep);
+            break;
+          case BrightnessAction::BRIGHTNESS_DEC:
+            manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
+                                       ? 0
+                                       : manager->getBrightness() - kBrightnessAdjStep);
+            break;
+          default:
+            SWO_PrintStringLine("unhandled input event type");
+            for (;;) {}
+            break;
+        }
+      } else {
+        for (;;) {
+          // didn't subscribe for this
+        }
       }
     }
   }

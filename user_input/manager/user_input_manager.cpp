@@ -6,7 +6,8 @@
 
 #include <algorithm>
 
-#include "bit_manipulation.h"
+#include "action_def.hpp"
+
 #include "swo_segger.h"
 
 static UserInputManager* manager = nullptr;
@@ -14,19 +15,8 @@ UserInputManager::UserInputManager(const std::vector<UserInputEventSubReq>& reqs
   manager = this;
 }
 
-void UserInputManager::notifySubscriber(const UserInputEventType     type,
-                                        const UserInputEventCategory category,
-                                        BaseType_t*                  higherTaskWoken) {
-  const UserInputEventNotif notif{category, type};
-  for (const auto& sub : subs) {
-    if (bit_get(sub.categories, static_cast<uint32_t>(category))) {
-      xQueueSendToBackFromISR(sub.queue, &notif, higherTaskWoken);
-    }
-  }
-}
-
 void UserInputManager::measureModeHandler(const bool isClockwise) {
-  static auto       currMode  = UserInputEventType::MEASURE_DC;
+  static auto       currMode  = MeasureAction::MEASURE_AC;
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kRotaryEncoderDebounce) {
@@ -36,20 +26,20 @@ void UserInputManager::measureModeHandler(const bool isClockwise) {
     SWO_PrintStringLine("inside rotary interrupt");
 
     if (isClockwise) {
-      currMode = static_cast<UserInputEventType>(currMode + 1);
-      currMode = static_cast<UserInputEventType>(currMode >= UserInputEventType::END_MEASURE
-                                                     ? UserInputEventType::START_MEASURE + 1
-                                                     : currMode);
+      currMode = static_cast<MeasureAction>(currMode + 1);
+      currMode = static_cast<MeasureAction>(currMode >= MeasureAction::LAST_MEASURE_ACTION
+                                                ? MeasureAction::FIRST_MEASURE_ACTION + 1
+                                                : currMode);
     } else {
-      currMode = static_cast<UserInputEventType>(currMode - 1);
-      currMode = static_cast<UserInputEventType>(currMode <= UserInputEventType::START_MEASURE
-                                                     ? UserInputEventType::END_MEASURE - 1
-                                                     : currMode);
+      currMode = static_cast<MeasureAction>(currMode - 1);
+      currMode = static_cast<MeasureAction>(currMode <= MeasureAction::FIRST_MEASURE_ACTION
+                                                ? MeasureAction::LAST_MEASURE_ACTION - 1
+                                                : currMode);
     }
 
     if (prevMode != currMode) {
       SWO_PrintStringLine("notifying subscribers");
-      manager->notifySubscriber(currMode, UserInputEventCategory::MEASURE, &higherTaskWoken);
+      manager->notifySubscriber(currMode, &higherTaskWoken);
     } else {
       SWO_PrintStringLine("same mode");
     }
@@ -65,20 +55,20 @@ void UserInputManager::brightnessHandler(const uint32_t intStatus) {
     SWO_PrintStringLine("handling input");
     lastInput = currTick;
 
-    BaseType_t             higherTaskWoken = pdFALSE;
-    UserInputEventCategory category        = UserInputEventCategory::CATEGORY_NONE;
-    UserInputEventType     type            = UserInputEventType::TYPE_NONE;
+    BaseType_t higherTaskWoken = pdFALSE;
+    auto       type            = BrightnessAction::FIRST_BRIGHTNESS_ACTION;
 
     if (bit_get(intStatus, kBrightnessCtrlButtons)) {
-      category = UserInputEventCategory::BRIGHTNESS;
       if (bit_get(intStatus, kBrightnessIncButton)) {
-        type = UserInputEventType::BRIGHTNESS_INC;
+        type = BrightnessAction::BRIGHTNESS_INC;
       } else if (bit_get(intStatus, kBrightnessDecButton)) {
-        type = UserInputEventType::BRIGHTNESS_DEC;
+        type = BrightnessAction::BRIGHTNESS_DEC;
+      } else {
+        return;
       }
     }
 
-    manager->notifySubscriber(type, category, &higherTaskWoken);
+    manager->notifySubscriber(type, &higherTaskWoken);
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }

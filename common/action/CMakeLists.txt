@@ -1,0 +1,3 @@
+add_library(action_common INTERFACE)
+target_include_directories(action_common INTERFACE .)
+target_link_libraries(action_common INTERFACE tiva_utils)

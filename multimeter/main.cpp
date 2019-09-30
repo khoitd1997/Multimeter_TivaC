@@ -35,6 +35,8 @@
 #include "uart_util.hpp"
 #include "user_input_manager.hpp"
 
+#include "action_def.hpp"
+
 #define UART_BAUD 115200
 
 #ifdef DEBUG
@@ -54,8 +56,8 @@ int main(void) {
       configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
   static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
   static UserInputManager  inputManager(
-      {{displayManager.inputEventQueue, UserInputEventCategory::BRIGHTNESS},
-       {coreSensorManager.inputEventQueue, UserInputEventCategory::MEASURE}});
+      {{displayManager.inputEventQueue, ActionCategory::BRIGHTNESS},
+       {coreSensorManager.inputEventQueue, ActionCategory::MEASURE}});
 
   SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();

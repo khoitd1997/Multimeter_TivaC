@@ -11,6 +11,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <variant>
+
 #include "inc/hw_gpio.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -27,6 +29,8 @@
 
 #include "bit_manipulation.h"
 #include "swo_segger.h"
+
+#include "action_def.hpp"
 
 CoreSensorManager::CoreSensorManager(const configSTACK_DEPTH_TYPE stackSize,
                                      const UBaseType_t            priority)
@@ -64,8 +68,12 @@ void CoreSensorManager::managerTask(void* param) {
     while (xQueueReceive(manager->inputEventQueue, &notif, 0)) {
       // NOTE: how sensors are selected by relay affect whether the code works
 
-      if (UserInputEventCategory::MEASURE == notif.category) {
-        newIndex = notif.type - UserInputEventType::START_MEASURE - 1;
+      if (std::holds_alternative<MeasureAction>(notif.action)) {
+        newIndex = std::get<MeasureAction>(notif.action) - MeasureAction::FIRST_MEASURE_ACTION - 1;
+      } else {
+        for (;;) {
+          // receive something that this didn't subscribe for
+        }
       }
     }
 

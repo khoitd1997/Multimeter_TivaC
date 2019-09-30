@@ -23,6 +23,9 @@
 #include "task.h"
 
 #include "user_input_subscriber.hpp"
+#include "action_def.hpp"
+
+#include "bit_manipulation.h"
 
 #include "button_group.hpp"
 #include "rotary_encoder.hpp"
@@ -31,9 +34,15 @@ class UserInputManager {
  public:
   UserInputManager(const std::vector<UserInputEventSubReq>& reqs);
 
-  void notifySubscriber(const UserInputEventType     type,
-                        const UserInputEventCategory category,
-                        BaseType_t*                  higherTaskWoken);
+  template <typename T>
+  void notifySubscriber(const T actionType, BaseType_t* higherTaskWoken) {
+    const UserInputEventNotif notif{AllActionContainer{actionType}};
+    for (const auto& sub : subs) {
+      if (actionIsInCategories<T>(sub.categories)) {
+        xQueueSendToBackFromISR(sub.queue, &notif, higherTaskWoken);
+      }
+    }
+  }
 
   static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(100);
   static void       measureModeHandler(const bool isClockwise);
