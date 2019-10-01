@@ -24,7 +24,6 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-#include "oled_font_source_pro.h"
 #include "ssd1306.h"
 
 #include "action_def.hpp"
@@ -46,6 +45,9 @@ void DisplayManager::managerTask(void *param) {
       {manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue});
 
   manager->printStartupScreen();
+
+  manager->_measureTitleWidget.draw(MeasureAction::MEASURE_DC);
+  manager->_measureDataWidget.draw(MeasureAction::MEASURE_DC, 5.9);
   for (;;) {
     QueueSetMemberHandle_t activeQueue;
 
@@ -131,6 +133,8 @@ void DisplayManager::printStartupScreen(void) {
   //     vTaskDelayUntil(&lastWakeTime, sceneDelay);
   //     setBrightness(250);
   //   }
+
+  ssd1306ClearDisplay();
 }
 
 void DisplayManager::setBrightness(const uint8_t brightness) {

@@ -28,13 +28,13 @@ void UserInputManager::measureModeHandler(const bool isClockwise) {
 
     if (isClockwise) {
       currMode = static_cast<MeasureAction>(currMode + 1);
-      currMode = static_cast<MeasureAction>(currMode >= MeasureAction::LAST_MEASURE_ACTION
-                                                ? MeasureAction::FIRST_MEASURE_ACTION + 1
+      currMode = static_cast<MeasureAction>(currMode > MeasureAction::LAST_MEASURE_ACTION
+                                                ? MeasureAction::FIRST_MEASURE_ACTION
                                                 : currMode);
     } else {
       currMode = static_cast<MeasureAction>(currMode - 1);
-      currMode = static_cast<MeasureAction>(currMode <= MeasureAction::FIRST_MEASURE_ACTION
-                                                ? MeasureAction::LAST_MEASURE_ACTION - 1
+      currMode = static_cast<MeasureAction>(currMode < MeasureAction::FIRST_MEASURE_ACTION
+                                                ? MeasureAction::LAST_MEASURE_ACTION
                                                 : currMode);
     }
 
@@ -56,8 +56,8 @@ void UserInputManager::brightnessHandler(const uint32_t intStatus) {
     SWO_PrintStringLine("handling input");
     lastInput = currTick;
 
-    BaseType_t higherTaskWoken = pdFALSE;
-    auto       type            = BrightnessAction::FIRST_BRIGHTNESS_ACTION;
+    BaseType_t       higherTaskWoken = pdFALSE;
+    BrightnessAction type;
 
     if (bit_get(intStatus, kBrightnessCtrlButtons)) {
       if (bit_get(intStatus, kBrightnessIncButton)) {

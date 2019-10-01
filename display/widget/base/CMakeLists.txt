@@ -1,0 +1,3 @@
+add_library(display_base_widget display_base_widget.cpp)
+target_include_directories(display_base_widget PUBLIC .)
+target_link_libraries(display_base_widget PUBLIC ssd1306)
