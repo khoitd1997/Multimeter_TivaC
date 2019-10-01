@@ -25,6 +25,7 @@
 #include "utils/uartstdio.h"
 
 #include "ssd1306.h"
+#include "ssd1306_info.h"
 
 #include "action_def.hpp"
 
@@ -33,7 +34,26 @@
 DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority)
     : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority},
       CoreSensorSubscriber{1},
-      ExtraSensorSubscriber{1} {
+      ExtraSensorSubscriber{1},
+
+      _coreSensorTitleWidget{{
+                                 .lineNum        = 0,
+                                 .colNum         = 0,
+                                 .totalCharacter = 10,
+                             },
+                             source_pro_set},
+      _coreSensorDataWidget{{
+                                .lineNum        = 1,
+                                .colNum         = 0,
+                                .totalCharacter = 13,
+                            },
+                            source_pro_set},
+      _extraSensorWdiget{{
+                             .lineNum        = 0,
+                             .colNum         = 84,
+                             .totalCharacter = 5,
+                         },
+                         source_pro_set} {
   ssd1306Init();
   ssd1306TurnOn(true);
   ssd1306ClearDisplay();
@@ -87,12 +107,16 @@ void DisplayManager::managerTask(void *param) {
           const auto currTick = xTaskGetTickCount();
           if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod) {
             lastCoreDataRefresh = currTick;
-            manager->_measureTitleWidget.draw(coreNotif.measureType);
-            manager->_measureDataWidget.draw(coreNotif.measureType, coreNotif.value);
+            manager->_coreSensorTitleWidget.draw(coreNotif.measureType);
+            manager->_coreSensorDataWidget.draw(coreNotif.measureType, coreNotif.value);
           }
         } else if (activeQueue == manager->extraNotifQueue) {
           ExtraSensorNotif extraNotif;
           xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
+          manager->_extraSensorWdiget.draw(extraNotif.timeData.hour,
+                                           extraNotif.timeData.minute,
+                                           static_cast<int>(extraNotif.envData.temperature),
+                                           static_cast<int>(extraNotif.envData.humidity));
         } else {
           for (;;) {
             // don't know this queue

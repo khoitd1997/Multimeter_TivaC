@@ -7,7 +7,7 @@
 struct DisplayWidgetDimension {
   const int    lineNum;
   const int    colNum;
-  const size_t length;
+  const size_t totalCharacter;
 };
 
 class DisplayBaseWidget {
@@ -18,10 +18,11 @@ class DisplayBaseWidget {
   void updateDisplay(const char* str);
 
   void clear();
+  // virtual void getBitLength() = 0;
+
+  const DisplayWidgetDimension dimension;
 
  protected:
-  const DisplayWidgetDimension _dimension;
-
   const fontSetDesc _font;
 
   const std::string _clearStr;

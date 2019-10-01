@@ -4,9 +4,9 @@
 
 #include "action_def.hpp"
 
-class DisplayMeasureTitleWidget : public DisplayBaseWidget {
+class DisplayCoreSensorTitleWidget : public DisplayBaseWidget {
  public:
-  DisplayMeasureTitleWidget(const DisplayWidgetDimension& dimension, const fontSetDesc& font);
+  DisplayCoreSensorTitleWidget(const DisplayWidgetDimension& dimension, const fontSetDesc& font);
 
   void draw(const MeasureAction action);
 
