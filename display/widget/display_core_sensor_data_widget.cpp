@@ -5,7 +5,8 @@
 
 #include "ssd1306.h"
 
-const char* const DisplayCoreSensorDataWidget::_actionUnit[] = {"Vrms", "V", "A", "Ohm"};
+const char* const DisplayCoreSensorDataWidget::_actionUnit[] = {
+    "Vrms - AC", "V - DC", "A - DC", "Ohm"};
 
 DisplayCoreSensorDataWidget::DisplayCoreSensorDataWidget(const DisplayWidgetDimension& dimension,
                                                          const fontSetDesc&            font)

@@ -14,7 +14,7 @@ void DisplayExtraSensorWidget::draw(const int hour,
                                     const int temperature,
                                     const int humidity) {
   char displayContent[30] = {0};
-  sprintf(displayContent, "%d:%d", hour, minute);
+  sprintf(displayContent, "%d:%d %dC/%d%%", hour, minute, temperature, humidity);
 
   updateDisplay(displayContent);
 }

@@ -29,9 +29,8 @@ class DisplayManager : public BaseTask,
   void                 setBrightness(const uint8_t brightness);
   uint8_t              getBrightness();
 
-  DisplayCoreSensorTitleWidget _coreSensorTitleWidget;
-  DisplayCoreSensorDataWidget  _coreSensorDataWidget;
-  DisplayExtraSensorWidget     _extraSensorWdiget;
+  DisplayCoreSensorDataWidget _coreSensorDataWidget;
+  DisplayExtraSensorWidget    _extraSensorWdiget;
 
  public:
   DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority);

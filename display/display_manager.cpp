@@ -36,22 +36,16 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
       CoreSensorSubscriber{1},
       ExtraSensorSubscriber{1},
 
-      _coreSensorTitleWidget{{
-                                 .lineNum        = 0,
-                                 .colNum         = 0,
-                                 .totalCharacter = 10,
-                             },
-                             source_pro_set},
       _coreSensorDataWidget{{
                                 .lineNum        = 1,
                                 .colNum         = 0,
-                                .totalCharacter = 13,
+                                .totalCharacter = 16,
                             },
                             source_pro_set},
       _extraSensorWdiget{{
                              .lineNum        = 0,
-                             .colNum         = 84,
-                             .totalCharacter = 5,
+                             .colNum         = 0,
+                             .totalCharacter = 13,
                          },
                          source_pro_set} {
   ssd1306Init();
@@ -107,7 +101,7 @@ void DisplayManager::managerTask(void *param) {
           const auto currTick = xTaskGetTickCount();
           if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod) {
             lastCoreDataRefresh = currTick;
-            manager->_coreSensorTitleWidget.draw(coreNotif.measureType);
+            // manager->_coreSensorTitleWidget.draw(coreNotif.measureType);
             manager->_coreSensorDataWidget.draw(coreNotif.measureType, coreNotif.value);
           }
         } else if (activeQueue == manager->extraNotifQueue) {
