@@ -16,10 +16,7 @@ void DisplayMeasureDataWidget::draw(const MeasureAction action, const float valu
   strcpy(displayContent, _clearStr.c_str());
   snprintf(displayContent, _dimension.length, "%.3f %s", value, actionToUnit(action));
 
-  char buf[30] = {0};
-  overlayOnClearStr(buf, displayContent);
-
-  ssd1306PrintString(buf, _dimension.lineNum, _dimension.colNum, _font);
+  updateDisplay(displayContent);
 }
 
 const char* DisplayMeasureDataWidget::actionToUnit(const MeasureAction action) {

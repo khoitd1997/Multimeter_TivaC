@@ -11,8 +11,7 @@ DisplayMeasureTitleWidget::DisplayMeasureTitleWidget(const DisplayWidgetDimensio
 
 void DisplayMeasureTitleWidget::draw(const MeasureAction action) {
   if (action != _prevAction) {
-    clear();
-    ssd1306PrintString(actionToTitle(action), _dimension.lineNum, _dimension.colNum, _font);
+    updateDisplay(actionToTitle(action));
     _prevAction = action;
   }
 }

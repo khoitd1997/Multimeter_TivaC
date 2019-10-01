@@ -15,7 +15,7 @@ class DisplayBaseWidget {
   DisplayBaseWidget(const DisplayWidgetDimension& dimension, const fontSetDesc& font);
   virtual ~DisplayBaseWidget() = 0;
 
-  void overlayOnClearStr(char* buf, const char* str);
+  void updateDisplay(const char* str);
 
   void clear();
 
@@ -25,4 +25,5 @@ class DisplayBaseWidget {
   const fontSetDesc _font;
 
   const std::string _clearStr;
+  std::string       _buf;
 };
