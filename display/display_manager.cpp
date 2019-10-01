@@ -31,7 +31,9 @@
 #include "swo_segger.h"
 
 DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority)
-    : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority} {
+    : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority},
+      CoreSensorSubscriber{1},
+      ExtraSensorSubscriber{1} {
   ssd1306Init();
   ssd1306TurnOn(true);
   ssd1306ClearDisplay();
@@ -39,9 +41,10 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
 }
 
 void DisplayManager::managerTask(void *param) {
-  auto       manager       = static_cast<DisplayManager *>(param);
-  auto       lastRefresh   = xTaskGetTickCount();
-  const auto refreshPeriod = pdMS_TO_TICKS(17);
+  auto manager = static_cast<DisplayManager *>(param);
+
+  auto       lastCoreDataRefresh   = xTaskGetTickCount();
+  const auto coreDataRefreshPeriod = pdMS_TO_TICKS(50);
 
   auto queueSet = free_rtos_utils::createQueueSet(
       {manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue});
@@ -78,21 +81,21 @@ void DisplayManager::managerTask(void *param) {
           }
         }
       } else {  // ui based events
-        const auto currTick = xTaskGetTickCount();
-        if (currTick - lastRefresh > refreshPeriod) {
-          lastRefresh = currTick;
-          if (activeQueue == manager->coreNotifQueue) {
-            CoreSensorNotif coreNotif;
-            xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
+        if (activeQueue == manager->coreNotifQueue) {
+          CoreSensorNotif coreNotif;
+          xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
+          const auto currTick = xTaskGetTickCount();
+          if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod) {
+            lastCoreDataRefresh = currTick;
             manager->_measureTitleWidget.draw(coreNotif.measureType);
             manager->_measureDataWidget.draw(coreNotif.measureType, coreNotif.value);
-          } else if (activeQueue == manager->extraNotifQueue) {
-            ExtraSensorNotif extraNotif;
-            xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
-          } else {
-            for (;;) {
-              // don't know this queue
-            }
+          }
+        } else if (activeQueue == manager->extraNotifQueue) {
+          ExtraSensorNotif extraNotif;
+          xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
+        } else {
+          for (;;) {
+            // don't know this queue
           }
         }
       }
