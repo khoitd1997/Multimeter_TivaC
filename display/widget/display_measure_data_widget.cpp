@@ -1,6 +1,7 @@
 #include "display_measure_data_widget.hpp"
 
 #include <cstdio>
+#include <cstring>
 
 #include "ssd1306.h"
 
@@ -11,9 +12,14 @@ DisplayMeasureDataWidget::DisplayMeasureDataWidget(const DisplayWidgetDimension&
     : DisplayBaseWidget{dimension, font} {}
 
 void DisplayMeasureDataWidget::draw(const MeasureAction action, const float value) {
-  snprintf(_buf, _dimension.length, "%.3f %s", value, actionToUnit(action));
-  clear();
-  ssd1306PrintString(_buf, _dimension.lineNum, _dimension.colNum, _font);
+  char displayContent[30] = {0};
+  strcpy(displayContent, _clearStr.c_str());
+  snprintf(displayContent, _dimension.length, "%.3f %s", value, actionToUnit(action));
+
+  char buf[30] = {0};
+  overlayOnClearStr(buf, displayContent);
+
+  ssd1306PrintString(buf, _dimension.lineNum, _dimension.colNum, _font);
 }
 
 const char* DisplayMeasureDataWidget::actionToUnit(const MeasureAction action) {

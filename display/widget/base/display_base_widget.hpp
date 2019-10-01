@@ -15,6 +15,8 @@ class DisplayBaseWidget {
   DisplayBaseWidget(const DisplayWidgetDimension& dimension, const fontSetDesc& font);
   virtual ~DisplayBaseWidget() = 0;
 
+  void overlayOnClearStr(char* buf, const char* str);
+
   void clear();
 
  protected:

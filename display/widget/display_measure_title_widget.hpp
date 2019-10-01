@@ -11,6 +11,7 @@ class DisplayMeasureTitleWidget : public DisplayBaseWidget {
   void draw(const MeasureAction action);
 
  private:
+  MeasureAction            _prevAction = MeasureAction::MEASURE_NONE;
   static const char* const _actionTitle[];
 
   const char* actionToTitle(const MeasureAction action);

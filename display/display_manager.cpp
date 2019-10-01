@@ -39,15 +39,15 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
 }
 
 void DisplayManager::managerTask(void *param) {
-  auto manager = static_cast<DisplayManager *>(param);
+  auto       manager       = static_cast<DisplayManager *>(param);
+  auto       lastRefresh   = xTaskGetTickCount();
+  const auto refreshPeriod = pdMS_TO_TICKS(17);
 
   auto queueSet = free_rtos_utils::createQueueSet(
       {manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue});
 
   manager->printStartupScreen();
 
-  manager->_measureTitleWidget.draw(MeasureAction::MEASURE_DC);
-  manager->_measureDataWidget.draw(MeasureAction::MEASURE_DC, 5.9);
   for (;;) {
     QueueSetMemberHandle_t activeQueue;
 
@@ -77,42 +77,23 @@ void DisplayManager::managerTask(void *param) {
             // didn't subscribe for this
           }
         }
-      } else if (activeQueue == manager->coreNotifQueue) {
-        CoreSensorNotif coreNotif;
-        xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
-        switch (coreNotif.measureType) {
-          case MeasureAction::MEASURE_AC:
-            // SWO_PrintStringLine("Received AC");
-            break;
-          case MeasureAction::MEASURE_DC:
-            // SWO_PrintStringLine("Received DC");
-            break;
-          case MeasureAction::MEASURE_CURRENT:
-            // SWO_PrintStringLine("Received Current");
-            break;
-          case MeasureAction::MEASURE_RESISTANCE:
-            // SWO_PrintStringLine("Received Resistance");
-            break;
-          default:
-            SWO_PrintStringLine("unhandled input event type");
-            for (;;) {}
-            break;
-        }
-      } else if (activeQueue == manager->extraNotifQueue) {
-        ExtraSensorNotif extraNotif;
-        xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
-
-        char buf[60] = {0};
-        sprintf(buf,
-                "temp: %f, humid: %f, time: %d:%d",
-                extraNotif.envData.temperature,
-                extraNotif.envData.humidity,
-                extraNotif.timeData.hour,
-                extraNotif.timeData.minute);
-        SWO_PrintStringLine(buf);
-      } else {
-        for (;;) {
-          // don't know this queue
+      } else {  // ui based events
+        const auto currTick = xTaskGetTickCount();
+        if (currTick - lastRefresh > refreshPeriod) {
+          lastRefresh = currTick;
+          if (activeQueue == manager->coreNotifQueue) {
+            CoreSensorNotif coreNotif;
+            xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
+            manager->_measureTitleWidget.draw(coreNotif.measureType);
+            manager->_measureDataWidget.draw(coreNotif.measureType, coreNotif.value);
+          } else if (activeQueue == manager->extraNotifQueue) {
+            ExtraSensorNotif extraNotif;
+            xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
+          } else {
+            for (;;) {
+              // don't know this queue
+            }
+          }
         }
       }
     }

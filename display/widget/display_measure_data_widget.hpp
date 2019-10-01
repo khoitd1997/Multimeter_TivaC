@@ -11,7 +11,6 @@ class DisplayMeasureDataWidget : public DisplayBaseWidget {
   void draw(const MeasureAction action, const float value);
 
  private:
-  char                     _buf[30] = {0};  // scratch buffer
   static const char* const _actionUnit[];
 
   const char* actionToUnit(const MeasureAction action);

@@ -17,6 +17,7 @@ enum BlueToothAction : int {
 };
 
 enum MeasureAction : int {
+  MEASURE_NONE,
   FIRST_MEASURE_ACTION,
   MEASURE_AC = FIRST_MEASURE_ACTION,
   MEASURE_DC,

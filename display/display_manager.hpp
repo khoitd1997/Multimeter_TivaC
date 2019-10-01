@@ -38,7 +38,7 @@ class DisplayManager : public BaseTask,
   DisplayMeasureDataWidget  _measureDataWidget{{
                                                   .lineNum = 1,
                                                   .colNum  = 0,
-                                                  .length  = 12,
+                                                  .length  = 13,
                                               },
                                               source_pro_set};
 

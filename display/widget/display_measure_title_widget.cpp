@@ -10,8 +10,11 @@ DisplayMeasureTitleWidget::DisplayMeasureTitleWidget(const DisplayWidgetDimensio
     : DisplayBaseWidget{dimension, font} {}
 
 void DisplayMeasureTitleWidget::draw(const MeasureAction action) {
-  clear();
-  ssd1306PrintString(actionToTitle(action), _dimension.lineNum, _dimension.colNum, _font);
+  if (action != _prevAction) {
+    clear();
+    ssd1306PrintString(actionToTitle(action), _dimension.lineNum, _dimension.colNum, _font);
+    _prevAction = action;
+  }
 }
 
 const char* DisplayMeasureTitleWidget::actionToTitle(const MeasureAction action) {
