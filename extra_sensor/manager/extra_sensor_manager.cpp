@@ -4,6 +4,7 @@
 
 // FreeRTOS
 #include "FreeRTOS.h"
+#include "free_rtos_utils.hpp"
 #include "queue.h"
 #include "task.h"
 
@@ -20,12 +21,12 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 
-#include "input_handler.hpp"
-
 #include "swo_segger.h"
 
 #include "ds3231.h"
 #include "htu21d.h"
+
+#include "extra_sensor_subscriber.hpp"
 
 ExtraSensorManager::ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize,
                                        const UBaseType_t            priority)
@@ -36,12 +37,15 @@ ExtraSensorManager::ExtraSensorManager(const configSTACK_DEPTH_TYPE stackSize,
   htu21d_init(&htu21dConfig);
 }
 
+void ExtraSensorManager::setSubscriptions(const std::vector<ExtraSensorSubReq> &reqs) {
+  _subs = reqs;
+}
+
 void ExtraSensorManager::managerTask(void *param) {
-  auto        manager      = static_cast<ExtraSensorManager *>(param);
-  auto        lastWakeTime = xTaskGetTickCount();
-  const auto  taskPeriod   = pdMS_TO_TICKS(60000);
-  Ds3231_time currTime{.is_12_form = false};
-  char        buf[100] = {0};
+  auto       manager      = static_cast<ExtraSensorManager *>(param);
+  auto       lastWakeTime = xTaskGetTickCount();
+  const auto taskPeriod   = pdMS_TO_TICKS(1000);
+  char       buf[100]     = {0};
 
   // Ds3231_time calibrateTime = {.is_12_form = false,
   //                              .second     = 0,
@@ -54,31 +58,40 @@ void ExtraSensorManager::managerTask(void *param) {
   // ds3231_set_time(&calibrateTime, true);
 
   for (;;) {
+    ExtraSensorNotif extraNotif;
+
     htu21d_start_temp_read(&manager->htu21dConfig);
     vTaskDelayUntil(&lastWakeTime, taskPeriod / 2);
-    float temperature = 0;
-    while (htu21d_check_temp_read(&(manager->htu21dConfig), &temperature) == HTU21D_ERROR_NO_DATA) {
+    while (htu21d_check_temp_read(&(manager->htu21dConfig), &extraNotif.envData.temperature) ==
+           HTU21D_ERROR_NO_DATA) {
       // wait
     }
 
     htu21d_start_humid_read(&manager->htu21dConfig);
     vTaskDelayUntil(&lastWakeTime, taskPeriod - taskPeriod / 2);
-    float humidity = 0;
-    while (htu21d_check_humid_read(&(manager->htu21dConfig), &humidity) == HTU21D_ERROR_NO_DATA) {
+    while (htu21d_check_humid_read(&(manager->htu21dConfig), &extraNotif.envData.humidity) ==
+           HTU21D_ERROR_NO_DATA) {
       // wait
     }
 
-    sprintf(buf, "temp: %f, humid: %f", temperature, humidity);
-    SWO_PrintStringLine(buf);
+    Ds3231_time currTime{.is_12_form = false};
     ds3231_get_time(&currTime);
-    sprintf(buf,
-            "time: %d/%d/%u %d:%d:%d",
-            currTime.month,
-            currTime.day,
-            currTime.year,
-            currTime.hour,
-            currTime.minute,
-            currTime.second);
-    SWO_PrintStringLine(buf);
+    extraNotif.timeData.hour   = currTime.hour;
+    extraNotif.timeData.minute = currTime.minute;
+
+    {
+      free_rtos_utils::SuspendLockGuard l();
+      for (const auto &sub : manager->_subs) { xQueueOverwrite(sub.queue, &extraNotif); }
+    }
+
+    // sprintf(buf,
+    //         "time: %d/%d/%u %d:%d:%d",
+    //         currTime.month,
+    //         currTime.day,
+    //         currTime.year,
+    //         currTime.hour,
+    //         currTime.minute,
+    //         currTime.second);
+    // SWO_PrintStringLine(buf);
   }
 }

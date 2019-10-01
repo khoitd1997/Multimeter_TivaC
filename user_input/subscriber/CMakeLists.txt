@@ -1,0 +1,3 @@
+add_library(user_input_subscriber user_input_subscriber.cpp)
+target_include_directories(user_input_subscriber PUBLIC .)
+target_link_libraries(user_input_subscriber PUBLIC action_common free_rtos)

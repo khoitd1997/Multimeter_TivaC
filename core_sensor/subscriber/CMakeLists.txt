@@ -1,0 +1,3 @@
+add_library(core_sensor_subscriber core_sensor_subscriber.cpp)
+target_include_directories(core_sensor_subscriber PUBLIC .)
+target_link_libraries(core_sensor_subscriber PUBLIC free_rtos action_common)

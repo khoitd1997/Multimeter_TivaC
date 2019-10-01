@@ -73,7 +73,8 @@
       "ostream": "cpp",
       "sstream": "cpp",
       "stdexcept": "cpp",
-      "typeinfo": "cpp"
+      "typeinfo": "cpp",
+      "variant": "cpp"
     },
     "editor.formatOnSave": true
 }

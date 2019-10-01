@@ -1,4 +1,5 @@
 add_library(free_rtos
+            free_rtos_utils.cpp
             Source/croutine.c
             Source/list.c
             Source/stream_buffer.c

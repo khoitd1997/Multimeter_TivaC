@@ -8,7 +8,7 @@ add_subdirectory(tivaware)
 add_subdirectory(Tiva_Extra)
 add_subdirectory(FreeRTOS)
 
-add_subdirectory(input_handler)
+add_subdirectory(user_input)
 
 add_subdirectory(common)
 add_subdirectory(extra_sensor)
