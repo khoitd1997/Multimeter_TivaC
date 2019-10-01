@@ -51,15 +51,15 @@ int main(void) {
   uartConfigure(UART_BAUD);
 
   SWO_PrintStringLine("Initializing tasks");
+  static UserInputManager   inputManager;
+  static CoreSensorManager  coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
+  static DisplayManager     displayManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4};
   static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 8};
-  static DisplayManager     displayManager{
-      configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4, nullptr, 0};
-  static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
-  static UserInputManager  inputManager;
 
-  coreSensorManager.setSubscriptions({{displayManager.coreNotifQueue}});
   inputManager.setSubcriptions({{displayManager.inputNotifQueue, ActionCategory::BRIGHTNESS},
                                 {coreSensorManager.inputNotifQueue, ActionCategory::MEASURE}});
+  coreSensorManager.setSubscriptions({{displayManager.coreNotifQueue}});
+  extraSensorManager.setSubscriptions({{displayManager.extraNotifQueue}});
 
   SWO_PrintStringLine("Preparing to start scheduler");
   vTaskStartScheduler();

@@ -42,7 +42,7 @@ class UserInputManager {
     }
   }
 
-  static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(60);
+  static const auto kRotaryEncoderDebounce = pdMS_TO_TICKS(100);
   static void       measureModeHandler(const bool isClockwise);
   typedef RotaryEncoder<SYSCTL_PERIPH_GPIOD,
                         GPIO_PORTD_BASE,

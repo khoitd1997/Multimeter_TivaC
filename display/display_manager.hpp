@@ -4,17 +4,18 @@
 #include "base_task.hpp"
 
 #include "core_sensor_subscriber.hpp"
+#include "extra_sensor_subscriber.hpp"
 #include "user_input_subscriber.hpp"
 
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
-#include "stream_buffer.h"
 
-class DisplayManager : public BaseTask, public UserInputSubscriber, public CoreSensorSubscriber {
+class DisplayManager : public BaseTask,
+                       public UserInputSubscriber,
+                       public CoreSensorSubscriber,
+                       public ExtraSensorSubscriber {
  private:
-  StreamBufferHandle_t *_streams;
-  const uint32_t        _totalStream;
-  uint8_t               _currBrightness;
+  uint8_t _currBrightness;
 
   static void managerTask(void *param);
 
@@ -25,8 +26,5 @@ class DisplayManager : public BaseTask, public UserInputSubscriber, public CoreS
   uint8_t              getBrightness();
 
  public:
-  DisplayManager(const configSTACK_DEPTH_TYPE stackSize,
-                 const UBaseType_t            priority,
-                 StreamBufferHandle_t         streamList[],
-                 const uint32_t               totalStream);
+  DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority);
 };

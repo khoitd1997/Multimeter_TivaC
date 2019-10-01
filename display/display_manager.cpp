@@ -6,7 +6,6 @@
 #include "FreeRTOS.h"
 #include "free_rtos_utils.hpp"
 #include "queue.h"
-#include "stream_buffer.h"
 #include "task.h"
 
 #include "inc/hw_gpio.h"
@@ -30,13 +29,8 @@
 
 #include "swo_segger.h"
 
-DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize,
-                               const UBaseType_t            priority,
-                               StreamBufferHandle_t         streamList[],
-                               const uint32_t               totalStream)
-    : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority},
-      _streams{streamList},
-      _totalStream{totalStream} {
+DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority)
+    : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority} {
   ssd1306Init();
   ssd1306TurnOn(true);
   ssd1306ClearDisplay();
