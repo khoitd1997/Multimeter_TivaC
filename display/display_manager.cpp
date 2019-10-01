@@ -1,5 +1,7 @@
 #include "display_manager.hpp"
 
+#include <cstdio>
+
 #include <variant>
 
 // FreeRTOS
@@ -40,8 +42,8 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
 void DisplayManager::managerTask(void *param) {
   auto manager = static_cast<DisplayManager *>(param);
 
-  auto queueSet =
-      free_rtos_utils::createQueueSet({manager->inputNotifQueue, manager->coreNotifQueue});
+  auto queueSet = free_rtos_utils::createQueueSet(
+      {manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue});
 
   manager->printStartupScreen();
   for (;;) {
@@ -78,22 +80,34 @@ void DisplayManager::managerTask(void *param) {
         xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
         switch (coreNotif.measureType) {
           case MeasureAction::MEASURE_AC:
-            SWO_PrintStringLine("Received AC");
+            // SWO_PrintStringLine("Received AC");
             break;
           case MeasureAction::MEASURE_DC:
-            SWO_PrintStringLine("Received DC");
+            // SWO_PrintStringLine("Received DC");
             break;
           case MeasureAction::MEASURE_CURRENT:
-            SWO_PrintStringLine("Received Current");
+            // SWO_PrintStringLine("Received Current");
             break;
           case MeasureAction::MEASURE_RESISTANCE:
-            SWO_PrintStringLine("Received Resistance");
+            // SWO_PrintStringLine("Received Resistance");
             break;
           default:
             SWO_PrintStringLine("unhandled input event type");
             for (;;) {}
             break;
         }
+      } else if (activeQueue == manager->extraNotifQueue) {
+        ExtraSensorNotif extraNotif;
+        xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
+
+        char buf[60] = {0};
+        sprintf(buf,
+                "temp: %f, humid: %f, time: %d:%d",
+                extraNotif.envData.temperature,
+                extraNotif.envData.humidity,
+                extraNotif.timeData.hour,
+                extraNotif.timeData.minute);
+        SWO_PrintStringLine(buf);
       } else {
         for (;;) {
           // don't know this queue

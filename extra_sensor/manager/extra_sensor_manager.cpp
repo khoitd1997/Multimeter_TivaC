@@ -44,7 +44,7 @@ void ExtraSensorManager::setSubscriptions(const std::vector<ExtraSensorSubReq> &
 void ExtraSensorManager::managerTask(void *param) {
   auto       manager      = static_cast<ExtraSensorManager *>(param);
   auto       lastWakeTime = xTaskGetTickCount();
-  const auto taskPeriod   = pdMS_TO_TICKS(60000);
+  const auto taskPeriod   = pdMS_TO_TICKS(1000);
   char       buf[100]     = {0};
 
   // Ds3231_time calibrateTime = {.is_12_form = false,
