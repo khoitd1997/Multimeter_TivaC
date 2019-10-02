@@ -135,7 +135,10 @@ void DisplayManager::managerTask(void *param) {
 }
 
 void DisplayManager::printStartupScreen(void) {
-  display_animation::playLoadingAnimation(2);
+  const auto kIndentLevel = 20;
+  ssd1306PrintString("Starting ", 0, kIndentLevel, source_pro_set);
+  ssd1306PrintString("Multimeter ", 1, kIndentLevel, source_pro_set);
+  display_animation::playLoadingAnimation(4);
   ssd1306ClearDisplay();
 }
 
