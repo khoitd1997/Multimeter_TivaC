@@ -15,8 +15,8 @@ class DisplayIcon {
  public:
   DisplayIcon(const DisplayIconDimension dimension, const std::vector<uint8_t>& bitMap);
 
-  void draw();
-  void clear();
+  void draw() const;
+  void clear() const;
 
  private:
   const DisplayIconDimension _dimension;

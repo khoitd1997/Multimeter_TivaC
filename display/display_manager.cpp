@@ -1,5 +1,6 @@
 #include "display_manager.hpp"
 
+#include <cstdint>
 #include <cstdio>
 
 #include <variant>
@@ -28,6 +29,8 @@
 #include "ssd1306_info.h"
 
 #include "action_def.hpp"
+
+#include "display_animation.hpp"
 
 #include "swo_segger.h"
 
@@ -66,10 +69,12 @@ void DisplayManager::managerTask(void *param) {
   auto       lastCoreDataRefresh   = xTaskGetTickCount();
   const auto coreDataRefreshPeriod = pdMS_TO_TICKS(50);
 
-  auto queueSet = free_rtos_utils::createQueueSet(
-      {manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue});
-
   manager->printStartupScreen();
+
+  const std::vector<QueueHandle_t> queueHandles{
+      manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue};
+  free_rtos_utils::resetQueues(queueHandles);
+  auto queueSet = free_rtos_utils::createQueueSet(queueHandles);
 
   for (;;) {
     QueueSetMemberHandle_t activeQueue;
@@ -107,9 +112,9 @@ void DisplayManager::managerTask(void *param) {
           CoreSensorNotif coreNotif;
           xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
           const auto currTick = xTaskGetTickCount();
-          if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod) {
+          if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod ||
+              currTick < lastCoreDataRefresh) {
             lastCoreDataRefresh = currTick;
-            // manager->_coreSensorTitleWidget.draw(coreNotif.measureType);
             manager->_coreSensorDataWidget.draw(coreNotif.measureType, coreNotif.value);
           }
         } else if (activeQueue == manager->extraNotifQueue) {
@@ -130,20 +135,7 @@ void DisplayManager::managerTask(void *param) {
 }
 
 void DisplayManager::printStartupScreen(void) {
-  auto lastWakeTime = xTaskGetTickCount();
-  auto sceneDelay   = pdMS_TO_TICKS(400);
-  auto totalRepeat  = 40;
-
-  ssd1306PrintString("  TivaC Multimeter", 0, 0, source_pro_set);
-  ssd1306PrintString("     Starting", 1, 0, source_pro_set);
-
-  //   while (--totalRepeat) {
-  //     vTaskDelayUntil(&lastWakeTime, sceneDelay);
-  //     setBrightness(0);
-  //     vTaskDelayUntil(&lastWakeTime, sceneDelay);
-  //     setBrightness(250);
-  //   }
-
+  display_animation::playLoadingAnimation(2);
   ssd1306ClearDisplay();
 }
 

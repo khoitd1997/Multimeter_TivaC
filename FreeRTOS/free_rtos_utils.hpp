@@ -24,6 +24,7 @@ class LockGuardUtils {
 }  // namespace utils
 
 QueueSetHandle_t createQueueSet(const std::vector<QueueHandle_t>& handles);
+void             resetQueues(const std::vector<QueueHandle_t>& handles);
 
 typedef utils::LockGuardUtils<vTaskSuspendAll, xTaskResumeAll> SuspendLockGuard;
 

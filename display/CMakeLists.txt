@@ -1,4 +1,5 @@
 add_subdirectory(tiva_SSD1306_Driver)
+add_subdirectory(animation)
 add_subdirectory(icon)
 add_subdirectory(widget)
 
@@ -11,5 +12,6 @@ target_link_libraries(display
                              extra_sensor_subscriber
                              display_widget
                              display_icon
+                             display_animation
                              ssd1306
                       PRIVATE free_rtos swo)
