@@ -67,6 +67,18 @@ class UserInputManager {
                                BrightnessControlButtonGroup;
   BrightnessControlButtonGroup brightnessCtrl;
 
+  static void       bluetoothHandler(const uint32_t intStatus);
+  static const auto kBluetoothButton   = GPIO_INT_PIN_4;
+  static const auto kBluetoothDebounce = pdMS_TO_TICKS(80);
+  typedef ButtonGroup<SYSCTL_PERIPH_GPIOC,
+                      GPIO_PORTC_BASE,
+                      INT_GPIOC,
+                      GPIO_PIN_4,
+                      kBluetoothButton,
+                      bluetoothHandler>
+                           BluetoothCtrlButtonGroup;
+  BluetoothCtrlButtonGroup bluetoothCtrl;
+
   std::vector<UserInputEventSubReq> _subs;
 
  public:

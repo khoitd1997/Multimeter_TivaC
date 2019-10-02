@@ -73,3 +73,26 @@ void UserInputManager::brightnessHandler(const uint32_t intStatus) {
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }
+
+void UserInputManager::bluetoothHandler(const uint32_t intStatus) {
+  static TickType_t lastInput = 0;
+  const auto        currTick  = xTaskGetTickCountFromISR();
+
+  static auto currBluetoothMode = BlueToothAction::BLUETOOTH_OFF;
+
+  if ((currTick - lastInput) > kBluetoothDebounce) {
+    SWO_PrintStringLine("handling bluetooth input");
+    lastInput = currTick;
+
+    BaseType_t higherTaskWoken = pdFALSE;
+
+    if (bit_get(intStatus, kBluetoothButton)) {
+      currBluetoothMode =
+          ((currBluetoothMode == BlueToothAction::BLUETOOTH_OFF) ? BlueToothAction::BLUETOOTH_ON
+                                                                 : BlueToothAction::BLUETOOTH_OFF);
+    }
+
+    manager->notifySubscriber(currBluetoothMode, &higherTaskWoken);
+    portYIELD_FROM_ISR(higherTaskWoken);
+  }
+}
