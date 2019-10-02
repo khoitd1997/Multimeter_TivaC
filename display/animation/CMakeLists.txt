@@ -1,0 +1,3 @@
+add_library(display_animation display_animation.cpp)
+target_include_directories(display_animation PUBLIC .)
+target_link_libraries(display_animation PUBLIC display_icon free_rtos ssd1306)

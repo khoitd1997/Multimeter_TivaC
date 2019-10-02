@@ -56,7 +56,7 @@ void CoreSensorManager::setSubscriptions(const std::vector<CoreSensorSubReq>& re
 }
 
 Sensor* CoreSensorManager::getSensorFromAction(const MeasureAction action) {
-  const auto index = action - MeasureAction::FIRST_MEASURE_ACTION - 1;
+  const auto index = action - MeasureAction::FIRST_MEASURE_ACTION;
   return _sensors[index];
 }
 

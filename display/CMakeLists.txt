@@ -1,4 +1,7 @@
 add_subdirectory(tiva_SSD1306_Driver)
+add_subdirectory(animation)
+add_subdirectory(icon)
+add_subdirectory(widget)
 
 add_library(display display_manager.cpp)
 target_include_directories(display PUBLIC .)
@@ -7,4 +10,8 @@ target_link_libraries(display
                              user_input_subscriber
                              core_sensor_subscriber
                              extra_sensor_subscriber
-                      PRIVATE ssd1306 free_rtos swo)
+                             display_widget
+                             display_icon
+                             display_animation
+                             ssd1306
+                      PRIVATE free_rtos swo)
