@@ -6,7 +6,7 @@
 
 struct DisplayWidgetDimension {
   const int    lineNum;
-  const int    colNum;
+  const int    startCol;
   const size_t totalCharacter;
 };
 

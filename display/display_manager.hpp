@@ -9,6 +9,7 @@
 
 #include "oled_font_source_pro.h"
 
+#include "display_icon.hpp"
 #include "display_widgets.hpp"
 
 #include "FreeRTOS.h"
@@ -31,6 +32,7 @@ class DisplayManager : public BaseTask,
 
   DisplayCoreSensorDataWidget _coreSensorDataWidget;
   DisplayExtraSensorWidget    _extraSensorWdiget;
+  DisplayIcon                 _bluetoothIcon;
 
  public:
   DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBaseType_t priority);

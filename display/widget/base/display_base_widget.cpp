@@ -17,9 +17,9 @@ void DisplayBaseWidget::updateDisplay(const char* str) {
     ++counter;
   }
 
-  ssd1306PrintString(_buf.c_str(), dimension.lineNum, dimension.colNum, _font);
+  ssd1306PrintString(_buf.c_str(), dimension.lineNum, dimension.startCol, _font);
 }
 
 void DisplayBaseWidget::clear() {
-  ssd1306PrintString(_clearStr.c_str(), dimension.lineNum, dimension.colNum, _font);
+  ssd1306PrintString(_clearStr.c_str(), dimension.lineNum, dimension.startCol, _font);
 }

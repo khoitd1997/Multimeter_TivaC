@@ -38,16 +38,22 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
 
       _coreSensorDataWidget{{
                                 .lineNum        = 1,
-                                .colNum         = 0,
+                                .startCol       = 0,
                                 .totalCharacter = 16,
                             },
                             source_pro_set},
       _extraSensorWdiget{{
                              .lineNum        = 0,
-                             .colNum         = 0,
+                             .startCol       = 0,
                              .totalCharacter = 13,
                          },
-                         source_pro_set} {
+                         source_pro_set},
+
+      // icon source: https://www.iconsdb.com/white-icons/bluetooth-2-icon.html
+      _bluetoothIcon{{.startCol = 98, .bitWidth = 18, .startPage = 0, .endPage = 1},
+                     {0x00, 0x00, 0x00, 0x00, 0x08, 0x98, 0x90, 0xf0, 0xff, 0xff, 0xf2, 0x96,
+                      0x9c, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
+                      0x00, 0x00, 0x0f, 0x0f, 0x04, 0x06, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00}} {
   ssd1306Init();
   ssd1306TurnOn(true);
   ssd1306ClearDisplay();
@@ -75,11 +81,13 @@ void DisplayManager::managerTask(void *param) {
         if (std::holds_alternative<BrightnessAction>(userNotif.action)) {
           switch (std::get<BrightnessAction>(userNotif.action)) {
             case BrightnessAction::BRIGHTNESS_INC:
+              manager->_bluetoothIcon.draw();
               manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
                                          ? 255
                                          : manager->getBrightness() + kBrightnessAdjStep);
               break;
             case BrightnessAction::BRIGHTNESS_DEC:
+              manager->_bluetoothIcon.clear();
               manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
                                          ? 0
                                          : manager->getBrightness() - kBrightnessAdjStep);
