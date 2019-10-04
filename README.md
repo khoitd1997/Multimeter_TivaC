@@ -1,6 +1,8 @@
 # Multimeter
 
-Utilize FreeRTOS as RTOS
+Basic Multimeter using FreeRTOS
+
+## Features
 
 Features:
 
@@ -13,3 +15,23 @@ Features:
 - Misc Features:
     - RTC for time keeping: DS1307 breakout from Adafruit
     - Temperature, humidity: HTU21D from sparkfun
+
+## Pin Allocations
+
+- I2C:
+  - I2C0:
+    - PB2: SCL
+    - PB3: SDA
+  - I2C1:
+    - PA6: SCL
+    - PA7: SDA
+- Core Sensors:
+  - ADC: E3(DC, AC), E1(Resistance), E2(Current)
+  - Relay Ctrl: PB4(Default DC, AC), PB5(Resistance)
+- User Input:
+  - Rotary Encoder: D2
+  - Brightness Ctrl: F0, F4
+  - Bluetooth Ctrl: C4
+- Bluetooth:
+  - Serial: UART0, PA1, PA0
+  - Ctrl: PB6
