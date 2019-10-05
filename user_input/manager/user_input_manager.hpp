@@ -69,7 +69,7 @@ class UserInputManager {
 
   static void       bluetoothHandler(const uint32_t intStatus);
   static const auto kBluetoothButton   = GPIO_INT_PIN_4;
-  static const auto kBluetoothDebounce = pdMS_TO_TICKS(80);
+  static const auto kBluetoothDebounce = pdMS_TO_TICKS(100);
   typedef ButtonGroup<SYSCTL_PERIPH_GPIOC,
                       GPIO_PORTC_BASE,
                       INT_GPIOC,

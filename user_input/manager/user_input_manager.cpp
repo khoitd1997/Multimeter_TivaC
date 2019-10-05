@@ -17,7 +17,7 @@ void UserInputManager::setSubcriptions(const std::vector<UserInputEventSubReq>& 
 }
 
 void UserInputManager::measureModeHandler(const bool isClockwise) {
-  static auto       currMode  = MeasureAction::MEASURE_AC;
+  static auto       currMode  = MeasureAction::STARTUP_MEASURE_ACTION;
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kRotaryEncoderDebounce) {
@@ -78,7 +78,7 @@ void UserInputManager::bluetoothHandler(const uint32_t intStatus) {
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
 
-  static auto currBluetoothMode = BlueToothAction::BLUETOOTH_OFF;
+  static auto currBluetoothMode = BluetoothAction::STARTUP_BLUETOOTH_ACTION;
 
   if ((currTick - lastInput) > kBluetoothDebounce) {
     SWO_PrintStringLine("handling bluetooth input");
@@ -88,8 +88,8 @@ void UserInputManager::bluetoothHandler(const uint32_t intStatus) {
 
     if (bit_get(intStatus, kBluetoothButton)) {
       currBluetoothMode =
-          ((currBluetoothMode == BlueToothAction::BLUETOOTH_OFF) ? BlueToothAction::BLUETOOTH_ON
-                                                                 : BlueToothAction::BLUETOOTH_OFF);
+          ((currBluetoothMode == BluetoothAction::BLUETOOTH_OFF) ? BluetoothAction::BLUETOOTH_ON
+                                                                 : BluetoothAction::BLUETOOTH_OFF);
     }
 
     manager->notifySubscriber(currBluetoothMode, &higherTaskWoken);

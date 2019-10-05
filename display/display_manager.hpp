@@ -25,6 +25,7 @@ class DisplayManager : public BaseTask,
   static void managerTask(void *param);
 
   void printStartupScreen(void);
+  void drawBluetoothIfOn(const BluetoothAction action);
 
   static const uint8_t kBrightnessAdjStep = 100;  // how much to inc/dec when user pushes buttons
   void                 setBrightness(const uint8_t brightness);

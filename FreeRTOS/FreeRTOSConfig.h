@@ -75,7 +75,7 @@
 #define configTICK_RATE_HZ ((portTickType)1000)
 
 #define configMINIMAL_STACK_SIZE ((unsigned short)400)
-#define configTOTAL_HEAP_SIZE ((size_t)(10000))  // originally 30000, this is in bytes
+#define configTOTAL_HEAP_SIZE ((size_t)(20000))  // originally 30000, this is in bytes
 
 #define configMAX_TASK_NAME_LEN (20)
 #define configUSE_TRACE_FACILITY 1
@@ -119,7 +119,7 @@ to exclude the API function. */
  */
 #define configKERNEL_INTERRUPT_PRIORITY                                                           \
   (7 << 5) /* Priority 7, or 0xE0 as only the top three bits are implemented.  This is the lowest \
-              \ priority. */
+              \ \ \ priority. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY \
   (5 << 5) /* Priority 5, or 0xA0 as only the top three bits are implemented. */
 

@@ -9,11 +9,12 @@
 
 enum ActionCategory : int32_t { BLUETOOTH = BIT(0), MEASURE = BIT(1), BRIGHTNESS = BIT(2) };
 
-enum BlueToothAction : int {
+enum BluetoothAction : int {
   FIRST_BLUETOOTH_ACTION,
   BLUETOOTH_ON = FIRST_BLUETOOTH_ACTION,
   BLUETOOTH_OFF,
-  LAST_BLUETOOTH_ACTION = BLUETOOTH_OFF
+  LAST_BLUETOOTH_ACTION    = BLUETOOTH_OFF,
+  STARTUP_BLUETOOTH_ACTION = BLUETOOTH_ON
 };
 
 enum MeasureAction : int {
@@ -23,7 +24,8 @@ enum MeasureAction : int {
   MEASURE_DC,
   MEASURE_CURRENT,
   MEASURE_RESISTANCE,
-  LAST_MEASURE_ACTION = MEASURE_RESISTANCE
+  LAST_MEASURE_ACTION    = MEASURE_RESISTANCE,
+  STARTUP_MEASURE_ACTION = MEASURE_AC
 };
 
 enum BrightnessAction : int {
@@ -35,7 +37,7 @@ enum BrightnessAction : int {
 
 template <typename T>
 bool actionIsInCategories(const int32_t categoryMask) {
-  if (std::is_same_v<T, BlueToothAction> && bit_get(categoryMask, ActionCategory::BLUETOOTH)) {
+  if (std::is_same_v<T, BluetoothAction> && bit_get(categoryMask, ActionCategory::BLUETOOTH)) {
     return true;
   }
   if (std::is_same_v<T, MeasureAction> && bit_get(categoryMask, ActionCategory::MEASURE)) {
@@ -48,4 +50,4 @@ bool actionIsInCategories(const int32_t categoryMask) {
   return false;
 }
 
-typedef std::variant<BlueToothAction, MeasureAction, BrightnessAction> AllActionContainer;
+typedef std::variant<BluetoothAction, MeasureAction, BrightnessAction> AllActionContainer;

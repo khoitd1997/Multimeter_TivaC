@@ -67,14 +67,14 @@ void DisplayManager::managerTask(void *param) {
   auto manager = static_cast<DisplayManager *>(param);
 
   auto       lastCoreDataRefresh   = xTaskGetTickCount();
-  const auto coreDataRefreshPeriod = pdMS_TO_TICKS(50);
-
-  manager->printStartupScreen();
+  const auto coreDataRefreshPeriod = pdMS_TO_TICKS(80);
 
   const std::vector<QueueHandle_t> queueHandles{
       manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue};
-  free_rtos_utils::resetQueues(queueHandles);
   auto queueSet = free_rtos_utils::createQueueSet(queueHandles);
+
+  manager->printStartupScreen();
+  manager->drawBluetoothIfOn(BluetoothAction::STARTUP_BLUETOOTH_ACTION);
 
   for (;;) {
     QueueSetMemberHandle_t activeQueue;
@@ -86,22 +86,22 @@ void DisplayManager::managerTask(void *param) {
         if (std::holds_alternative<BrightnessAction>(userNotif.action)) {
           switch (std::get<BrightnessAction>(userNotif.action)) {
             case BrightnessAction::BRIGHTNESS_INC:
-              manager->_bluetoothIcon.draw();
               manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
                                          ? 255
                                          : manager->getBrightness() + kBrightnessAdjStep);
               break;
             case BrightnessAction::BRIGHTNESS_DEC:
-              manager->_bluetoothIcon.clear();
               manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
                                          ? 0
                                          : manager->getBrightness() - kBrightnessAdjStep);
               break;
             default:
-              SWO_PrintStringLine("unhandled input event type");
+              SWO_PrintStringLine("unhandled brightness event type");
               for (;;) {}
               break;
           }
+        } else if (std::holds_alternative<BluetoothAction>(userNotif.action)) {
+          manager->drawBluetoothIfOn(std::get<BluetoothAction>(userNotif.action));
         } else {
           for (;;) {
             // didn't subscribe for this
@@ -138,8 +138,23 @@ void DisplayManager::printStartupScreen(void) {
   const auto kIndentLevel = 20;
   ssd1306PrintString("Starting ", 0, kIndentLevel, source_pro_set);
   ssd1306PrintString("Multimeter ", 1, kIndentLevel, source_pro_set);
-  display_animation::playLoadingAnimation(4);
+  display_animation::playLoadingAnimation(2);
   ssd1306ClearDisplay();
+}
+
+void DisplayManager::drawBluetoothIfOn(const BluetoothAction action) {
+  switch (action) {
+    case BluetoothAction::BLUETOOTH_ON:
+      _bluetoothIcon.draw();
+      break;
+    case BluetoothAction::BLUETOOTH_OFF:
+      _bluetoothIcon.clear();
+      break;
+    default:
+      SWO_PrintStringLine("unhandled bluetooth event type");
+      for (;;) {}
+      break;
+  }
 }
 
 void DisplayManager::setBrightness(const uint8_t brightness) {
