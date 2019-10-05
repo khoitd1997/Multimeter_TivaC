@@ -49,11 +49,11 @@ int main(void) {
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
   SWO_PrintStringLine("Initializing tasks");
-  static UserInputManager   inputManager;
-  static CoreSensorManager  coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
-  static BluetoothManager   bluetoothManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 5};
-  static DisplayManager     displayManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4};
-  static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 8};
+  static UserInputManager  inputManager;
+  static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
+  static DisplayManager    displayManager{configMINIMAL_STACK_SIZE + 300, configMAX_PRIORITIES - 8};
+  static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 9};
+  static BluetoothManager   bluetoothManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 10};
 
   inputManager.setSubcriptions(
       {{displayManager.inputNotifQueue, ActionCategory::BRIGHTNESS | ActionCategory::BLUETOOTH},

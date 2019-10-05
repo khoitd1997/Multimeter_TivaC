@@ -24,7 +24,7 @@ void UserInputManager::measureModeHandler(const bool isClockwise) {
     BaseType_t higherTaskWoken = pdFALSE;
     const auto prevMode        = currMode;
     lastInput                  = currTick;
-    SWO_PrintStringLine("inside rotary interrupt");
+    // SWO_PrintStringLine("inside rotary interrupt");
 
     if (isClockwise) {
       currMode = static_cast<MeasureAction>(currMode + 1);
@@ -39,12 +39,9 @@ void UserInputManager::measureModeHandler(const bool isClockwise) {
     }
 
     if (prevMode != currMode) {
-      SWO_PrintStringLine("notifying subscribers");
+      // SWO_PrintStringLine("notifying subscribers");
       manager->notifySubscriber(currMode, &higherTaskWoken);
-    } else {
-      SWO_PrintStringLine("same mode");
     }
-
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }
@@ -84,7 +81,7 @@ void UserInputManager::bluetoothHandler(const uint32_t intStatus) {
     SWO_PrintStringLine("handling bluetooth input");
     lastInput = currTick;
 
-    BaseType_t higherTaskWoken = pdFALSE;
+    auto higherTaskWoken = pdFALSE;
 
     if (bit_get(intStatus, kBluetoothButton)) {
       currBluetoothMode =

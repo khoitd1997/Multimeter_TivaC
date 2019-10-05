@@ -33,7 +33,8 @@ const char* const BluetoothManager::_actionSignalWord[] = {"AV", "DV", "I", "R"}
 
 BluetoothManager::BluetoothManager(const configSTACK_DEPTH_TYPE stackSize,
                                    const UBaseType_t            priority)
-    : BaseTask{BluetoothManager::managerTask, "Bluetooth Manager Task", stackSize, this, priority} {
+    : BaseTask{BluetoothManager::managerTask, "Bluetooth Manager Task", stackSize, this, priority},
+      _queueSet{free_rtos_utils::createQueueSet({inputNotifQueue, coreNotifQueue})} {
   uartConfigure(38400);
 }
 
@@ -42,50 +43,47 @@ void BluetoothManager::managerTask(void* param) {
 
   auto isSendingData = true;
   auto currMeasure   = MeasureAction::STARTUP_MEASURE_ACTION;
-  auto queueSet =
-      free_rtos_utils::createQueueSet({manager->inputNotifQueue, manager->coreNotifQueue});
 
   for (;;) {
-    QueueSetMemberHandle_t activeQueue;
-    while (activeQueue = xQueueSelectFromSet(queueSet, portMAX_DELAY)) {
-      if (activeQueue == manager->inputNotifQueue) {
-        UserInputEventNotif userNotif;
-        xQueueReceive(manager->inputNotifQueue, &userNotif, 0);
-        if (std::holds_alternative<BluetoothAction>(userNotif.action)) {
-          switch (std::get<BluetoothAction>(userNotif.action)) {
-            case BluetoothAction::BLUETOOTH_OFF:
-              isSendingData = false;
-              break;
-            case BluetoothAction::BLUETOOTH_ON:
-              isSendingData = true;
-              break;
-            default:
-              SWO_PrintStringLine("unhandled input event type");
-              for (;;) {}
-              break;
-          }
-        } else {
-          for (;;) {
-            // didn't subscribe for this
-          }
-        }
-      } else if (activeQueue == manager->coreNotifQueue) {
-        CoreSensorNotif coreNotif;
-        xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
-        if (isSendingData) {
-          if (coreNotif.measureType != currMeasure) {
-            UARTprintf("%s\n", actionToSignalWord(coreNotif.measureType));
-            currMeasure = coreNotif.measureType;
-          }
-
-          std::array<char, 20> dataBuf;
-          snprintf(dataBuf.data(), dataBuf.size(), "%f\n", coreNotif.value);
-          UARTprintf(dataBuf.data());
+    auto activeQueue = xQueueSelectFromSet(manager->_queueSet, portMAX_DELAY);
+    if (activeQueue == manager->inputNotifQueue) {
+      UserInputEventNotif userNotif;
+      xQueueReceive(manager->inputNotifQueue, &userNotif, 0);
+      if (std::holds_alternative<BluetoothAction>(userNotif.action)) {
+        SWO_PrintStringLine("got bluetooth action");
+        switch (std::get<BluetoothAction>(userNotif.action)) {
+          case BluetoothAction::BLUETOOTH_OFF:
+            isSendingData = false;
+            break;
+          case BluetoothAction::BLUETOOTH_ON:
+            isSendingData = true;
+            break;
+          default:
+            SWO_PrintStringLine("unhandled input event type");
+            for (;;) {}
+            break;
         }
       } else {
         for (;;) {
-          // don't know this queue
+          // didn't subscribe for this
         }
+      }
+    } else if (activeQueue == manager->coreNotifQueue) {
+      CoreSensorNotif coreNotif;
+      xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
+      if (isSendingData) {
+        if (coreNotif.measureType != currMeasure) {
+          UARTprintf("%s\n", actionToSignalWord(coreNotif.measureType));
+          currMeasure = coreNotif.measureType;
+        }
+
+        std::array<char, 20> dataBuf;
+        snprintf(dataBuf.data(), dataBuf.size(), "%f\n", coreNotif.value);
+        UARTprintf(dataBuf.data());
+      }
+    } else {
+      for (;;) {
+        // don't know this queue
       }
     }
   }

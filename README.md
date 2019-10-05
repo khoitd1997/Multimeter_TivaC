@@ -31,7 +31,7 @@ Features:
 - User Input:
   - Rotary Encoder: D2
   - Brightness Ctrl: F0, F4
-  - Bluetooth Ctrl: C4
+  - Bluetooth Ctrl: C5
 - Bluetooth:
   - Serial: UART0, PA1, PA0
   - Ctrl: PB6

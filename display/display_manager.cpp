@@ -38,6 +38,8 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
     : BaseTask{DisplayManager::managerTask, "Display Manager Task", stackSize, this, priority},
       CoreSensorSubscriber{1},
       ExtraSensorSubscriber{1},
+      _queueSet{
+          free_rtos_utils::createQueueSet({inputNotifQueue, coreNotifQueue, extraNotifQueue})},
 
       _coreSensorDataWidget{{
                                 .lineNum        = 1,
@@ -66,68 +68,65 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
 void DisplayManager::managerTask(void *param) {
   auto manager = static_cast<DisplayManager *>(param);
 
+  // manager->printStartupScreen();
+  manager->drawBluetoothIfOn(BluetoothAction::STARTUP_BLUETOOTH_ACTION);
+
   auto       lastCoreDataRefresh   = xTaskGetTickCount();
   const auto coreDataRefreshPeriod = pdMS_TO_TICKS(80);
 
-  const std::vector<QueueHandle_t> queueHandles{
-      manager->inputNotifQueue, manager->coreNotifQueue, manager->extraNotifQueue};
-  auto queueSet = free_rtos_utils::createQueueSet(queueHandles);
-
-  manager->printStartupScreen();
-  manager->drawBluetoothIfOn(BluetoothAction::STARTUP_BLUETOOTH_ACTION);
-
   for (;;) {
-    QueueSetMemberHandle_t activeQueue;
+    auto activeQueue = xQueueSelectFromSet(manager->_queueSet, portMAX_DELAY);
 
-    while (activeQueue = xQueueSelectFromSet(queueSet, portMAX_DELAY)) {
-      if (activeQueue == manager->inputNotifQueue) {
-        UserInputEventNotif userNotif;
-        xQueueReceive(manager->inputNotifQueue, &userNotif, 0);
-        if (std::holds_alternative<BrightnessAction>(userNotif.action)) {
-          switch (std::get<BrightnessAction>(userNotif.action)) {
-            case BrightnessAction::BRIGHTNESS_INC:
-              manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
-                                         ? 255
-                                         : manager->getBrightness() + kBrightnessAdjStep);
-              break;
-            case BrightnessAction::BRIGHTNESS_DEC:
-              manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
-                                         ? 0
-                                         : manager->getBrightness() - kBrightnessAdjStep);
-              break;
-            default:
-              SWO_PrintStringLine("unhandled brightness event type");
-              for (;;) {}
-              break;
-          }
-        } else if (std::holds_alternative<BluetoothAction>(userNotif.action)) {
-          manager->drawBluetoothIfOn(std::get<BluetoothAction>(userNotif.action));
-        } else {
-          for (;;) {
-            // didn't subscribe for this
-          }
+    // SWO_PrintStringLine("display manager received something");
+    if (activeQueue == manager->inputNotifQueue) {
+      UserInputEventNotif userNotif;
+      xQueueReceive(manager->inputNotifQueue, &userNotif, 0);
+      if (std::holds_alternative<BrightnessAction>(userNotif.action)) {
+        switch (std::get<BrightnessAction>(userNotif.action)) {
+          case BrightnessAction::BRIGHTNESS_INC:
+            manager->setBrightness((manager->getBrightness() + kBrightnessAdjStep > 255)
+                                       ? 255
+                                       : manager->getBrightness() + kBrightnessAdjStep);
+            break;
+          case BrightnessAction::BRIGHTNESS_DEC:
+            manager->setBrightness((manager->getBrightness() < kBrightnessAdjStep)
+                                       ? 0
+                                       : manager->getBrightness() - kBrightnessAdjStep);
+            break;
+          default:
+            SWO_PrintStringLine("unhandled brightness event type");
+            for (;;) {}
+            break;
         }
-      } else {  // ui based events
-        if (activeQueue == manager->coreNotifQueue) {
-          CoreSensorNotif coreNotif;
-          xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
-          const auto currTick = xTaskGetTickCount();
-          if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod ||
-              currTick < lastCoreDataRefresh) {
-            lastCoreDataRefresh = currTick;
-            manager->_coreSensorDataWidget.draw(coreNotif.measureType, coreNotif.value);
-          }
-        } else if (activeQueue == manager->extraNotifQueue) {
-          ExtraSensorNotif extraNotif;
-          xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
-          manager->_extraSensorWdiget.draw(extraNotif.timeData.hour,
-                                           extraNotif.timeData.minute,
-                                           static_cast<int>(extraNotif.envData.temperature),
-                                           static_cast<int>(extraNotif.envData.humidity));
-        } else {
-          for (;;) {
-            // don't know this queue
-          }
+      } else if (std::holds_alternative<BluetoothAction>(userNotif.action)) {
+        manager->drawBluetoothIfOn(std::get<BluetoothAction>(userNotif.action));
+      } else {
+        for (;;) {
+          // didn't subscribe for this
+        }
+      }
+    } else {  // ui based events
+      if (activeQueue == manager->coreNotifQueue) {
+        // SWO_PrintStringLine("display manager received core notif");
+        CoreSensorNotif coreNotif;
+        xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
+        const auto currTick = xTaskGetTickCount();
+        if (currTick - lastCoreDataRefresh > coreDataRefreshPeriod ||
+            currTick < lastCoreDataRefresh) {
+          lastCoreDataRefresh = currTick;
+          manager->_coreSensorDataWidget.draw(coreNotif.measureType, coreNotif.value);
+        }
+      } else if (activeQueue == manager->extraNotifQueue) {
+        // SWO_PrintStringLine("display manager received extra notif");
+        ExtraSensorNotif extraNotif;
+        xQueueReceive(manager->extraNotifQueue, &extraNotif, 0);
+        manager->_extraSensorWdiget.draw(extraNotif.timeData.hour,
+                                         extraNotif.timeData.minute,
+                                         static_cast<int>(extraNotif.envData.temperature),
+                                         static_cast<int>(extraNotif.envData.humidity));
+      } else {
+        for (;;) {
+          // don't know this queue
         }
       }
     }

@@ -44,8 +44,7 @@ void ExtraSensorManager::setSubscriptions(const std::vector<ExtraSensorSubReq> &
 void ExtraSensorManager::managerTask(void *param) {
   auto       manager      = static_cast<ExtraSensorManager *>(param);
   auto       lastWakeTime = xTaskGetTickCount();
-  const auto taskPeriod   = pdMS_TO_TICKS(1000);
-  char       buf[100]     = {0};
+  const auto taskPeriod   = pdMS_TO_TICKS(2000);
 
   // Ds3231_time calibrateTime = {.is_12_form = false,
   //                              .second     = 0,
@@ -81,9 +80,10 @@ void ExtraSensorManager::managerTask(void *param) {
 
     {
       free_rtos_utils::SuspendLockGuard l();
-      for (const auto &sub : manager->_subs) { xQueueOverwrite(sub.queue, &extraNotif); }
+      for (const auto &sub : manager->_subs) { xQueueSendToBack(sub.queue, &extraNotif, 0); }
     }
 
+    // char       buf[100]     = {0};
     // sprintf(buf,
     //         "time: %d/%d/%u %d:%d:%d",
     //         currTime.month,
