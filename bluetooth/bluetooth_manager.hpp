@@ -21,6 +21,7 @@ class BluetoothManager : public BaseTask, public UserInputSubscriber, public Cor
  private:
   QueueSetHandle_t _queueSet;
 
+  static constexpr auto    _kBaudRate = 115200;
   static const char* const _actionSignalWord[];
   static const char*       actionToSignalWord(const MeasureAction action);
 

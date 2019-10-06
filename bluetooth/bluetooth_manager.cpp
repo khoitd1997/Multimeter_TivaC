@@ -35,11 +35,16 @@ BluetoothManager::BluetoothManager(const configSTACK_DEPTH_TYPE stackSize,
                                    const UBaseType_t            priority)
     : BaseTask{BluetoothManager::managerTask, "Bluetooth Manager Task", stackSize, this, priority},
       _queueSet{free_rtos_utils::createQueueSet({inputNotifQueue, coreNotifQueue})} {
-  uartConfigure(115200);
+  uartConfigure(_kBaudRate);
 }
 
 void BluetoothManager::managerTask(void* param) {
   auto manager = static_cast<BluetoothManager*>(param);
+
+  constexpr auto kBandWidthBitPerSecond =
+      (_kBaudRate * 0.8) - 100;  // subtract some just to be sure
+  auto bitSentThisSecond = 0;
+  auto lastBitReset      = xTaskGetTickCount();
 
   auto isSendingData = true;
   auto currMeasure   = MeasureAction::STARTUP_MEASURE_ACTION;
@@ -72,15 +77,25 @@ void BluetoothManager::managerTask(void* param) {
       CoreSensorNotif coreNotif;
       xQueueReceive(manager->coreNotifQueue, &coreNotif, 0);
       if (isSendingData) {
-        if (coreNotif.measureType != currMeasure) {
-          UARTprintf("%s\n", actionToSignalWord(coreNotif.measureType));
-          currMeasure = coreNotif.measureType;
+        const auto currTick = xTaskGetTickCount();
+        if (currTick - lastBitReset > pdMS_TO_TICKS(1000)) {
+          bitSentThisSecond = 0;
+          lastBitReset      = currTick;
         }
+        if (bitSentThisSecond < kBandWidthBitPerSecond) {
+          std::array<char, 12> dataBuf;
+          if (coreNotif.measureType != currMeasure) {
+            const auto signalWord = actionToSignalWord(coreNotif.measureType);
+            bitSentThisSecond += snprintf(dataBuf.data(), dataBuf.size(), "%s\n", signalWord) * 8;
+            UARTprintf(dataBuf.data());
 
-        std::array<char, 12> dataBuf;
-        snprintf(dataBuf.data(), dataBuf.size(), "%.3f\n", coreNotif.value);
-        UARTprintf(dataBuf.data());
-        byteTransferredThisSecond += 1;
+            currMeasure = coreNotif.measureType;
+          }
+
+          bitSentThisSecond +=
+              snprintf(dataBuf.data(), dataBuf.size(), "%.3f\n", coreNotif.value) * 8;
+          UARTprintf(dataBuf.data());
+        }
       }
     } else {
       for (;;) {
