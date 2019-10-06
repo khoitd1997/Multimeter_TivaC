@@ -2,7 +2,6 @@ add_executable(multimeter.elf
                ../tm4c123gh6pm_startup_ccs_gcc.c
                freeRTOS_hook.c
                main.cpp
-               uart_util.cpp
                test_task.cpp)
 target_link_libraries(multimeter.elf
                       swo
@@ -11,5 +10,5 @@ target_link_libraries(multimeter.elf
                       free_rtos
                       core_sensor_manager
                       extra_sensor_manager
-                      tiva_utils
-                      tivaware_utils)
+                      bluetooth_manager
+                      tiva_utils)

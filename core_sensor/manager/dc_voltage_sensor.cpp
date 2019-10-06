@@ -34,7 +34,7 @@ DcVoltageSensor::DcVoltageSensor()
 
 float DcVoltageSensor::read(void) { return _adc.read() * DC_COEFF; }
 void  DcVoltageSensor::init(void) {
-  _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_3, ADC_CTL_CH0, 8);
+  _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_3, ADC_CTL_CH0, 64);
 }
 void DcVoltageSensor::disableCallback() { _adc.disable(); }
 void DcVoltageSensor::enableCallback() { _adc.enable(); }

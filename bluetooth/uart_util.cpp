@@ -4,14 +4,6 @@
 #include <stdint.h>
 #include <string.h>
 
-// peripheral
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/rom.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
-#include "utils/uartstdio.h"
-
 // hardware
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"

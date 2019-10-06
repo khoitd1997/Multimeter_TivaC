@@ -31,7 +31,7 @@ ResistanceSensor::ResistanceSensor()
 
 float ResistanceSensor::read() { return ((VDD * R1) / _adc.read()) - R1; }
 void  ResistanceSensor::init() {
-  _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_1, ADC_CTL_CH2, 4);
+  _adc.init(SYSCTL_PERIPH_ADC0, SYSCTL_PERIPH_GPIOE, GPIO_PORTE_BASE, GPIO_PIN_1, ADC_CTL_CH2, 64);
 }
 
 void ResistanceSensor::disableCallback() { _adc.disable(); }

@@ -17,14 +17,14 @@ void UserInputManager::setSubcriptions(const std::vector<UserInputEventSubReq>& 
 }
 
 void UserInputManager::measureModeHandler(const bool isClockwise) {
-  static auto       currMode  = MeasureAction::MEASURE_AC;
+  static auto       currMode  = MeasureAction::STARTUP_MEASURE_ACTION;
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kRotaryEncoderDebounce) {
     BaseType_t higherTaskWoken = pdFALSE;
     const auto prevMode        = currMode;
     lastInput                  = currTick;
-    SWO_PrintStringLine("inside rotary interrupt");
+    // SWO_PrintStringLine("inside rotary interrupt");
 
     if (isClockwise) {
       currMode = static_cast<MeasureAction>(currMode + 1);
@@ -39,12 +39,9 @@ void UserInputManager::measureModeHandler(const bool isClockwise) {
     }
 
     if (prevMode != currMode) {
-      SWO_PrintStringLine("notifying subscribers");
+      // SWO_PrintStringLine("notifying subscribers");
       manager->notifySubscriber(currMode, &higherTaskWoken);
-    } else {
-      SWO_PrintStringLine("same mode");
     }
-
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }
@@ -53,7 +50,7 @@ void UserInputManager::brightnessHandler(const uint32_t intStatus) {
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kBrightnessDebounce) {
-    SWO_PrintStringLine("handling input");
+    // SWO_PrintStringLine("handling brightness input");
     lastInput = currTick;
 
     BaseType_t       higherTaskWoken = pdFALSE;
@@ -70,6 +67,29 @@ void UserInputManager::brightnessHandler(const uint32_t intStatus) {
     }
 
     manager->notifySubscriber(type, &higherTaskWoken);
+    portYIELD_FROM_ISR(higherTaskWoken);
+  }
+}
+
+void UserInputManager::bluetoothHandler(const uint32_t intStatus) {
+  static TickType_t lastInput = 0;
+  const auto        currTick  = xTaskGetTickCountFromISR();
+
+  static auto currBluetoothMode = BluetoothAction::STARTUP_BLUETOOTH_ACTION;
+
+  if ((currTick - lastInput) > kBluetoothDebounce) {
+    SWO_PrintStringLine("handling bluetooth input");
+    lastInput = currTick;
+
+    auto higherTaskWoken = pdFALSE;
+
+    if (bit_get(intStatus, kBluetoothButton)) {
+      currBluetoothMode =
+          ((currBluetoothMode == BluetoothAction::BLUETOOTH_OFF) ? BluetoothAction::BLUETOOTH_ON
+                                                                 : BluetoothAction::BLUETOOTH_OFF);
+    }
+
+    manager->notifySubscriber(currBluetoothMode, &higherTaskWoken);
     portYIELD_FROM_ISR(higherTaskWoken);
   }
 }

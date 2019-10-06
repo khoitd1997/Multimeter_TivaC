@@ -42,7 +42,7 @@ CoreSensorManager::CoreSensorManager(const configSTACK_DEPTH_TYPE stackSize,
       _currentSensor(),
       _resistanceSensor(),
       _sensors({&_acSensor, &_dcSensor, &_currentSensor, &_resistanceSensor}),
-      _activeAction{MeasureAction::MEASURE_AC},
+      _activeAction{MeasureAction::STARTUP_MEASURE_ACTION},
       _activeSensor{getSensorFromAction(_activeAction)},
       _activeSamplingPeriod(pdMS_TO_TICKS(_activeSensor->samplingPeriodMs)) {
   for (auto& sensor : _sensors) {
@@ -95,11 +95,13 @@ void CoreSensorManager::managerTask(void* param) {
     manager->changeSensor(newAction);
     auto ret = manager->_activeSensor->read();
 
+    // SWO_PrintStringLine("core notifying sub");
     CoreSensorNotif coreNotif{manager->_activeAction, ret};
     {
       free_rtos_utils::SuspendLockGuard l();
-      for (const auto& sub : manager->_subs) { xQueueOverwrite(sub.queue, &coreNotif); }
+      for (const auto& sub : manager->_subs) { xQueueSendToBack(sub.queue, &coreNotif, 0); }
     }
+    // SWO_PrintStringLine("core done notifying sub");
 
     // char tempStr[100];
     // sprintf(tempStr, "AC is %f\n", ret);

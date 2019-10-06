@@ -17,7 +17,6 @@
 #include "driverlib/rom.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
-#include "utils/uartstdio.h"
 
 // hardware
 #include "inc/hw_ints.h"
@@ -25,6 +24,7 @@
 #include "inc/hw_types.h"
 
 // tasks
+#include "bluetooth_manager.hpp"
 #include "core_sensor_manager.hpp"
 #include "display_manager.hpp"
 #include "extra_sensor_manager.hpp"
@@ -48,17 +48,19 @@ int main(void) {
   // 80 MHz
   ROM_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
-  uartConfigure(UART_BAUD);
-
   SWO_PrintStringLine("Initializing tasks");
-  static UserInputManager   inputManager;
-  static CoreSensorManager  coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
-  static DisplayManager     displayManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 4};
-  static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 8};
+  static UserInputManager  inputManager;
+  static CoreSensorManager coreSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 6};
+  static DisplayManager    displayManager{configMINIMAL_STACK_SIZE + 300, configMAX_PRIORITIES - 8};
+  static ExtraSensorManager extraSensorManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 9};
+  static BluetoothManager   bluetoothManager{configMINIMAL_STACK_SIZE, configMAX_PRIORITIES - 10};
 
-  inputManager.setSubcriptions({{displayManager.inputNotifQueue, ActionCategory::BRIGHTNESS},
-                                {coreSensorManager.inputNotifQueue, ActionCategory::MEASURE}});
-  coreSensorManager.setSubscriptions({{displayManager.coreNotifQueue}});
+  inputManager.setSubcriptions(
+      {{displayManager.inputNotifQueue, ActionCategory::BRIGHTNESS | ActionCategory::BLUETOOTH},
+       {coreSensorManager.inputNotifQueue, ActionCategory::MEASURE},
+       {bluetoothManager.inputNotifQueue, ActionCategory::BLUETOOTH}});
+  coreSensorManager.setSubscriptions(
+      {{displayManager.coreNotifQueue}, {bluetoothManager.coreNotifQueue}});
   extraSensorManager.setSubscriptions({{displayManager.extraNotifQueue}});
 
   SWO_PrintStringLine("Preparing to start scheduler");
