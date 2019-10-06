@@ -39,6 +39,8 @@ NOTE: POWER SUPPLY NEEDS CAPACITORS(10 uF) TO STABILIZE DURING RELAY SWITCHING
 
 ## Bluetooth
 
+[Command List](https://www.itead.cc/wiki/Serial_Port_Bluetooth_Module_(Master/Slave)_:_HC-05)
+
 Uses 115200 baud, 8 data bit, no parity, stop bit 1
 
 For Linux, run this command to bind the module and view the output:
@@ -49,6 +51,7 @@ sudo rfcomm bind 0 98:D3:31:FB:1F:DE 1
 
 # view output, if it says busy, try again
 cat /dev/rfcomm0
+cat /dev/rfcomm0 | bat --paging=never -l log # integrate with bat
 ```
 
 AT command for HC-5:
