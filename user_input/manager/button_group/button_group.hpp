@@ -35,12 +35,12 @@ class ButtonGroup {
     HWREG(base + GPIO_O_CR) |= 0x01;
 
     GPIOPinTypeGPIOInput(base, pins);
-    GPIOPadConfigSet(base, pins, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(base, pins, GPIO_STRENGTH_12MA, GPIO_PIN_TYPE_STD_WPU);
 
     HWREG(base + GPIO_O_LOCK) = 0;
 
     GPIOIntDisable(base, intFlags);
-    GPIOIntClear(base, pins);
+    GPIOIntClear(base, intFlags);
     GPIOIntTypeSet(base, pins, GPIO_FALLING_EDGE);
     GPIOIntRegister(base, []() {
       const auto intStatus = GPIOIntStatus(base, true);

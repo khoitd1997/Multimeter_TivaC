@@ -46,6 +46,7 @@ class UserInputManager {
   static void       measureModeHandler(const bool isClockwise);
   typedef RotaryEncoder<SYSCTL_PERIPH_GPIOD,
                         GPIO_PORTD_BASE,
+                        INT_GPIOD,
                         GPIO_PIN_2,
                         GPIO_INT_PIN_2,
                         GPIO_PIN_3,
@@ -68,12 +69,12 @@ class UserInputManager {
   BrightnessControlButtonGroup brightnessCtrl;
 
   static void       bluetoothHandler(const uint32_t intStatus);
-  static const auto kBluetoothButton   = GPIO_INT_PIN_5;
+  static const auto kBluetoothButton   = GPIO_INT_PIN_6;
   static const auto kBluetoothDebounce = pdMS_TO_TICKS(100);
-  typedef ButtonGroup<SYSCTL_PERIPH_GPIOC,
-                      GPIO_PORTC_BASE,
-                      INT_GPIOC,
-                      GPIO_PIN_5,
+  typedef ButtonGroup<SYSCTL_PERIPH_GPIOB,
+                      GPIO_PORTB_BASE,
+                      INT_GPIOB,
+                      GPIO_PIN_6,
                       kBluetoothButton,
                       bluetoothHandler>
                            BluetoothCtrlButtonGroup;

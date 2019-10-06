@@ -18,6 +18,8 @@ Features:
 
 ## Pin Allocations
 
+NOTE: POWER SUPPLY NEEDS CAPACITORS(10 uF) TO STABILIZE DURING RELAY SWITCHING
+
 - I2C:
   - I2C0:
     - PB2: SCL
@@ -26,12 +28,11 @@ Features:
     - PA6: SCL
     - PA7: SDA
 - Core Sensors:
-  - ADC: E3(DC, AC), E1(Resistance), E2(Current)
+  - ADC: PE3(DC, AC), PE1(Resistance), PE2(Current)
   - Relay Ctrl: PB4(Default DC, AC), PB5(Resistance)
 - User Input:
-  - Rotary Encoder: D2
-  - Brightness Ctrl: F0, F4
-  - Bluetooth Ctrl: C5
+  - Rotary Encoder: PD2
+  - Brightness Ctrl: PF0, PF4
+  - Bluetooth Select: PB6
 - Bluetooth:
-  - Serial: UART0, PA1, PA0
-  - Ctrl: PB6
+  - Serial: UART0(PA1, PA0)

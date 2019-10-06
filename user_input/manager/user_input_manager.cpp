@@ -50,7 +50,7 @@ void UserInputManager::brightnessHandler(const uint32_t intStatus) {
   static TickType_t lastInput = 0;
   const auto        currTick  = xTaskGetTickCountFromISR();
   if ((currTick - lastInput) > kBrightnessDebounce) {
-    SWO_PrintStringLine("handling input");
+    // SWO_PrintStringLine("handling brightness input");
     lastInput = currTick;
 
     BaseType_t       higherTaskWoken = pdFALSE;
