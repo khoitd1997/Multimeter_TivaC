@@ -35,7 +35,7 @@ BluetoothManager::BluetoothManager(const configSTACK_DEPTH_TYPE stackSize,
                                    const UBaseType_t            priority)
     : BaseTask{BluetoothManager::managerTask, "Bluetooth Manager Task", stackSize, this, priority},
       _queueSet{free_rtos_utils::createQueueSet({inputNotifQueue, coreNotifQueue})} {
-  uartConfigure(38400);
+  uartConfigure(115200);
 }
 
 void BluetoothManager::managerTask(void* param) {
@@ -77,9 +77,10 @@ void BluetoothManager::managerTask(void* param) {
           currMeasure = coreNotif.measureType;
         }
 
-        std::array<char, 20> dataBuf;
-        snprintf(dataBuf.data(), dataBuf.size(), "%f\n", coreNotif.value);
+        std::array<char, 12> dataBuf;
+        snprintf(dataBuf.data(), dataBuf.size(), "%.3f\n", coreNotif.value);
         UARTprintf(dataBuf.data());
+        byteTransferredThisSecond += 1;
       }
     } else {
       for (;;) {

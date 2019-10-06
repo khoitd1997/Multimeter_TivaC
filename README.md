@@ -36,3 +36,23 @@ NOTE: POWER SUPPLY NEEDS CAPACITORS(10 uF) TO STABILIZE DURING RELAY SWITCHING
   - Bluetooth Select: PB6
 - Bluetooth:
   - Serial: UART0(PA1, PA0)
+
+## Bluetooth
+
+Uses 115200 baud, 8 data bit, no parity, stop bit 1
+
+For Linux, run this command to bind the module and view the output:
+
+```shell
+# bind
+sudo rfcomm bind 0 98:D3:31:FB:1F:DE 1
+
+# view output, if it says busy, try again
+cat /dev/rfcomm0
+```
+
+AT command for HC-5:
+
+```shell
+AT+UART=115200，1,0
+```
