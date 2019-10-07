@@ -1,20 +1,28 @@
 # Tiva Multimeter
 
-Basic Multimeter using tiva devboard with FreeRTOS as RTOS
+Basic Multimeter using tiva devboard
 
 ## Features
 
-Features:
+- Measurement Type:
+  - Voltage: voltage divider for DC, full-bridge rectifier circuit for AC
+  - Current: use INA169 Adafruit breakout board
+  - Resistance: use voltage divider
+- Display: oled display using SSD1306 with support for smooth startup animations
+- Data Logging: transfer data to the host machine through HC-05(classic Bluetooth) at 115200 Baud
+- Extra Features:
+  - Real Time Clock: ds3231 module
+  - Temperature, humidity: htu21d from Sparkfun
 
-- PC communication: sending data to the host machine wirelessly or through usb
-- Electrical Measurement type:
-    - Voltage: Voltage divider for DC, full-bridge rectifier circuit for AC
-    - Current: use INA169 Adafruit breakout board
-    - Resistance: Use voltage divider
-- Display: OLED display using SSD1306
-- Misc Features:
-    - RTC for time keeping: DS1307 breakout from Adafruit
-    - Temperature, humidity: HTU21D from sparkfun
+## General Design
+
+The multimeter uses FreeRTOS to efficiently manage various tasks, tasks usually expose a subscriber interface where other tasks can subscribe for new data(such as display task subscribing for voltage data). Task list:
+
+- Core Sensor: responsible to sampling data such as voltage, current, resistance. The AC voltage sensor is the most demanding with sampling frequency at ```500 Hz``` in addition to bandpass filter for noise reduction
+- Extra Sensor: run at fairly low priority and at least once per minute to update time as well as temperature/humidity
+- Bluetooth: listen for new data from core sensors and send data through UART to Bluetooth module(as long as bandwidth is available)
+- Display: listen to changes in data or user input to redraw or draw new widgets
+- User Input: this is not a FreeRTOS task but rather a set of interrupt handler that triggers on user input and notify other tasks of the changes. State management is done here whenever possible to avoid code duplication across tasks
 
 ## Pin Allocations
 
