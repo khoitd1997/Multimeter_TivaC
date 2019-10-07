@@ -18,6 +18,8 @@
 
 #include "ac_voltage_sensor.hpp"
 
+#include "arm_math.h"
+
 #include <math.h>
 #include <stdio.h>
 
@@ -37,52 +39,6 @@
 
 const uint32_t AC_SAMPLING_PERIOD_MS = 2;
 
-// modified from ARM CMSIS library
-static float arm_rms_f32(float* pSrc, uint32_t blockSize) {
-  float    sum = 0.0f; /* Accumulator */
-  float    in;         /* Tempoprary variable to store input value */
-  uint32_t blkCnt;     /* loop counter */
-
-  /* Run the below code for Cortex-M4 and Cortex-M3 */
-  /* loop Unrolling */
-  blkCnt = blockSize >> 2U;
-
-  /* First part of the processing with loop unrolling.  Compute 4 outputs at a time.
-   ** a second loop below computes the remaining 1 to 3 samples. */
-  while (blkCnt > 0U) {
-    /* C = A[0] * A[0] + A[1] * A[1] + A[2] * A[2] + ... + A[blockSize-1] * A[blockSize-1] */
-    /* Compute sum of the squares and then store the result in a temporary variable, sum  */
-    in = *pSrc++;
-    sum += in * in;
-    in = *pSrc++;
-    sum += in * in;
-    in = *pSrc++;
-    sum += in * in;
-    in = *pSrc++;
-    sum += in * in;
-
-    /* Decrement the loop counter */
-    blkCnt--;
-  }
-
-  /* If the blockSize is not a multiple of 4, compute any remaining output samples here.
-   ** No loop unrolling is used. */
-  blkCnt = blockSize % 0x4U;
-
-  while (blkCnt > 0U) {
-    /* C = A[0] * A[0] + A[1] * A[1] + A[2] * A[2] + ... + A[blockSize-1] * A[blockSize-1] */
-    /* Compute sum of the squares and then store the results in a temporary variable, sum  */
-    in = *pSrc++;
-    sum += in * in;
-
-    /* Decrement the loop counter */
-    blkCnt--;
-  }
-
-  /* Compute Rms and store the result in the destination */
-  return sqrtf(sum / (float)blockSize);
-}
-
 AcVoltageSensor::AcVoltageSensor(DcVoltageSensor& dcSensor)
     : Sensor(SensorType::AC_VOLT,
              AC_SAMPLING_PERIOD_MS,
@@ -100,7 +56,7 @@ float AcVoltageSensor::read(void) {
 
   if (SAMPLE_PER_READ - 1 == _currSample) {
     _currSample = 0;
-    _lastVal    = arm_rms_f32(_samplingBuf, SAMPLE_PER_READ);
+    arm_rms_f32(_samplingBuf, SAMPLE_PER_READ, &_lastVal);
 
   } else {
     ++_currSample;
