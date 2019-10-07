@@ -9,7 +9,7 @@
 class AcVoltageSensor : public Sensor {
  public:
   static constexpr uint32_t kSamplePerRead    = ACBandpassFilter::kBlockSize;
-  static constexpr uint32_t kACSamplingPeriod = 2;
+  static constexpr uint32_t kACSamplingPeriod = 1000 / ACBandpassFilter::kSamplingFreq;
 
   AcVoltageSensor(DcVoltageSensor& dcSensor);
 

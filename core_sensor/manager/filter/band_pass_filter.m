@@ -10,7 +10,7 @@ Astop2 = 80;   % Second Stopband Attenuation (dB)
 Fs     = 500;  % Sampling Frequency
 
 % filter usage parm
-Blocksize = 64; % data points per filter call
+Blocksize = 256; % data points per filter call
 
 bp_design = fdesign.bandpass('fst1,fp1,fp2,fst2,ast1,ap,ast2', Fstop1, Fpass1, ...
     Fpass2, Fstop2, Astop1, Apass, Astop2, Fs);
@@ -47,6 +47,7 @@ fprintf(cpp_hdr_file,'  public:\n');
 
 fprintf(cpp_hdr_file,'    static constexpr uint32_t kBlockSize = %d;\n', Blocksize);
 fprintf(cpp_hdr_file,'    static constexpr uint16_t kTotalTap = %d;\n', length(filterCoeffs));
+fprintf(cpp_hdr_file,'    static constexpr uint32_t kSamplingFreq = %d;\n', Fs);
 
 fprintf(cpp_hdr_file,'    \nACBandpassFilter();\n');
 fprintf(cpp_hdr_file,'    void filter(const float32_t input[kBlockSize] , float32_t output[kBlockSize] );\n');
@@ -74,11 +75,10 @@ fprintf(cpp_src_file,'}\n');
 
 fclose(cpp_src_file);
 
-% fliplr()
 % fvtool(bpf,'Analysis','freq')
 % fvtool(bpf,'Analysis','impulse')
 cost(bpf)
-    
+
 % rng default
 % Signal = dsp.SineWave('SampleRate', Fs,'Frequency',Fp);
 % Signal.SamplesPerFrame = 4000;
