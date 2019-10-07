@@ -1,3 +1,5 @@
+add_subdirectory(filter)
+
 add_library(core_sensor_manager
             ac_voltage_sensor.cpp
             adc.cpp

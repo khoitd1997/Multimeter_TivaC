@@ -1,14 +1,10 @@
+# add_executable(multimeter.elf ../tm4c123gh6pm_startup_ccs_gcc.c
+# freeRTOS_hook.c main.cpp)
 add_executable(multimeter.elf
                ../tm4c123gh6pm_startup_ccs_gcc.c
                freeRTOS_hook.c
-               main.cpp
-               test_task.cpp)
-target_link_libraries(multimeter.elf
-                      swo
-                      display
-                      user_input_manager
-                      free_rtos
-                      core_sensor_manager
-                      extra_sensor_manager
-                      bluetooth_manager
-                      tiva_utils)
+               arm_fir_example_f32.c
+               arm_fir_data.c)
+target_link_libraries(multimeter.elf swo free_rtos)
+# target_link_libraries(multimeter.elf swo display user_input_manager free_rtos
+# core_sensor_manager extra_sensor_manager bluetooth_manager tiva_utils)
