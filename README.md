@@ -2,6 +2,12 @@
 
 Basic Multimeter using tiva devboard
 
+## How to build, debug, flash
+
+The build system in use is CMake
+
+The project uses vscode tasks to run build, flash, debug, check ```.vscode/tasks.json``` and ```.vscode/launch.json``` for the commands to do these things
+
 ## Features
 
 - Measurement Type:
