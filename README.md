@@ -30,13 +30,10 @@ There is a concept called ```action``` which defines users' commands and is used
 
 NOTE: POWER SUPPLY NEEDS CAPACITORS(More than 10 uF) TO STABILIZE DURING RELAY SWITCHING
 
-- I2C:
-  - I2C0:
-    - PB2: SCL
-    - PB3: SDA
-  - I2C1:
-    - PA6: SCL
-    - PA7: SDA
+- Display:
+  - I2C0: PB2(SCL), PB3(SDA)
+- Extra Sensors:
+  - I2C1: PA6(SCL), PA7(SDA)
 - Core Sensors:
   - ADC: PE3(DC, AC), PE1(Resistance), PE2(Current)
   - Relay Ctrl: PB4(Default DC, AC), PB5(Resistance)
