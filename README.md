@@ -16,7 +16,7 @@ Basic Multimeter using tiva devboard
 
 ## General Design
 
-The multimeter uses FreeRTOS to efficiently manage various tasks, tasks usually expose a subscriber interface where other tasks can subscribe for new data(such as display task subscribing for voltage data). Task list:
+The multimeter uses FreeRTOS to efficiently manage various tasks(the code that a task will run is called a ```manager```), tasks usually expose a ```subscriber``` interface where other tasks can subscribe for new data(such as display task subscribing for voltage data). Task list:
 
 - Core Sensor: responsible to sampling data such as voltage, current, resistance. The AC voltage sensor is the most demanding with sampling frequency at ```500 Hz``` in addition to bandpass filter for noise reduction
 - Extra Sensor: run at fairly low priority and at least once per minute to update time as well as temperature/humidity
@@ -24,9 +24,11 @@ The multimeter uses FreeRTOS to efficiently manage various tasks, tasks usually 
 - Display: listen to changes in data or user input to redraw or draw new widgets
 - User Input: this is not a FreeRTOS task but rather a set of interrupt handler that triggers on user input and notify other tasks of the changes. State management is done here whenever possible to avoid code duplication across tasks
 
+There is a concept called ```action``` which defines users' commands and is used in messages between tasks to indicate things like current action being executed or to execute
+
 ## Pin Allocations
 
-NOTE: POWER SUPPLY NEEDS CAPACITORS(10 uF) TO STABILIZE DURING RELAY SWITCHING
+NOTE: POWER SUPPLY NEEDS CAPACITORS(More than 10 uF) TO STABILIZE DURING RELAY SWITCHING
 
 - I2C:
   - I2C0:
