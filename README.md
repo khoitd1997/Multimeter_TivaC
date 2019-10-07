@@ -1,6 +1,6 @@
-# Multimeter
+# Tiva Multimeter
 
-Basic Multimeter using FreeRTOS
+Basic Multimeter using tiva devboard with FreeRTOS as RTOS
 
 ## Features
 
