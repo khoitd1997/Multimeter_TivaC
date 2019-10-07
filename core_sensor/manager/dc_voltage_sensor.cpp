@@ -24,13 +24,13 @@ static const float DC_COEFF = 1;
 const uint32_t DC_SAMPLING_PERIOD_MS = 10;
 
 DcVoltageSensor::DcVoltageSensor()
-    : _adc(ADC0_BASE, 8, 0),
-      Sensor(SensorType::DC_VOLT,
+    : Sensor(SensorType::DC_VOLT,
              DC_SAMPLING_PERIOD_MS,
              SYSCTL_PERIPH_GPIOB,
              GPIO_PORTB_BASE,
              GPIO_PIN_4,
-             true) {}
+             true),
+      _adc(ADC0_BASE, 8, 0) {}
 
 float DcVoltageSensor::read(void) { return _adc.read() * DC_COEFF; }
 void  DcVoltageSensor::init(void) {

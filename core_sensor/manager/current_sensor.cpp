@@ -18,7 +18,7 @@ const uint32_t CURRENT_SAMPLING_PERIOD_MS = 10;
 static const float SHUNT_RESISTOR_OHM = 1;
 
 CurrentSensor::CurrentSensor()
-    : _adc(ADC1_BASE, 8, 0), Sensor(SensorType::CURRENT, CURRENT_SAMPLING_PERIOD_MS) {}
+    : Sensor(SensorType::CURRENT, CURRENT_SAMPLING_PERIOD_MS), _adc(ADC1_BASE, 8, 0) {}
 
 float CurrentSensor::read(void) { return _adc.read() / SHUNT_RESISTOR_OHM; }
 void  CurrentSensor::init(void) {

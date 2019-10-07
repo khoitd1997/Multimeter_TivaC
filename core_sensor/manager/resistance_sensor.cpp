@@ -21,13 +21,13 @@ static const float VDD = 3.3;
 const uint32_t RESISTANCE_SAMPLING_PERIOD_MS = 10;
 
 ResistanceSensor::ResistanceSensor()
-    : _adc(ADC0_BASE, 4, 2),
-      Sensor(SensorType::RESISTANCE,
+    : Sensor(SensorType::RESISTANCE,
              RESISTANCE_SAMPLING_PERIOD_MS,
              SYSCTL_PERIPH_GPIOB,
              GPIO_PORTB_BASE,
              GPIO_PIN_5,
-             true) {}
+             true),
+      _adc(ADC0_BASE, 4, 2) {}
 
 float ResistanceSensor::read() { return ((VDD * R1) / _adc.read()) - R1; }
 void  ResistanceSensor::init() {

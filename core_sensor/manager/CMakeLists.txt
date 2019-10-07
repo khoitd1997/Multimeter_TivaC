@@ -1,3 +1,5 @@
+add_subdirectory(filter)
+
 add_library(core_sensor_manager
             ac_voltage_sensor.cpp
             adc.cpp
@@ -12,4 +14,5 @@ target_link_libraries(core_sensor_manager
                              task_common
                              core_sensor_subscriber
                              user_input_subscriber
+                             core_sensor_filter
                       PRIVATE tiva_utils swo)
