@@ -14,4 +14,5 @@ target_link_libraries(core_sensor_manager
                              task_common
                              core_sensor_subscriber
                              user_input_subscriber
+                             core_sensor_filter
                       PRIVATE tiva_utils swo)

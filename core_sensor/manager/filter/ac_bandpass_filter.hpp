@@ -6,10 +6,11 @@
 
 class ACBandpassFilter {
   public:
-    ACBandpassFilter();
-    void filter(const float32_t *input, float32_t *output);
-    static constexpr uint32_t kBlockSize = 5;
-    static constexpr uint16_t kTotalTap = 219;
+    static constexpr uint32_t kBlockSize = 64;
+    static constexpr uint16_t kTotalTap = 348;
+    
+ACBandpassFilter();
+    void filter(const float32_t input[kBlockSize] , float32_t output[kBlockSize] );
 
   private:
     arm_fir_instance_f32 _firInstance;

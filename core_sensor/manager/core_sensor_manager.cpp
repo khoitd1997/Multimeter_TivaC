@@ -44,7 +44,7 @@ CoreSensorManager::CoreSensorManager(const configSTACK_DEPTH_TYPE stackSize,
       _sensors({&_acSensor, &_dcSensor, &_currentSensor, &_resistanceSensor}),
       _activeAction{MeasureAction::STARTUP_MEASURE_ACTION},
       _activeSensor{getSensorFromAction(_activeAction)},
-      _activeSamplingPeriod(pdMS_TO_TICKS(_activeSensor->samplingPeriodMs)) {
+      _activeSamplingPeriod{pdMS_TO_TICKS(_activeSensor->samplingPeriodMs)} {
   for (auto& sensor : _sensors) {
     sensor->init();
     sensor->disable();

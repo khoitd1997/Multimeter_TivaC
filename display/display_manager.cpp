@@ -68,7 +68,7 @@ DisplayManager::DisplayManager(const configSTACK_DEPTH_TYPE stackSize, const UBa
 void DisplayManager::managerTask(void *param) {
   auto manager = static_cast<DisplayManager *>(param);
 
-  manager->printStartupScreen();
+  // manager->printStartupScreen();
   manager->drawBluetoothIfOn(BluetoothAction::STARTUP_BLUETOOTH_ACTION);
 
   auto       lastCoreDataRefresh   = xTaskGetTickCount();

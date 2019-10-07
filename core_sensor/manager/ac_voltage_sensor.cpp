@@ -37,29 +37,31 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
-const uint32_t AC_SAMPLING_PERIOD_MS = 2;
-
 AcVoltageSensor::AcVoltageSensor(DcVoltageSensor& dcSensor)
     : Sensor(SensorType::AC_VOLT,
-             AC_SAMPLING_PERIOD_MS,
+             kACSamplingPeriod,
              SYSCTL_PERIPH_GPIOB,
              GPIO_PORTB_BASE,
              GPIO_PIN_4,
              false),
       _dcSensor{dcSensor},
-      _currSample{0},
+      _currSampleCnt{0},
       _samplingBuf{0},
+      _filteredOutput{0},
       _lastVal{0} {}
 
 float AcVoltageSensor::read(void) {
-  _samplingBuf[_currSample] = _dcSensor.read();
+  _samplingBuf[_currSampleCnt] = _dcSensor.read() * _kVoltageDividerCoeff;
 
-  if (SAMPLE_PER_READ - 1 == _currSample) {
-    _currSample = 0;
-    arm_rms_f32(_samplingBuf, SAMPLE_PER_READ, &_lastVal);
-
+  if (kSamplePerRead - 1 == _currSampleCnt) {
+    _currSampleCnt = 0;
+    _filter.filter(_samplingBuf, _filteredOutput);
+    for (auto i = 0; i < static_cast<int>(kSamplePerRead); ++i) {
+      _filteredOutput[i] = processRawVoltage(_filteredOutput[i]);
+    }
+    arm_rms_f32(_filteredOutput, kSamplePerRead, &_lastVal);
   } else {
-    ++_currSample;
+    ++_currSampleCnt;
   }
 
   return _lastVal;
@@ -67,3 +69,8 @@ float AcVoltageSensor::read(void) {
 void AcVoltageSensor::init(void) { _dcSensor.init(); }
 void AcVoltageSensor::disableCallback() { _dcSensor.disable(); }
 void AcVoltageSensor::enableCallback() { _dcSensor.enable(); }
+
+float32_t AcVoltageSensor::processRawVoltage(const float32_t raw) {
+  // if diode is active then compensate
+  return ((raw > 0.1) ? raw + 0.4 * 2 : raw);
+}
