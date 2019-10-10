@@ -1,13 +1,13 @@
 
 % filter design param
-Fstop1 = 40;   % First Stopband Frequency
+Fstop1 = 35;   % First Stopband Frequency
 Fpass1 = 45;   % First Passband Frequency
 Fpass2 = 65;   % Second Passband Frequency
-Fstop2 = 70;   % Second Stopband Frequency
+Fstop2 = 75;   % Second Stopband Frequency
 Astop1 = 80;   % First Stopband Attenuation (dB)
 Apass  = 0.1;    % Passband Ripple (dB)
 Astop2 = 80;   % Second Stopband Attenuation (dB)
-Fs     = 500;  % Sampling Frequency
+Fs     = 1000;  % Sampling Frequency
 
 % filter usage parm
 Blocksize = 256; % data points per filter call
