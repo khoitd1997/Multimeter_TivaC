@@ -1,0 +1,93 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L TM4C123GH6PMI:TM4C123GH6PMI U?
+U 1 1 5E2B6B59
+P 4600 3350
+F 0 "U?" H 4600 5826 50  0000 C CNN
+F 1 "TM4C123GH6PMI" H 4600 3350 50  0001 L BNN
+F 2 "QFP50P1200X1200X160-64N" H 4600 3350 50  0001 L BNN
+F 3 "TEXAS instruments" H 4600 3350 50  0001 L BNN
+	1    4600 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x04_Female J?
+U 1 1 5E2BD329
+P 6400 2100
+F 0 "J?" H 6428 2076 50  0000 L CNN
+F 1 "Conn_OLED" H 6428 1985 50  0000 L CNN
+F 2 "" H 6400 2100 50  0001 C CNN
+F 3 "~" H 6400 2100 50  0001 C CNN
+	1    6400 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x06_Female J?
+U 1 1 5E2C2C28
+P 6400 2850
+F 0 "J?" H 6428 2826 50  0000 L CNN
+F 1 "Conn_BLUETOOTH" H 6428 2735 50  0000 L CNN
+F 2 "" H 6400 2850 50  0001 C CNN
+F 3 "~" H 6400 2850 50  0001 C CNN
+	1    6400 2850
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Rotary_Encoder_Switch SW?
+U 1 1 5E2C4472
+P 7750 2350
+F 0 "SW?" H 7750 2717 50  0000 C CNN
+F 1 "Rotary_Encoder_Switch" H 7750 2626 50  0000 C CNN
+F 2 "" H 7600 2510 50  0001 C CNN
+F 3 "~" H 7750 2610 50  0001 C CNN
+	1    7750 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW?
+U 1 1 5E2C5874
+P 6350 3650
+F 0 "SW?" H 6350 3935 50  0000 C CNN
+F 1 "SW_Push" H 6350 3844 50  0000 C CNN
+F 2 "" H 6350 3850 50  0001 C CNN
+F 3 "~" H 6350 3850 50  0001 C CNN
+	1    6350 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW?
+U 1 1 5E2C6456
+P 6350 4050
+F 0 "SW?" H 6350 4335 50  0000 C CNN
+F 1 "SW_Push" H 6350 4244 50  0000 C CNN
+F 2 "" H 6350 4250 50  0001 C CNN
+F 3 "~" H 6350 4250 50  0001 C CNN
+	1    6350 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW?
+U 1 1 5E2C6641
+P 6400 4550
+F 0 "SW?" H 6400 4835 50  0000 C CNN
+F 1 "SW_Push" H 6400 4744 50  0000 C CNN
+F 2 "" H 6400 4750 50  0001 C CNN
+F 3 "~" H 6400 4750 50  0001 C CNN
+	1    6400 4550
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

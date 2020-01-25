@@ -12,7 +12,7 @@ The project uses vscode tasks to run build, flash, debug, check ```.vscode/tasks
 
 - Measurement Type:
   - Voltage: voltage divider for DC, full-bridge rectifier circuit for AC
-  - Current: use INA169 Adafruit breakout board
+  - Current: use shunt resistors
   - Resistance: use voltage divider
 - Display: oled display using SSD1306 with support for smooth startup animations
 - Data Logging: transfer data to the host machine through HC-05(classic Bluetooth) at 115200 Baud
@@ -43,12 +43,18 @@ NOTE: POWER SUPPLY NEEDS CAPACITORS(More than 10 uF) TO STABILIZE DURING RELAY S
 - Core Sensors:
   - ADC: PE3(DC, AC), PE1(Resistance), PE2(Current)
   - Relay Ctrl: PB4(Default DC, AC), PB5(Resistance)
-- User Input:
+- User Input, all uses pull-up:
   - Rotary Encoder: PD2
   - Brightness Ctrl: PF0, PF4
   - Bluetooth Select: PB6
 - Bluetooth:
   - Serial: UART0(PA1, PA0)
+
+Probably female banana connector for the measurement input
+
+I2C line isn't pulled up by default so need that
+
+The MCU itself needs a USB powerline and JTAG header
 
 ## Bluetooth
 
