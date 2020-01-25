@@ -103,17 +103,6 @@ F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresigh
 $EndComp
 $Comp
 L Relay:G6E K?
-U 1 1 5E2CF753
-P 7700 3400
-F 0 "K?" H 8130 3446 50  0000 L CNN
-F 1 "G6E" H 8130 3355 50  0000 L CNN
-F 2 "Relay_THT:Relay_SPDT_Omron_G6E" H 8830 3370 50  0001 C CNN
-F 3 "https://www.omron.com/ecb/products/pdf/en-g6e.pdf" H 7700 3400 50  0001 C CNN
-	1    7700 3400
-	1    0    0    -1  
-$EndComp
-$Comp
-L Relay:G6E K?
 U 1 1 5E2D2425
 P 7700 4350
 F 0 "K?" H 8130 4396 50  0000 L CNN
