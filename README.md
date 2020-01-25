@@ -50,6 +50,8 @@ NOTE: POWER SUPPLY NEEDS CAPACITORS(More than 10 uF) TO STABILIZE DURING RELAY S
 - Bluetooth:
   - Serial: UART0(PA1, PA0)
 
+[pcb version control](https://cadlab.io/)
+
 Probably female banana connector for the measurement input
 
 I2C line isn't pulled up by default so need that
